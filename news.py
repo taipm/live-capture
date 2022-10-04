@@ -8,13 +8,16 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 
 driver = webdriver.Chrome(executable_path = '/Users/taipm/Documents/GitHub/live-capture/drivers/chromedriver')
-url = "https://www.vnwallstreet.com/#/home"
-driver.get(url)
-sleep(10)
-#wait the ready state to be complete
-WebDriverWait(driver=driver, timeout=10).until(
-    lambda x: x.execute_script("return document.readyState === 'complete'")
-)
 
-text = driver.find_element_by_class_name("article-container-box").text
-print(text)
+while True:
+    url = "https://www.vnwallstreet.com/#/home"
+    driver.get(url)
+    sleep(10)
+    #wait the ready state to be complete
+    WebDriverWait(driver=driver, timeout=10).until(
+        lambda x: x.execute_script("return document.readyState === 'complete'")
+    )
+
+    text = driver.find_element_by_class_name("article-container-box").text
+    print(text)
+    sleep(60*1)
