@@ -1,9 +1,12 @@
+from time import sleep
 from telegram.ext.updater import Updater
 from telegram.update import Update
 from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.commandhandler import CommandHandler
 from telegram.ext.messagehandler import MessageHandler
 from telegram.ext.filters import Filters
+
+from Imager import getTextFromImage
 
 
 TELE_TOKEN = '5505330729:AAG4HHefzja4rMp81XNmeGv5YdQe8t0nSUo'
@@ -54,11 +57,18 @@ def unknown(update: Update, context: CallbackContext):
 def image_handler(update: Update, context: CallbackContext):
     print('image')
     update.message.reply_text("Image received")
-    file = update.message.photo[0].file_id
+    file = update.message.photo[0].file_id    
     obj = context.bot.get_file(file)
-    obj.download()
     
-    update.message.reply_text("Image received")
+    obj.download()
+    sleep(1)
+    #print(obj)
+    print(obj.file_path)
+    
+    text_of_img = getTextFromImage(fileName=file)
+    #sleep(10)
+    print(text_of_img)
+    update.message.reply_text(text_of_img)
 
 def unknown_text(update: Update, context: CallbackContext):
 	update.message.reply_text(
@@ -78,4 +88,5 @@ updater.dispatcher.add_handler(MessageHandler(
 
 # Filters out unknown messages.
 updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown_text))
-updater.start_polling(timeout=600)
+#updater.start_polling(timeout=600)
+updater.start_polling()
