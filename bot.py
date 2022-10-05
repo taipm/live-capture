@@ -1,3 +1,4 @@
+from pprint import pprint
 from time import sleep
 from telegram.ext.updater import Updater
 from telegram.update import Update
@@ -7,11 +8,13 @@ from telegram.ext.messagehandler import MessageHandler
 from telegram.ext.filters import Filters
 
 from Imager import getTextFromImage
+from watcher import get_last_image
 
 
 TELE_TOKEN = '5505330729:AAG4HHefzja4rMp81XNmeGv5YdQe8t0nSUo'
 CHAT_ID = '5505330729'
 
+#updater = Updater(TELE_TOKEN, use_context=True)
 updater = Updater(TELE_TOKEN, use_context=True)
 
 
@@ -62,11 +65,9 @@ def image_handler(update: Update, context: CallbackContext):
     
     obj.download()
     sleep(1)
-    #print(obj)
-    print(obj.file_path)
-    
-    text_of_img = getTextFromImage(fileName=file)
-    #sleep(10)
+    last_file = get_last_image()
+    text_of_img = getTextFromImage(fileName=last_file)
+    sleep(10)
     print(text_of_img)
     update.message.reply_text(text_of_img)
 
@@ -89,4 +90,4 @@ updater.dispatcher.add_handler(MessageHandler(
 # Filters out unknown messages.
 updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown_text))
 #updater.start_polling(timeout=600)
-updater.start_polling()
+updater.start_polling(timeout=600)
