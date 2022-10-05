@@ -50,7 +50,15 @@ def geeks_url(update: Update, context: CallbackContext):
 def unknown(update: Update, context: CallbackContext):
 	update.message.reply_text(
 		"Sorry '%s' is not a valid command" % update.message.text)
-
+ 
+def image_handler(update: Update, context: CallbackContext):
+    print('image')
+    update.message.reply_text("Image received")
+    file = update.message.photo[0].file_id
+    obj = context.bot.get_file(file)
+    obj.download()
+    
+    update.message.reply_text("Image received")
 
 def unknown_text(update: Update, context: CallbackContext):
 	update.message.reply_text(
@@ -63,10 +71,11 @@ updater.dispatcher.add_handler(CommandHandler('help', help))
 updater.dispatcher.add_handler(CommandHandler('linkedin', linkedIn_url))
 updater.dispatcher.add_handler(CommandHandler('gmail', gmail_url))
 updater.dispatcher.add_handler(CommandHandler('geeks', geeks_url))
+updater.dispatcher.add_handler(MessageHandler(Filters.photo, image_handler))
 updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown))
 updater.dispatcher.add_handler(MessageHandler(
 	Filters.command, unknown)) # Filters out unknown commands
 
 # Filters out unknown messages.
 updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown_text))
-updater.start_polling()
+updater.start_polling(timeout=600)

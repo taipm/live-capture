@@ -21,4 +21,4 @@ def send():
     bot = telegram.Bot(token=TELE_TOKEN)
     bot.send_message(chat_id=CHAT_ID, text='USP-Python has started up!')
 
-send()
+#send()
