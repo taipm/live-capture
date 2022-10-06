@@ -29,6 +29,8 @@ RUN apt-get update \
 RUN pip3 install python-telegram-bot
 RUN pip3 install tesseract
 RUN pip3 install pytesseract
+RUN pip3 install pytesseract
+RUN pip3 install selenium
 #RUN sudo apt-get install tesseract-ocr-vie
 #RUN brew install tesseract
 
