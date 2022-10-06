@@ -15,13 +15,13 @@ def getTextFromImage(filePath):
 # text = getTextFromImage("luong.png")
 # print(text)
 
-folder = '/Users/taipm/Desktop/'
-folder = '.'
-last_img = get_last_image(folder)
-#last_img = get_last_image(".")
-print(last_img)
-text = getTextFromImage(last_img)
-print(text)
+# folder = '/Users/taipm/Desktop/'
+# folder = '.'
+# last_img = get_last_image(folder)
+# #last_img = get_last_image(".")
+# print(last_img)
+# text = getTextFromImage(last_img)
+# print(text)
 
 
 # text = getTextFromImage('file_11.jpg')

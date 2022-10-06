@@ -7,6 +7,7 @@ from telegram.ext.messagehandler import MessageHandler
 from telegram.ext.filters import Filters
 
 from Imager import getTextFromImage
+from news import getNews_wallstreet
 from watcher import get_last_image
 
 
@@ -74,6 +75,14 @@ def image_handler(update: Update, context: CallbackContext):
 	except:
 		update.message.reply_text("Không được đọc chữ")
 
+def news_handler(update: Update, context: CallbackContext):
+	try:
+		text = getNews_wallstreet()
+		update.message.reply_text(text=text)
+	except:
+		update.message.reply_text("Không được đọc chữ")
+
+
 def unknown_text(update: Update, context: CallbackContext):
 	update.message.reply_text(
 		"Sorry I can't recognize you , you said '%s'" % update.message.text)
@@ -85,6 +94,7 @@ updater.dispatcher.add_handler(CommandHandler('help', help))
 updater.dispatcher.add_handler(CommandHandler('linkedin', linkedIn_url))
 updater.dispatcher.add_handler(CommandHandler('gmail', gmail_url))
 updater.dispatcher.add_handler(CommandHandler('geeks', geeks_url))
+updater.dispatcher.add_handler(CommandHandler('news', news_handler))
 updater.dispatcher.add_handler(MessageHandler(Filters.photo, image_handler))
 updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown))
 updater.dispatcher.add_handler(MessageHandler(
