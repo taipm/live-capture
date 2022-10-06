@@ -1,4 +1,3 @@
-from pprint import pprint
 from time import sleep
 from telegram.ext.updater import Updater
 from telegram.update import Update
