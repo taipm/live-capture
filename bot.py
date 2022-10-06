@@ -57,18 +57,22 @@ def unknown(update: Update, context: CallbackContext):
 		"Sorry '%s' is not a valid command" % update.message.text)
  
 def image_handler(update: Update, context: CallbackContext):
-    print('image')
-    update.message.reply_text("Image received")
-    file = update.message.photo[0].file_id    
-    obj = context.bot.get_file(file)
-    
-    obj.download()
-    sleep(1)
-    last_file = get_last_image()
-    text_of_img = getTextFromImage(fileName=last_file)
-    sleep(10)
-    print(text_of_img)
-    update.message.reply_text(text_of_img)
+	print('image')
+	update.message.reply_text("Image received")
+	file = update.message.photo[0].file_id    
+	obj = context.bot.get_file(file)
+
+	obj.download()
+	sleep(1)
+	last_file = get_last_image('.')
+	print(last_file)
+	text_of_img = getTextFromImage(filePath=last_file)
+	sleep(3)
+	print(text_of_img)
+	try:
+		update.message.reply_text(text_of_img)
+	except:
+		update.message.reply_text("Không được đọc chữ")
 
 def unknown_text(update: Update, context: CallbackContext):
 	update.message.reply_text(
