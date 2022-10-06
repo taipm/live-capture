@@ -16,6 +16,7 @@ def getTextFromImage(filePath):
 # print(text)
 
 folder = '/Users/taipm/Desktop/'
+folder = '.'
 last_img = get_last_image(folder)
 #last_img = get_last_image(".")
 print(last_img)
