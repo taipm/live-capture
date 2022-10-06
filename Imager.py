@@ -6,5 +6,5 @@ def getTextFromImage(fileName):
     print(text)
     return text
 
-text = getTextFromImage("1.png")
+text = getTextFromImage("3.png")
 print(text)

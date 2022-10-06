@@ -16,8 +16,21 @@ COPY . .
 # RUN pip3 --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
 #     && rm -rf /tmp/pip-tmp
 
-RUN pip uninstall python-telegram-bot
-RUN pip install python-telegram-bot
+#RUN pip3 uninstall python-telegram-bot
+RUN apt-get update \
+  && apt-get -y install tesseract-ocr \
+  && apt-get -y install tesseract-ocr-vie
+  #&& apt-get install -y python3 python3-distutils python3-pip \
+  #&& cd /usr/local/bin \
+  #&& ln -s /usr/bin/python3 python \
+  #&& pip3 --no-cache-dir install --upgrade pip \
+  #&& rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install python-telegram-bot
+RUN pip3 install tesseract
+RUN pip3 install pytesseract
+#RUN sudo apt-get install tesseract-ocr-vie
+#RUN brew install tesseract
 
 CMD ["python","./bot.py"]
 
