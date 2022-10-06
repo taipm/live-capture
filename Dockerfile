@@ -12,9 +12,12 @@ WORKDIR /LIVE-CAPTURE
 COPY . .
 
 # [Optional] If your pip requirements rarely change, uncomment this section to add them to the image.
-COPY requirements.txt /tmp/pip-tmp/
-RUN pip3 --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
-    && rm -rf /tmp/pip-tmp
+# COPY requirements.txt /tmp/pip-tmp/
+# RUN pip3 --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
+#     && rm -rf /tmp/pip-tmp
+
+RUN pip uninstall python-telegram-bot
+RUN pip install python-telegram-bot
 
 CMD ["python","./bot.py"]
 

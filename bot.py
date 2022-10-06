@@ -6,8 +6,8 @@ from telegram.ext.commandhandler import CommandHandler
 from telegram.ext.messagehandler import MessageHandler
 from telegram.ext.filters import Filters
 
-#from Imager import getTextFromImage
-#from watcher import get_last_image
+from Imager import getTextFromImage
+from watcher import get_last_image
 
 
 TELE_TOKEN = '5505330729:AAG4HHefzja4rMp81XNmeGv5YdQe8t0nSUo'
@@ -56,19 +56,19 @@ def unknown(update: Update, context: CallbackContext):
 	update.message.reply_text(
 		"Sorry '%s' is not a valid command" % update.message.text)
  
-# def image_handler(update: Update, context: CallbackContext):
-#     print('image')
-#     update.message.reply_text("Image received")
-#     file = update.message.photo[0].file_id    
-#     obj = context.bot.get_file(file)
+def image_handler(update: Update, context: CallbackContext):
+    print('image')
+    update.message.reply_text("Image received")
+    file = update.message.photo[0].file_id    
+    obj = context.bot.get_file(file)
     
-#     obj.download()
-#     sleep(1)
-#     last_file = get_last_image()
-#     text_of_img = getTextFromImage(fileName=last_file)
-#     sleep(10)
-#     print(text_of_img)
-#     update.message.reply_text(text_of_img)
+    obj.download()
+    sleep(1)
+    last_file = get_last_image()
+    text_of_img = getTextFromImage(fileName=last_file)
+    sleep(10)
+    print(text_of_img)
+    update.message.reply_text(text_of_img)
 
 def unknown_text(update: Update, context: CallbackContext):
 	update.message.reply_text(
@@ -81,7 +81,7 @@ updater.dispatcher.add_handler(CommandHandler('help', help))
 updater.dispatcher.add_handler(CommandHandler('linkedin', linkedIn_url))
 updater.dispatcher.add_handler(CommandHandler('gmail', gmail_url))
 updater.dispatcher.add_handler(CommandHandler('geeks', geeks_url))
-#updater.dispatcher.add_handler(MessageHandler(Filters.photo, image_handler))
+updater.dispatcher.add_handler(MessageHandler(Filters.photo, image_handler))
 updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown))
 updater.dispatcher.add_handler(MessageHandler(
 	Filters.command, unknown)) # Filters out unknown commands
