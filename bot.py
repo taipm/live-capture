@@ -7,6 +7,7 @@ from telegram.ext.messagehandler import MessageHandler
 from telegram.ext.filters import Filters
 
 from Imager import getTextFromImage
+from stock import Stock
 #from news import getNews_wallstreet
 from watcher import get_last_image
 from apscheduler.schedulers.background import BlockingScheduler
@@ -58,11 +59,6 @@ def linkedIn_url(update: Update, context: CallbackContext):
 def geeks_url(update: Update, context: CallbackContext):
 	update.message.reply_text(
 		"GeeksforGeeks URL => https://www.geeksforgeeks.org/")
-
-
-def unknown(update: Update, context: CallbackContext):
-	update.message.reply_text(
-		"Sorry '%s' is not a valid command" % update.message.text)
  
 def image_handler(update: Update, context: CallbackContext):
 	print('image')
@@ -89,10 +85,28 @@ def news_handler(update: Update, context: CallbackContext):
 	except:
 		update.message.reply_text("Không được đọc chữ")
 
+def stock(update: Update, context: CallbackContext):
+    try:
+        text = ""#getNews_wallstreet()
+        update.message.reply_text(text=text)
+    except:
+        update.message.reply_text("Không được đọc chữ")
 
+def unknown(update: Update, context: CallbackContext):
+    update.message.reply_text(
+		"Sorry '%s' is not a valid command" % update.message.text)
+     
 def unknown_text(update: Update, context: CallbackContext):
-	update.message.reply_text(
-		"Sorry I can't recognize you , you said '%s'" % update.message.text)
+	input_text = update.message.text
+	if(len(input_text) == 3):
+		s = Stock(name= input_text.upper())
+		s.Prepare()
+		#p = s.GetPrice('2022-08-05')
+		p = s.Get_Profit('2022-08-01','2022-08-05')
+		print(p)
+	else:
+		update.message.reply_text(
+			"Sorry I can't recognize you , you said '%s'" % update.message.text)
 
 def notify_ending(message):
 	
@@ -118,9 +132,9 @@ def main():
 	updater.dispatcher.add_handler(CommandHandler('linkedin', linkedIn_url))
 	updater.dispatcher.add_handler(CommandHandler('gmail', gmail_url))
 	updater.dispatcher.add_handler(CommandHandler('geeks', geeks_url))
-	updater.dispatcher.add_handler(CommandHandler('news', news_handler))
+	updater.dispatcher.add_handler(CommandHandler('news', news_handler))	
 	updater.dispatcher.add_handler(MessageHandler(Filters.photo, image_handler))
-	updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown))
+	#updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown_text))
 	updater.dispatcher.add_handler(MessageHandler(Filters.command, unknown)) # Filters out unknown commands
 
 	# Filters out unknown messages.
@@ -128,9 +142,9 @@ def main():
 	#updater.start_polling(timeout=600)
 	updater.start_polling(timeout=60)
 
-	sched = BlockingScheduler()
-	sched.add_job(prompt,'interval', seconds=15) 
-	sched.start()
+	#sched = BlockingScheduler()
+	#sched.add_job(prompt,'interval', seconds=15) 
+	#sched.start()
 
 main()
 

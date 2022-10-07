@@ -36,6 +36,6 @@ def GetSticks_Intraday(symbol):
 
   return df_sticks
 
-symbol = 'VND'
-df_sticks = GetSticks_Intraday(symbol=symbol)
-print(df_sticks)
+# symbol = 'VND'
+# df_sticks = GetSticks_Intraday(symbol=symbol)
+# print(df_sticks)
