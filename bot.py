@@ -7,12 +7,19 @@ from telegram.ext.messagehandler import MessageHandler
 from telegram.ext.filters import Filters
 
 from Imager import getTextFromImage
-from news import getNews_wallstreet
+#from news import getNews_wallstreet
 from watcher import get_last_image
+from apscheduler.schedulers.background import BlockingScheduler
+import requests
+import json
+import telegram
 
 
-TELE_TOKEN = '5505330729:AAG4HHefzja4rMp81XNmeGv5YdQe8t0nSUo'
-CHAT_ID = '5505330729'
+# TELE_TOKEN = '5505330729:AAG4HHefzja4rMp81XNmeGv5YdQe8t0nSUo'
+# CHAT_ID = '5505330729'
+
+TELE_TOKEN = '5505330729:AAGxQSLBn-J22Aj9gPD30CT0ah13LPlwhBo'
+CHAT_ID = '1133501778'
 
 #updater = Updater(TELE_TOKEN, use_context=True)
 updater = Updater(TELE_TOKEN, use_context=True)
@@ -77,7 +84,7 @@ def image_handler(update: Update, context: CallbackContext):
 
 def news_handler(update: Update, context: CallbackContext):
 	try:
-		text = getNews_wallstreet()
+		text = ""#getNews_wallstreet()
 		update.message.reply_text(text=text)
 	except:
 		update.message.reply_text("Không được đọc chữ")
@@ -104,3 +111,22 @@ updater.dispatcher.add_handler(MessageHandler(
 updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown_text))
 #updater.start_polling(timeout=600)
 updater.start_polling(timeout=60)
+
+
+
+def notify_ending(message):
+	
+	bot = telegram.Bot(token=TELE_TOKEN)
+	rs = bot.sendMessage(chat_id=CHAT_ID, text=message)
+	print(rs)
+
+notify_ending(message="Hello, teo")
+# Creates a default Background Scheduler
+sched = BlockingScheduler()
+
+def prompt():
+	notify_ending(message="Tự động đây")
+ 
+prompt()
+sched.add_job(prompt,'interval', seconds=15) 
+sched.start()

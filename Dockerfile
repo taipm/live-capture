@@ -29,12 +29,14 @@ RUN apt-get update \
 RUN pip3 install python-telegram-bot
 RUN pip3 install tesseract
 RUN pip3 install pytesseract
-RUN pip3 install pytesseract
 RUN pip3 install selenium
+RUN pip3 install APScheduler
+RUN pip3 install requests
 #RUN sudo apt-get install tesseract-ocr-vie
 #RUN brew install tesseract
 
 CMD ["python","./bot.py"]
+#CMD ["python","./bot.py;./bot2.py"]
 
 # [Optional] Uncomment this section to install additional OS packages.
 # RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
