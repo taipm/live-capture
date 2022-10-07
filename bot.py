@@ -94,26 +94,6 @@ def unknown_text(update: Update, context: CallbackContext):
 	update.message.reply_text(
 		"Sorry I can't recognize you , you said '%s'" % update.message.text)
 
-
-updater.dispatcher.add_handler(CommandHandler('start', start))
-updater.dispatcher.add_handler(CommandHandler('youtube', youtube_url))
-updater.dispatcher.add_handler(CommandHandler('help', help))
-updater.dispatcher.add_handler(CommandHandler('linkedin', linkedIn_url))
-updater.dispatcher.add_handler(CommandHandler('gmail', gmail_url))
-updater.dispatcher.add_handler(CommandHandler('geeks', geeks_url))
-updater.dispatcher.add_handler(CommandHandler('news', news_handler))
-updater.dispatcher.add_handler(MessageHandler(Filters.photo, image_handler))
-updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown))
-updater.dispatcher.add_handler(MessageHandler(
-	Filters.command, unknown)) # Filters out unknown commands
-
-# Filters out unknown messages.
-updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown_text))
-#updater.start_polling(timeout=600)
-updater.start_polling(timeout=60)
-
-
-
 def notify_ending(message):
 	
 	bot = telegram.Bot(token=TELE_TOKEN)
@@ -122,11 +102,35 @@ def notify_ending(message):
 
 notify_ending(message="Hello, teo")
 # Creates a default Background Scheduler
-sched = BlockingScheduler()
+
 
 def prompt():
 	notify_ending(message="Tự động đây")
  
 prompt()
-sched.add_job(prompt,'interval', seconds=15) 
-sched.start()
+
+
+
+def main():
+	updater.dispatcher.add_handler(CommandHandler('start', start))
+	updater.dispatcher.add_handler(CommandHandler('youtube', youtube_url))
+	updater.dispatcher.add_handler(CommandHandler('help', help))
+	updater.dispatcher.add_handler(CommandHandler('linkedin', linkedIn_url))
+	updater.dispatcher.add_handler(CommandHandler('gmail', gmail_url))
+	updater.dispatcher.add_handler(CommandHandler('geeks', geeks_url))
+	updater.dispatcher.add_handler(CommandHandler('news', news_handler))
+	updater.dispatcher.add_handler(MessageHandler(Filters.photo, image_handler))
+	updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown))
+	updater.dispatcher.add_handler(MessageHandler(Filters.command, unknown)) # Filters out unknown commands
+
+	# Filters out unknown messages.
+	updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown_text))
+	#updater.start_polling(timeout=600)
+	updater.start_polling(timeout=60)
+
+	sched = BlockingScheduler()
+	sched.add_job(prompt,'interval', seconds=15) 
+	sched.start()
+
+main()
+
