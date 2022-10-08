@@ -32,6 +32,16 @@ RUN pip3 install pytesseract
 RUN pip3 install selenium
 RUN pip3 install APScheduler
 RUN pip3 install requests
+RUN pip3 install numpy
+RUN pip3 install pandas
+RUN pip3 install matplotlib
+RUN pip3 install seaborn
+RUN pip3 install lxml
+RUN pip3 install tabulate
+RUN pip3 install vnstock
+RUN pip3 install openpyxl
+RUN pip3 install markdown
+
 #RUN sudo apt-get install tesseract-ocr-vie
 #RUN brew install tesseract
 

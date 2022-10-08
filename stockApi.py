@@ -6,6 +6,7 @@ import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
 
+
 def GetSticks_Intraday(symbol):
   url = f'https://s.cafef.vn/Lich-su-giao-dich-{symbol}-6.chn#data'
   data = pd.read_html(url)
@@ -39,3 +40,19 @@ def GetSticks_Intraday(symbol):
 # symbol = 'VND'
 # df_sticks = GetSticks_Intraday(symbol=symbol)
 # print(df_sticks)
+def getMaxStickVolume(stock):
+  df = GetSticks_Intraday(symbol=stock)
+  max_volume = df['Volume'].max()
+  item = df[df['Volume']==max_volume]
+  return item
+
+def analysisOrderSticks(df):
+  output = ''
+  output += output
+  return output
+
+
+# stock = 'VND'
+# df = GetSticks_Intraday(symbol=stock)
+# max_volume = getMaxStickVolume(df)
+# print(max_volume)

@@ -6,7 +6,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-import datetime as dt# Xử lý ngày tháng
+import datetime as dt
+from IntradayData import *
+from stockApi import *
 
 sns.set()
 pd.options.display.float_format='{:,.2f}'.format
@@ -40,7 +42,11 @@ class Stock:
         if self.df_data.empty:
             return False
         return True
-    
+
+    def GetDataSticks(self):
+        df_sticks = GetSticks_Intraday(self.name)
+        return df_sticks
+
     def Prepare(self):
         '''
         Chuẩn bị đầy đủ dữ liệu và sẵn sàng thực hiện tính toán
@@ -83,12 +89,30 @@ class Stock:
         item = self.df_data[self.df_data['Date'] == dt.datetime.strptime(d_str, '%Y-%m-%d').date()]
         return item
     
+    def GetDataItemAtPrev(self,countOfPrevDays):
+        item = self.df_data.iloc[countOfPrevDays]
+        return item
+    
+    def GetPriceAtPrev(self,countOfPrevDays):
+        return self.GetDataItemAtPrev(countOfPrevDays=countOfPrevDays)['Close']
+
     def Get_Profit(self,d_start_str,d_end_str):
         p1 = self.Get_Price(d_start_str)
         p2 = self.Get_Price(d_end_str)
-        
-        return ((p2-p1)/p1)*100 #Tính % lời/lỗ và trả về
-    
+        value = ((p2-p1)/p1)*100
+        print(value)
+        return value
+
+    def GetProfitAtPrev(self,countOfPrevDay):
+        last_p = self.GetLastPrice()
+        prev_p = self.GetPriceAtPrev(countOfPrevDays=countOfPrevDay)
+        return ((last_p-prev_p)/prev_p)*100
+
+    def Get_LastTrans_Date(self):
+        return self.df_data['Date'][0]
+    def GetLastPrice(self):
+        return self.df_data['Close'][0]
+
     def ToCandleSticks(self):
         sticks = list()
         for i in range(0,self.LEN_DATA):
@@ -174,26 +198,30 @@ class Stock:
         return rs
     
     def Describe(self):
-        #self.Prepare()
-        '''
-        Tóm tắt thông tin cổ phiếu
-        '''
-        output = ""
+        
+        output = f'{self.name.upper()}- Last date: {self.Get_LastTrans_Date()}'
         output += f'\nGiá cao nhất: {str(self.MAX_P)} | Giá thấp nhất: {str(self.MIN_P)} | Giá hiện tại: {self.P}'
         output += f'\n&CN: {"{:.2f}".format(((self.P - self.MAX_P)/self.MAX_P)*100)} (%) | &TN: {"{:.2f}".format(((self.P - self.MIN_P)/self.MIN_P)*100)} (%)'
-
+        output += f'\n05 (phiên): {self.GetPriceAtPrev(5)} | {"{:.2f}".format(self.GetProfitAtPrev(5))} (%)'
+        output += f'\n10 (phiên): {self.GetPriceAtPrev(10)} | {"{:.2f}".format(self.GetProfitAtPrev(10))} (%)'
+        output += f'\n20 (phiên): {self.GetPriceAtPrev(20)} | {"{:.2f}".format(self.GetProfitAtPrev(20))} (%)'
         output += f'\nKL cao nhất: {str(self.MAX_V)} | KL thấp nhất: {str(self.MIN_V)}'
         output += f'\nThanh khoản cao nhất: {str(np.max(self.df_data["Money"]))} | Thanh khoản thấp nhất: {str(np.min(self.df_data["Money"]))}'
         output += f'\nNến hiện tại {self.STICKS[0].Describe()}'
-        output += f'\nDự báo (nến) {self.STICKS[0].Forecast_By_CandleStick()}'
+
+        analysis_intraday = AnalysisIntradayData(symbol=self.name)
+        output += f'\nAnalysis IntradayData:\n{analysis_intraday.GetSummary()}\n'
+
+        #output += f'\nDự báo (nến) {self.STICKS[0].Forecast_By_CandleStick()}'
+        output += f'\nDự báo (nến) {getMaxStickVolume(self.name).to_markdown()}'
         output += f'\nCác dự báo quá khứ: '
         rs = ""
-        for x in self.AllForecasts():
-            rs += "\n-> Phiên thứ: " + str(x[0]) + " | Giá : "+ str(x[1])
+        for x in self.AllForecasts()[0:10]:
+            rs += '\n-> Phiên thứ: ' + str(x[0]) + ' | Giá : ' + str(x[1])
         output += rs
         
         #In kiểm tra dự báo
-        check_forecasts = self.CheckForecasts(T_n=30)
+        #check_forecasts = self.CheckForecasts(T_n=30)
         # for item in check_forecasts:
         #     print(str(item))
         return output
@@ -354,11 +382,13 @@ class Stock:
         plt.show()
         
 
-
 # s = Stock(name="VND")
 # s.Prepare()
+# # item = s.GetDataItemAtPrev(5).values
+# # print(item)
+# print(s.Describe())
 # #p = s.GetPrice('2022-08-05')
-# p = s.Get_Profit('2022-08-01','2022-08-05')
+#p = s.Get_Profit('2022-08-01','2022-08-05')
 # print(p)
 #s.DrawWithForcecast(N=30)
 #print(s.StrSummary)

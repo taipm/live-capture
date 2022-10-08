@@ -7,6 +7,7 @@ from telegram.ext.messagehandler import MessageHandler
 from telegram.ext.filters import Filters
 
 from Imager import getTextFromImage
+from helpers import StrTODAY, StrYESTERDAY
 from stock import Stock
 #from news import getNews_wallstreet
 from watcher import get_last_image
@@ -14,7 +15,7 @@ from apscheduler.schedulers.background import BlockingScheduler
 import requests
 import json
 import telegram
-
+import markdown
 
 # TELE_TOKEN = '5505330729:AAG4HHefzja4rMp81XNmeGv5YdQe8t0nSUo'
 # CHAT_ID = '5505330729'
@@ -101,9 +102,10 @@ def unknown_text(update: Update, context: CallbackContext):
 	if(len(input_text) == 3):
 		s = Stock(name= input_text.upper())
 		s.Prepare()
-		#p = s.GetPrice('2022-08-05')
-		p = s.Get_Profit('2022-08-01','2022-08-05')
-		print(p)
+		update.message.reply_text(f'{s.Describe()}')
+		# update.message.reply_text(
+		# 	markdown.markdown(f'{s.Describe()}'),
+		# 	parse_mode='MarkdownV2')
 	else:
 		update.message.reply_text(
 			"Sorry I can't recognize you , you said '%s'" % update.message.text)
@@ -114,14 +116,14 @@ def notify_ending(message):
 	rs = bot.sendMessage(chat_id=CHAT_ID, text=message)
 	print(rs)
 
-notify_ending(message="Hello, teo")
-# Creates a default Background Scheduler
+# notify_ending(message="Hello, teo")
+# # Creates a default Background Scheduler
 
 
-def prompt():
-	notify_ending(message="Tự động đây")
+# def prompt():
+# 	notify_ending(message="Tự động đây")
  
-prompt()
+# prompt()
 
 
 
