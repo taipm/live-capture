@@ -28,6 +28,10 @@ def Is_Business_Day(date):
 def compareDates(dt1, dt2):
     pass
 
+def percent(x,y):
+    if(y !=0):
+        return ((x-y)/y)*100
+    return None
 
 # def Text_To_Markdown2(text):
 #     return text

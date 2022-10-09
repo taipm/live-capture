@@ -22,8 +22,8 @@ def GetIntradayData(symbol):
     return df
 
 
-# df = GetIntradayData("VND")
-# print(df.tail(20))
+#df = GetIntradayData("VND")
+#print(df.tail(20))
 
 class AnalysisIntradayData:
     def __init__(self, symbol) -> None:
@@ -58,15 +58,9 @@ class AnalysisIntradayData:
             f'Orders: {self.countOf_Orders:,.0f} | Rate (Buy orders): {self.rateOf_Buy_Orders:.2f} (%) | Rate (Buy/Sell Orders): {self.rateOf_Buy_Over_Sell_Orders:.2f} (%)\n'
         )
 
-        summary_text += f'Forcast: {self.symbol} \- {self.GetForcast()}'
-        # sum_buy_volume = self.df_data[self.df_data['a']=='BU']['volume'].sum()
-        # sum_sell_volume = self.df_data[self.df_data['a']=='SD']['volume'].sum()
+        summary_text += f'Forcast: {self.symbol} - {self.GetForcast()}'
         return summary_text
-        # print(f'Sum Buy: {sum_buy_volume}')
-        # print(f'Sum Sell: {sum_sell_volume}')
-        # print(f'Max Buy: {self.GetMaxVolume_Buy()}')
-        # return sum_buy_volume - sum_sell_volume
-    
+       
     def GetForcast(self):
         if(self.rateOf_Buy_Over_Sell_Orders > 1) and (self.rateOf_Buy_Over_Sell_Volume > 1):
             return 'BUY'

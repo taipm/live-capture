@@ -43,9 +43,12 @@ class Stock:
             return False
         return True
 
-    def GetDataSticks(self):
-        df_sticks = GetSticks_Intraday(self.name)
-        return df_sticks
+    def GetTCB(self):
+        return price_board(self.name).transpose()
+
+    # def GetDataSticks(self):
+    #     df_sticks = GetSticks_Intraday(self.name)
+    #     return df_sticks
 
     def Prepare(self):
         '''

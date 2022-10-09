@@ -1,3 +1,4 @@
+from sre_constants import IN
 from time import sleep
 from telegram.ext.updater import Updater
 from telegram.update import Update
@@ -5,6 +6,7 @@ from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.commandhandler import CommandHandler
 from telegram.ext.messagehandler import MessageHandler
 from telegram.ext.filters import Filters
+from FinanceStock import FinanceStock
 
 from Imager import getTextFromImage
 from helpers import StrTODAY, StrYESTERDAY
@@ -96,19 +98,31 @@ def stock(update: Update, context: CallbackContext):
 def unknown(update: Update, context: CallbackContext):
     update.message.reply_text(
 		"Sorry '%s' is not a valid command" % update.message.text)
-     
+
+from TextCommand import *
+
 def unknown_text(update: Update, context: CallbackContext):
 	input_text = update.message.text
+
+	
 	if(len(input_text) == 3):
 		s = Stock(name= input_text.upper())
 		s.Prepare()
 		update.message.reply_text(f'{s.Describe()}')
+		# financeStock = FinanceStock(input_text)
+		# basicInfo = financeStock.getBasicInfo().to_markdown()
+		update.message.reply_text(f'{s.GetTCB()}')
 		# update.message.reply_text(
 		# 	markdown.markdown(f'{s.Describe()}'),
 		# 	parse_mode='MarkdownV2')
 	else:
-		update.message.reply_text(
-			"Sorry I can't recognize you , you said '%s'" % update.message.text)
+		rs = parseTextCommand(input_text)
+		
+		if rs == "":
+			update.message.reply_text(
+				"Sorry I can't recognize you , you said '%s'" % update.message.text)
+		else:
+			update.message.reply_text(rs)
 
 def notify_ending(message):
 	

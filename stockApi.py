@@ -6,6 +6,8 @@ import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
 
+# def GetMarketPrice(symbol):
+
 
 def GetSticks_Intraday(symbol):
   url = f'https://s.cafef.vn/Lich-su-giao-dich-{symbol}-6.chn#data'
