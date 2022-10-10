@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*- 
-# from xml.dom.minidom import TypeInfo
-# #from bs4 import BeautifulSoup
-# from PIL import Image
-# import os.path
-# import requests
+# -*- coding: utf-8 -*-
 import datetime
 from requests.exceptions import HTTPError
 import pandas as pd
