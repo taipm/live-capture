@@ -1,6 +1,6 @@
-from turtle import pd
 from vnstock import *
-
+import pandas as pd
+from helpers import *
 
 def GetIntradayData(symbol):
     _page_num = 0
@@ -20,7 +20,6 @@ def GetIntradayData(symbol):
         
         df = df.append(df_next)
     return df
-
 
 #df = GetIntradayData("VND")
 #print(df.tail(20))
@@ -50,6 +49,14 @@ class AnalysisIntradayData:
         self.rateOf_Sell_Orders = self.countOf_SellOrders/self.countOf_Orders
         self.rateOf_Buy_Over_Sell_Orders = self.countOf_BuyOrders/self.countOf_SellOrders
 
+        self.db = IntradayDb(self.symbol)
+        self.db.UpdateDb()
+    
+    def isBig_Buy_Order(self):
+        pass
+    def isBig_Sell_Order(self):
+        pass
+
 
          
     def GetSummary(self):
@@ -72,7 +79,23 @@ class AnalysisIntradayData:
     def GetMaxVolume_Buy(self):
         return self.df_buy['volume'].max()
 
+class IntradayDb:
+    
+    def __init__(self,symbol) -> None:
+        self.symbol = symbol.upper()
+        self.db_file_path = './data/' + self.symbol + '-Intraday-' + StrTODAY + ".xlsx"
+    
+    def GetLastData(self):
+        df = pd.read_excel(self.db_file_path)
+        return df
 
+    def UpdateDb(self):
+        df = GetIntradayData(self.symbol)
+        print(df)
+        if(df != None):
+            df.to_excel(self.db_file_path)
 
-# a = AnalysisIntradayData(symbol='hax')
+#a = AnalysisIntradayData(symbol='hax')
+# a = IntradayDb(symbol='HAX')
+# a.UpdateDb()
 # print(a.GetSummary())

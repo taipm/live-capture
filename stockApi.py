@@ -2,12 +2,12 @@ import pandas as pd
 import numpy as np
 import datetime
 from urllib.request import urlopen, Request
+import db
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
-
-# def GetMarketPrice(symbol):
-
+def GetMarketPrice(symbol):
+  market_price = db.get_stock_data_from_api(symbol=symbol).iloc[0]['Close']
 
 def GetSticks_Intraday(symbol):
   url = f'https://s.cafef.vn/Lich-su-giao-dich-{symbol}-6.chn#data'
