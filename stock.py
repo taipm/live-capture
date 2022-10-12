@@ -1,5 +1,6 @@
 # from TaiPM import *
 
+from Caculator import split_array, split_chunks_array
 from candleStick import CandleStick
 import db
 import pandas as pd
@@ -15,7 +16,6 @@ pd.options.display.float_format='{:,.2f}'.format
 pd.set_option('display.width',85)
 
 class Stock:
-
     def __init__(self, name) -> None:
         self.name = name
         
@@ -33,18 +33,50 @@ class Stock:
         self.df_data = pd.DataFrame()
         self.StrSummary = self.name
         self.FileName = ''
+ 
+        self.df_data = self.Load_Daily_Data()
+        self.df_daily_data = self.df_data
+        self.df_weekly_data = split_chunks_array(arr = self.df_daily_data,sizeOf_item=5)
+
+        self.last_price = self.df_data['Close'][0]
+        self.last_volume = self.df_data['Volume'][0]
         
+        self.daily_prices = self.df_data['Close']
+        self.daily_volumes = self.df_data['Volume']
+        self.daily_foreign = self.df_data['NN']
+        self.daily_money = self.df_data['Money']
+        self.daily_low_prices = self.df_data['Low']
+        self.daily_high_prices = self.df_data['High']
+        self.daily_open_prices = self.df_data['Open']
+        self.daily_close_prices = self.df_data['Close']
+
+
+        self.TCB_Data = self.load_basic_data()#price_board(self.name)
+        self.Price = self.TCB_Data['Giá Khớp Lệnh'].values
+        self.TCB_Suggest_Price = self.TCB_Data['TCBS định giá'].values
+        self.RSI = self.TCB_Data['RSI'].values
+        self.P_B = self.TCB_Data['P/B'].values
+        self.P_E = self.TCB_Data['P/E'].values
+        self.ROE = self.TCB_Data['ROE'].values
+
+        self.df_intraday_data = self.load_intraday_data()
     
-    def LoadData(self) -> pd.DataFrame:
-        self.df_data = db.GetStockData(self.name)
+    def Load_Daily_Data(self) -> pd.DataFrame:
+        return db.GetStockData(self.name)
+    
+    def load_intraday_data(self)->pd.DataFrame:
+        return GetIntradayData(self.name)
         
+    def load_basic_data(self):
+        return price_board(self.name)
+
+    def GetTCB(self):
+        return price_board(self.name).transpose()
+
     def IsLoadData(self):
         if self.df_data.empty:
             return False
         return True
-
-    def GetTCB(self):
-        return price_board(self.name).transpose()
 
     # def GetDataSticks(self):
     #     df_sticks = GetSticks_Intraday(self.name)
@@ -385,8 +417,12 @@ class Stock:
         plt.show()
         
 
-# s = Stock(name="VND")
-# s.Prepare()
+s = Stock(name="VND")
+s.Prepare()
+print(s.TCB_Suggest_Price)
+print(s.RSI)
+print(s.Price)
+print(s.df_weekly_data)
 # # item = s.GetDataItemAtPrev(5).values
 # # print(item)
 # print(s.Describe())

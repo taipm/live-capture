@@ -28,8 +28,9 @@ def test_evaluationOder():
     else:
         print('Tính toán sai')
 
-#test_evaluationOder()
+#test_evaluationOder()dad
 
-
-
+import numpy as np
+def split_chunks_array(arr, sizeOf_item = 5): #SAI, ĐANG CHIA 05 PHẦN
+    return np.array_split(arr, sizeOf_item)
 

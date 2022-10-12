@@ -1,18 +1,19 @@
-from tkinter.messagebox import RETRY
-from vnstock import *
+#from tkinter.messagebox import RETRY
+#from vnstock import *
 import pandas as pd
 from helpers import *
+import db
 
 def GetIntradayData(symbol):
     _page_num = 0
     _page_size = 5000
     
-    df =  stock_intraday_data(symbol=symbol, 
+    df =  db.get_intraday_data(symbol=symbol, 
                             page_num=_page_num, 
                            page_size=_page_size)
     while True:
         _page_num += 1
-        df_next =  stock_intraday_data(symbol=symbol, 
+        df_next =  db.get_intraday_data(symbol=symbol, 
                             page_num=_page_num, 
                            page_size=_page_size)
         if df_next.empty:
@@ -45,6 +46,7 @@ class AnalysisIntradayData:
         self.symbol = symbol.upper()
 
         self.df_data = GetIntradayData(symbol=self.symbol)
+
         self.df_big_sticks = self.Get_Big_Sticks()
         self.df_big_buy_sticks = self.df_big_sticks[self.df_big_sticks['a']=='BU']
         self.df_big_sell_sticks = self.df_big_sticks[self.df_big_sticks['a']=='SD']
@@ -71,9 +73,20 @@ class AnalysisIntradayData:
         self.db = IntradayDb(self.symbol)
         self.db.UpdateDb()
 
+    def get_last_stick(self):
+        return self.df_data.sort_values(by=['time'],ascending=False).iloc[:1]
+        
+    def get_top_sticks(self, n_sticks):
+        return self.df_data.sort_values(by=['volume'],ascending=False).head(n_sticks)
+
+    def analysis_top_sticks(self, n_sticks):
+        df = self.get_top_sticks(n_sticks=n_sticks)
+        sum_volume = df[df['a']=='BU']['volume'].sum() - df[df['a']=='SD']['volume'].sum()
+        return sum_volume
+
     def Get_Big_Sticks(self):
         rate_of_big_stick = 20/100
-        limit_money = 150000000
+        limit_money = 200000000
         df_big_sticks_by_rate = self.df_data[self.df_data['volume']>=rate_of_big_stick]
         df_big_sticks_by_rate = df_big_sticks_by_rate[df_big_sticks_by_rate['volume']*df_big_sticks_by_rate['price']>=limit_money]
 
@@ -116,7 +129,14 @@ class AnalysisIntradayData:
     def GetMaxVolume_Buy(self):
         return self.df_buy['volume'].max()
 
-# x = AnalysisIntradayData(symbol='PVT')
+x = AnalysisIntradayData(symbol='VND')
+print(x.get_last_stick())
+sticks = x.get_top_sticks(10)
+print(sticks)
+
+
+top_sticks = x.analysis_top_sticks(10)
+print(top_sticks)
 # print(x.GetSummary())
 # df = x.Get_Big_OrderStick()
 # print('Big_OrderSticks')

@@ -41,6 +41,8 @@ RUN pip3 install tabulate
 RUN pip3 install vnstock
 RUN pip3 install openpyxl
 RUN pip3 install markdown
+RUN pip3 install python-wordpress-xmlrpc
+#RUN pip3 install json-normalize
 
 #RUN sudo apt-get install tesseract-ocr-vie
 #RUN brew install tesseract
