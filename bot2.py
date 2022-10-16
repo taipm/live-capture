@@ -7,6 +7,9 @@ from telegram.ext.filters import Filters
 from time import sleep
 from apscheduler.schedulers.background import BlockingScheduler
 import requests
+import json
+import telegram
+
 
 TELE_TOKEN = '5505330729:AAGxQSLBn-J22Aj9gPD30CT0ah13LPlwhBo'
 CHAT_ID = '1133501778'
@@ -14,8 +17,6 @@ CHAT_ID = '1133501778'
 #updater = Updater(TELE_TOKEN, use_context=True)
 updater = Updater(TELE_TOKEN, use_context=True)
 
-import json
-import telegram
 def notify_ending(message):
 	
 	bot = telegram.Bot(token=TELE_TOKEN)

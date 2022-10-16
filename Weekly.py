@@ -9,7 +9,7 @@ class AnalysisDaily:
         
         self.df_data = db.get_stock_data_from_api(symbol=self.symbol)
         self.Prices = self.df_data['Price']
-        self.Volums = self.df_data['Volume']
+        self.Volumes = self.df_data['Volume']
 
         self.MaxPrice = self.Prices.max()
         self.MinPrice = self.Prices.min()

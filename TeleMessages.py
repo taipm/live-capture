@@ -1,2 +1,0 @@
-def StockInfo():
-    pass

@@ -35,7 +35,7 @@ def get_intraday_data (symbol, page_num, page_size):
     return df
 
 
-_page_num = 0
-_page_size = 5000
-x = get_intraday_data(symbol= 'HPG', page_num=_page_num,page_size=_page_size)
-print(x.head(10))
+# _page_num = 0
+# _page_size = 5000
+# x = get_intraday_data(symbol= 'HPG', page_num=_page_num,page_size=_page_size)
+# print(x.head(10))

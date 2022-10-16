@@ -26,19 +26,13 @@ class Blog:
         rs = self.wp.call(GetPosts())
         print(rs)
 
-    def post(self):
-        #[<WordPressPost: hello-world (id=1)>]
-
-        info = self.wp.call(GetUserInfo())
-        print(info)
-        #<WordPressUser: max>
-
+    def post(self, title, content, tags):
         post = WordPressPost()
-        post.title = 'Bài viết được viết bằng chương trình python'
-        post.content = 'This is the body of my new post.'
+        post.title = title
+        post.content = content
         post.terms_names = {
-        'post_tag': ['auto', 'python', 'tự động'],
-        'category': ['Python', 'Auto']
+        'post_tag': tags,
+        'category': ['Stocks', 'Query']
         }
         post.post_status = 'publish'
         self.wp.call(NewPost(post))
@@ -63,14 +57,14 @@ class Blog:
             #       'type': 'image/jpeg',
             # }
             attachment_id = response['id']
-    def upload_thumbnail(self):
-        post = WordPressPost()
-        post.title = 'Picture of the Day'
-        post.content = 'What a lovely picture today!'
-        post.post_status = 'publish'
-        post.thumbnail = attachment_id
-        post.id = client.call(posts.NewPost(post))
+    # def upload_thumbnail(self):
+    #     post = WordPressPost()
+    #     post.title = 'Picture of the Day'
+    #     post.content = 'What a lovely picture today!'
+    #     post.post_status = 'publish'
+    #     post.thumbnail = attachment_id
+    #     post.id = client.call(posts.NewPost(post))
 
 
-blog = Blog()
-blog.upload(file_path='./test.png')
+# blog = Blog()
+# blog.upload(file_path='./test.png')

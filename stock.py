@@ -1,6 +1,6 @@
 # from TaiPM import *
 
-from Caculator import split_array, split_chunks_array
+from Caculator import *
 from candleStick import CandleStick
 import db
 import pandas as pd
@@ -10,6 +10,7 @@ import seaborn as sns
 import datetime as dt
 from IntradayData import *
 from stockApi import *
+from vnstock import *
 
 sns.set()
 pd.options.display.float_format='{:,.2f}'.format
@@ -36,7 +37,7 @@ class Stock:
  
         self.df_data = self.Load_Daily_Data()
         self.df_daily_data = self.df_data
-        self.df_weekly_data = split_chunks_array(arr = self.df_daily_data,sizeOf_item=5)
+        self.df_weekly_data = split_array(arr = self.df_daily_data,sizeOf_item=5)
 
         self.last_price = self.df_data['Close'][0]
         self.last_volume = self.df_data['Volume'][0]
@@ -335,10 +336,7 @@ class Stock:
 
      
         plt.tight_layout()
-        plt.show()
-
-    def drawn_seaborn(self): #MỘT SỐ ĐỒ THỊ TRỰC QUAN
-        pass
+        plt.show()    
         
     def DrawWithForcecast(self,N):
         """
@@ -417,12 +415,13 @@ class Stock:
         plt.show()
         
 
-s = Stock(name="VND")
-s.Prepare()
-print(s.TCB_Suggest_Price)
-print(s.RSI)
-print(s.Price)
-print(s.df_weekly_data)
+# s = Stock(name="VND")
+# s.Prepare()
+# s.draw()
+# print(s.TCB_Suggest_Price)
+# print(s.RSI)
+# print(s.Price)
+# print(s.df_weekly_data)
 # # item = s.GetDataItemAtPrev(5).values
 # # print(item)
 # print(s.Describe())

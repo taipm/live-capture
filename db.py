@@ -147,3 +147,5 @@ def get_intraday_data (symbol, page_num, page_size):
 #df = GetStockData('VND')
 #print(df)
 
+#symbol = 'VND'
+#print(GetStockData(symbol=symbol))

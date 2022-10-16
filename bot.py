@@ -7,20 +7,14 @@ from telegram.ext.commandhandler import CommandHandler
 from telegram.ext.messagehandler import MessageHandler
 from telegram.ext.filters import Filters
 from FinanceStock import FinanceStock
-
 from Imager import getTextFromImage
 from helpers import StrTODAY, StrYESTERDAY
 from stock import Stock
 #from news import getNews_wallstreet
 from watcher import get_last_image
 from apscheduler.schedulers.background import BlockingScheduler
-import requests
-import json
 import telegram
-import markdown
-
-# TELE_TOKEN = '5505330729:AAG4HHefzja4rMp81XNmeGv5YdQe8t0nSUo'
-# CHAT_ID = '5505330729'
+from BotAnswer import BotAnswer
 
 TELE_TOKEN = '5505330729:AAGxQSLBn-J22Aj9gPD30CT0ah13LPlwhBo'
 CHAT_ID = '1133501778'
@@ -103,15 +97,17 @@ from TextCommand import *
 
 def unknown_text(update: Update, context: CallbackContext):
 	input_text = update.message.text
-
 	
 	if(len(input_text) == 3):
-		s = Stock(name= input_text.upper())
-		s.Prepare()
-		update.message.reply_text(f'{s.Describe()}')
-		# financeStock = FinanceStock(input_text)
-		# basicInfo = financeStock.getBasicInfo().to_markdown()
-		update.message.reply_text(f'{s.GetTCB()}')
+		botAnswer = BotAnswer(input_text)
+		textOf_answer = botAnswer.answer()
+		update.message.reply_text(textOf_answer)
+		# s = Stock(name= input_text.upper())
+		# s.Prepare()
+		# update.message.reply_text(f'{s.Describe()}')
+		# # financeStock = FinanceStock(input_text)
+		# # basicInfo = financeStock.getBasicInfo().to_markdown()
+		# update.message.reply_text(f'{s.GetTCB()}')
 		# update.message.reply_text(
 		# 	markdown.markdown(f'{s.Describe()}'),
 		# 	parse_mode='MarkdownV2')

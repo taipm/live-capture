@@ -60,5 +60,5 @@ def parseTextCommand(text):
 
 #def planning()
 
-print(parseTextCommand("VND 500 17250"))
-print(parseTextCommand("VND 500 17250 13400"))
+# print(parseTextCommand("VND 500 17250"))
+# print(parseTextCommand("VND 500 17250 13400"))

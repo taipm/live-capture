@@ -54,8 +54,8 @@ class AnalysisIntradayData:
         self.df_buy = self.df_data[self.df_data['a']=='BU']
         self.df_sell = self.df_data[self.df_data['a']=='SD']
 
-        self.sum_Volume_Buy = self.df_buy['volume'].sum()   #self.df_data[self.df_data['a']=='BU']['volume'].sum()
-        self.sum_Volume_Sell = self.df_sell['volume'].sum() # self.df_data[self.df_data['a']=='SD']['volume'].sum()
+        self.sum_Volume_Buy = self.df_buy['volume'].sum() 
+        self.sum_Volume_Sell = self.df_sell['volume'].sum()
         self.sum_Volume = self.df_data['volume'].sum()
 
         self.rateOf_Buy_Volume = self.sum_Volume_Buy/self.sum_Volume
@@ -129,14 +129,14 @@ class AnalysisIntradayData:
     def GetMaxVolume_Buy(self):
         return self.df_buy['volume'].max()
 
-x = AnalysisIntradayData(symbol='VND')
-print(x.get_last_stick())
-sticks = x.get_top_sticks(10)
-print(sticks)
+# x = AnalysisIntradayData(symbol='VND')
+# print(x.get_last_stick())
+# sticks = x.get_top_sticks(10)
+# print(sticks)
 
 
-top_sticks = x.analysis_top_sticks(10)
-print(top_sticks)
+# top_sticks = x.analysis_top_sticks(10)
+# print(top_sticks)
 # print(x.GetSummary())
 # df = x.Get_Big_OrderStick()
 # print('Big_OrderSticks')
