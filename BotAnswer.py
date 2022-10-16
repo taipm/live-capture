@@ -1,3 +1,4 @@
+from FinanceStock import FinanceStock
 from stock import Stock
 from BlogManager import Blog
 
@@ -20,12 +21,17 @@ class BotAnswer:
         self.posts = []
 
     def answer(self):
+        output = ''
         if(len(self.query)==3):
             s = Stock(name= self.query.upper())
             s.Prepare()
             post = BlogPost(title=self.query,content=s.Describe(),tags=s.name)
             post.update_to_blog()
-            return f'{s.Describe()}'
+            
+            output += s.Describe()
+            output += '\nCổ tức: ' + FinanceStock(symbol=self.query.upper()).get_avg_dividend()
+
+            return f'{output}'
             # update.message.reply_text(f'{s.Describe()}')
             # # financeStock = FinanceStock(input_text)
             # # basicInfo = financeStock.getBasicInfo().to_markdown()

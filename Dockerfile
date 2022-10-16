@@ -26,6 +26,7 @@ RUN apt-get update \
   #&& pip3 --no-cache-dir install --upgrade pip \
   #&& rm -rf /var/lib/apt/lists/*
 
+RUN pip3 install --upgrade pip
 RUN pip3 install python-telegram-bot
 RUN pip3 install tesseract
 RUN pip3 install pytesseract

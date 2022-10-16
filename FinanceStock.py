@@ -43,7 +43,7 @@ class FinanceStock:
         df_share = df[df['issueMethod']=='share']#['cashDividendPercentage']
 
         start_year = df['cashYear'].min()
-        end_year = df['cashYear'].max()
+        end_year = df['cashYear'].max()+1
 
         sum_of_year = end_year - start_year
 
@@ -80,10 +80,10 @@ class FinanceStock:
         money = self.default_shares*price
 
 
-stock = 'HBC'
-f = FinanceStock(symbol=stock)
-print(f.getBasicInfo())
-print(f.get_avg_dividend())
+# stock = 'HAX'
+# f = FinanceStock(symbol=stock)
+# print(f.getBasicInfo())
+# print(f.get_avg_dividend())
 
 # x = valuation_rating(stock)
 # print(x)
