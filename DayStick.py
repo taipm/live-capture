@@ -94,15 +94,14 @@ class DayData:
             return None
 
     def get_check_forcast(self, date):
-        stick = self.get_date_data_stick(date=date)
+        current_stick = self.get_date_data_stick(date=date)
         next_date = get_next_date(str_date=date,days=3)
         next_stick = self.get_date_data_stick(date=next_date)
-        print(stick.close)
-        print(next_stick.close)
+        print(f'{self.symbol} - Current: {current_stick.close} ({date}) - Next: {next_stick.close} ({next_date})')
 
         #result_of_forcast = self.get_check_forcast(date=date)
 
-        if(stick.close >= next_stick.close):
+        if(current_stick.close <= next_stick.close):
             return True
         else:
             return False
