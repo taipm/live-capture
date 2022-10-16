@@ -21,7 +21,7 @@ def test_evaluationOder():
     p_avg = (old_price*old_vol + new_vol*market_price)/(new_vol+old_vol)
     ratio_profit = (market_price-p_avg)/p_avg
 
-    print(f'GiaTB : {p_avg} - LN: {ratio_profit}')
+    print(f'Gia TB : {p_avg} - LN: {ratio_profit}')
 
     if(ratio_profit >= ratio):
         print('Tính toán đúng')

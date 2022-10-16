@@ -8,6 +8,11 @@ def parse_text_to_date(str_date):
     else:
         return None
 
+def get_next_date(str_date, days):
+    date = parse_text_to_date(str_date=str_date)
+    next_date = date + timedelta(days=days)
+    return next_date
+
 def get_after_date(str_date):
     date = parse_text_to_date(str_date=str_date)
     next_date = date + timedelta(days=1)

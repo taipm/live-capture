@@ -48,10 +48,6 @@ def getMaxStickVolume(stock):
   item = df[df['Volume']==max_volume]
   return item
 
-def analysisOrderSticks(df):
-  output = ''
-  output += output
-  return output
 
 
 # stock = 'VND'

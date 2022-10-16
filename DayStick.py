@@ -14,17 +14,9 @@ class DateStick:
         self.high = high
         self.low = low
         self.volume = volume
-    # def __init__(self, symbol, date) -> None:
-    #     self.symbol = symbol.upper()
-    #     self.date = date
-    #     df_data = DayData(self.symbol).get_date_data_stick(date=date)
-    #     self.close = df_data['Close']
-    #     self.open = df_data['Open']
-    #     self.high = df_data['High']
-    #     self.low = df_data['Low']
-    #     self.volume = df_data['Volume']
+  
     def to_string(self):
-        print(f'CP: {self.symbol} Close: {self.close} Open: {self.open} High: {self.high}')
+        print(f'CP: {self.symbol} - Date {self.date} : Close: {self.close} Open: {self.open} High: {self.high}')
 
     def is_up(self) -> bool:
         if (self.close == self.high):
@@ -42,8 +34,8 @@ class DateStick:
         else:
             return None     
 
-    def get_next_day_stick(self):
-        next_date = self.date - timedelta(days = 1)
+    # def get_next_day_stick(self):
+    #     next_date = self.date - timedelta(days = 1)
         
     #def check_forcast(self):
 
@@ -51,15 +43,16 @@ class DayData:
     def __init__(self, symbol) -> None:
         self.symbol = symbol.upper()
         self.df_data = db.GetStockData(self.symbol)
+        self.end_date = pd.to_datetime(self.df_data['Date'][0]).date()
+        self.start_date = pd.to_datetime(self.df_data['Date'][len(self.df_data)-1]).date()
+        self.count_of_days = len(self.df_data)
+        self.sticks = []
+
+    def to_string(self):
+        print(f'Count of days: {self.count_of_days} - Start: {self.start_date} - End: {self.end_date}')
 
     def get_date_data_stick(self,date):
-        data = self.df_data[self.df_data['Date'] == parse_text_to_date(date)]
-        print(data)
-        print(data['Open'])
-        print(data['Close'])
-        print(data['High'])
-        print(data['Low'])
-
+        data = self.df_data[self.df_data['Date'] == parse_text_to_date(str(date))]
         date_stick = DateStick(symbol=self.symbol,
             date = date,
             open = data['Open'].values,
@@ -69,17 +62,65 @@ class DayData:
             volume= data['Volume'].values
         )
         return date_stick
+    
+    def get_next_stick(self, date):
+        next_date = get_after_date(date)
+        return self.get_date_data_stick(date = str(next_date))
+    
+    def get_prev_stick(self, date):
+        prev_date = get_prev_date(date)
+        return self.get_date_data_stick(date = str(prev_date))
+    
+    def to_sticks(self):
+        start = self.start_date
+        end = self.end_date
+        delta = timedelta(days=1)
+        
+        while (start <= end):
+            date = start
+            stick = self.get_date_data_stick(date=date)
+            self.sticks.append(stick)
+            start += delta
 
-d = DayData(symbol='VND')
-date_stick = d.get_date_data_stick(date='2022-10-14')
-date_stick.to_string()
+        return self.sticks
 
-print(date_stick.symbol)
-print(date_stick.open)
-print(date_stick.forcast())
+    def get_forcast(self, date):
+        stick = self.get_date_data_stick(date=date)
+        if(stick.close == stick.low):
+            return "UP"
+        elif(stick.close == stick.high):
+            return "UP"
+        else:
+            return None
 
-# stick = DateStick(symbol='VND')
-# stick.forcast()
-# print(date_stick.volume)
+    def get_check_forcast(self, date):
+        stick = self.get_date_data_stick(date=date)
+        next_date = get_next_date(str_date=date,days=3)
+        next_stick = self.get_date_data_stick(date=next_date)
+        print(stick.close)
+        print(next_stick.close)
 
+        #result_of_forcast = self.get_check_forcast(date=date)
+
+        if(stick.close >= next_stick.close):
+            return True
+        else:
+            return False
+    # def check_forcast(self, date):
+    #     stick = self.get_date_data_stick(date=date)
+    #     for days in range(0,5):
+    #         next_stick
+
+d = DayData(symbol='FRT')
+d.to_string()
+date = "2022-10-10"
+print(d.get_forcast(date=date))
+print(d.get_check_forcast(date=date))
+
+# sticks = d.to_sticks()
+# for stick in sticks:
+#     f = stick.forcast()
+#     if(f):
+#         print(stick.forcast())
+#         print(stick.to_string())
 
