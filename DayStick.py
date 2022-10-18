@@ -1,5 +1,4 @@
 
-import datetime
 from datetime import timedelta 
 import db
 from DateHelper import *
@@ -110,11 +109,11 @@ class DayData:
     #     for days in range(0,5):
     #         next_stick
 
-d = DayData(symbol='FRT')
-d.to_string()
-date = "2022-10-10"
-print(d.get_forcast(date=date))
-print(d.get_check_forcast(date=date))
+# d = DayData(symbol='FRT')
+# d.to_string()
+# date = "2022-10-10"
+# print(d.get_forcast(date=date))
+# print(d.get_check_forcast(date=date))
 
 # sticks = d.to_sticks()
 # for stick in sticks:

@@ -1,7 +1,7 @@
 import Caculator
 from vnstock import *
 import db
-from helpers import percent
+from DateHelper import *
 from stock import Stock
 
 def parseTextCommand(text):

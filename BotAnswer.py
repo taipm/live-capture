@@ -32,6 +32,14 @@ class BotAnswer:
             output += '\nCổ tức: ' + FinanceStock(symbol=self.query.upper()).get_avg_dividend()
 
             return f'{output}'
+
+    def answer_with_chart(self):
+        if(len(self.query)==3):
+            print('Đang vẽ đồ thị')
+            s = Stock(name = self.query.upper())
+            s.Prepare()
+            file_path = s.draw()
+            return file_path
             # update.message.reply_text(f'{s.Describe()}')
             # # financeStock = FinanceStock(input_text)
             # # basicInfo = financeStock.getBasicInfo().to_markdown()

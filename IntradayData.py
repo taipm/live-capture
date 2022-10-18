@@ -1,7 +1,5 @@
-#from tkinter.messagebox import RETRY
-#from vnstock import *
 import pandas as pd
-from helpers import *
+from DateHelper import *
 import db
 
 def GetIntradayData(symbol):
@@ -11,6 +9,7 @@ def GetIntradayData(symbol):
     df =  db.get_intraday_data(symbol=symbol, 
                             page_num=_page_num, 
                            page_size=_page_size)
+    
     while True:
         _page_num += 1
         df_next =  db.get_intraday_data(symbol=symbol, 
@@ -78,6 +77,24 @@ class AnalysisIntradayData:
         
     def get_top_sticks(self, n_sticks):
         return self.df_data.sort_values(by=['volume'],ascending=False).head(n_sticks)
+    
+    def get_top_sticks_markdown(self,n_sticks):
+        df = self.get_top_sticks(n_sticks=n_sticks)
+        df = df[['price','volume','a','time']]
+       
+        sum_buy = df[df['a']=='BU']['volume'].sum()
+        sum_sell = df[df['a']=='SD']['volume'].sum()
+
+        output = df.to_markdown() + "\n" + f'volume: {sum_buy-sum_sell}'
+        
+        if(sum_buy/sum_sell >=1.2):
+            output += ' => Đang mua vào'
+        elif(sum_sell/sum_buy >= 1.2):
+            output += ' => Đang bán ra'
+        else:
+            output += ' => Chưa rõ xu hướng'
+        output += '\n'
+        return output
 
     def analysis_top_sticks(self, n_sticks):
         df = self.get_top_sticks(n_sticks=n_sticks)
@@ -113,9 +130,11 @@ class AnalysisIntradayData:
             f'Shark action: {self.analysis_shark_action()}\n'+\
             f'Volume: {self.sum_Volume:,.0f} | Rate (Buy): {self.rateOf_Buy_Volume:.2f} (%) | Rate (Buy/Sell): {self.rateOf_Buy_Over_Sell_Volume:.2f}\n'
             f'Orders: {self.countOf_Orders:,.0f} | Rate (Buy orders): {self.rateOf_Buy_Orders:.2f} (%) | Rate (Buy/Sell Orders): {self.rateOf_Buy_Over_Sell_Orders:.2f} (%)\n'
+            f'Forcast: {self.symbol} - {self.GetForcast()}\n'
+            f'Top sticks: \n'
+            f'{self.get_top_sticks_markdown(20)}'
         )
 
-        summary_text += f'Forcast: {self.symbol} - {self.GetForcast()}'
         return summary_text
        
     def GetForcast(self):

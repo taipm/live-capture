@@ -1,5 +1,3 @@
-# from TaiPM import *
-
 from Caculator import *
 from candleStick import CandleStick
 import db
@@ -234,10 +232,10 @@ class Stock:
         return rs
     
     def Describe(self):
-        
         output = f'{self.name.upper()}- Last date: {self.Get_LastTrans_Date()}'
         output += f'\nGiá cao nhất: {str(self.MAX_P)} | Giá thấp nhất: {str(self.MIN_P)} | Giá hiện tại: {self.P}'
         output += f'\n&CN: {"{:.2f}".format(((self.P - self.MAX_P)/self.MAX_P)*100)} (%) | &TN: {"{:.2f}".format(((self.P - self.MIN_P)/self.MIN_P)*100)} (%)'
+        output += f'\n03 (phiên): {self.GetPriceAtPrev(3)} | {"{:.2f}".format(self.GetProfitAtPrev(3))} (%)'
         output += f'\n05 (phiên): {self.GetPriceAtPrev(5)} | {"{:.2f}".format(self.GetProfitAtPrev(5))} (%)'
         output += f'\n10 (phiên): {self.GetPriceAtPrev(10)} | {"{:.2f}".format(self.GetProfitAtPrev(10))} (%)'
         output += f'\n20 (phiên): {self.GetPriceAtPrev(20)} | {"{:.2f}".format(self.GetProfitAtPrev(20))} (%)'
@@ -249,12 +247,12 @@ class Stock:
         output += f'\nAnalysis IntradayData:\n{analysis_intraday.GetSummary()}\n'
 
         #output += f'\nDự báo (nến) {self.STICKS[0].Forecast_By_CandleStick()}'
-        output += f'\nDự báo (nến) {getMaxStickVolume(self.name).to_markdown()}'
-        output += f'\nCác dự báo quá khứ: '
-        rs = ""
-        for x in self.AllForecasts()[0:10]:
-            rs += '\n-> Phiên thứ: ' + str(x[0]) + ' | Giá : ' + str(x[1])
-        output += rs
+        # output += f'\nDự báo (nến) {getMaxStickVolume(self.name).to_markdown()}'
+        # output += f'\nCác dự báo quá khứ: '
+        # rs = ""
+        # for x in self.AllForecasts()[0:10]:
+        #     rs += '\n-> Phiên thứ: ' + str(x[0]) + ' | Giá : ' + str(x[1])
+        # output += rs
         
         #In kiểm tra dự báo
         #check_forecasts = self.CheckForecasts(T_n=30)
@@ -328,15 +326,17 @@ class Stock:
         
     #TRỰC QUAN HÓA DỮ LIỆU
     def draw(self):
+        print('Đang gọi hàm draw để lưu ảnh')
         fig, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(10,4), sharey=True, dpi=120)
 
         ax1.plot(self.PRICES, 'go-')
         ax2.plot(self.PRICES, 'ro-')
         ax3.plot(self.PRICES, 'bo-')
-
-     
         plt.tight_layout()
-        plt.show()    
+        # plt.show()
+        file_path = f'./data/images/{self.name}.png'
+        plt.savefig(file_path)
+        return file_path
         
     def DrawWithForcecast(self,N):
         """
@@ -417,7 +417,8 @@ class Stock:
 
 # s = Stock(name="VND")
 # s.Prepare()
-# s.draw()
+# path = s.draw()
+# print(path)
 # print(s.TCB_Suggest_Price)
 # print(s.RSI)
 # print(s.Price)

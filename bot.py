@@ -8,13 +8,13 @@ from telegram.ext.messagehandler import MessageHandler
 from telegram.ext.filters import Filters
 from FinanceStock import FinanceStock
 from Imager import getTextFromImage
-from helpers import StrTODAY, StrYESTERDAY
+from DateHelper import *
 from stock import Stock
-#from news import getNews_wallstreet
 from watcher import get_last_image
 from apscheduler.schedulers.background import BlockingScheduler
 import telegram
 from BotAnswer import BotAnswer
+from TextCommand import *
 
 TELE_TOKEN = '5505330729:AAGxQSLBn-J22Aj9gPD30CT0ah13LPlwhBo'
 CHAT_ID = '1133501778'
@@ -93,8 +93,6 @@ def unknown(update: Update, context: CallbackContext):
     update.message.reply_text(
 		"Sorry '%s' is not a valid command" % update.message.text)
 
-from TextCommand import *
-
 def unknown_text(update: Update, context: CallbackContext):
 	input_text = update.message.text
 	
@@ -102,6 +100,10 @@ def unknown_text(update: Update, context: CallbackContext):
 		botAnswer = BotAnswer(input_text)
 		textOf_answer = botAnswer.answer()
 		update.message.reply_text(textOf_answer)
+
+		# file_path= botAnswer.answer_with_chart()
+		# print(file_path)
+		# update.message.reply_photo(chat_id=CHAT_ID, photo=open(file_path, 'rb'))
 		# s = Stock(name= input_text.upper())
 		# s.Prepare()
 		# update.message.reply_text(f'{s.Describe()}')

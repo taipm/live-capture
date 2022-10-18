@@ -16,7 +16,16 @@ try:
 except AttributeError:
     collectionsAbc = collections
 
+class BlogPost:
+    def __init__(self, title, content, tags) -> None:
+        self.title = title
+        self.content = content
+        self.tags = tags
 
+    def update_to_blog(self):
+        blog = Blog()
+        blog.post(title=self.title,content=self.content, tags= self.tags)
+        
 #https://python-wordpress-xmlrpc.readthedocs.io/en/latest/examples/media.html#uploading-a-file
 class Blog:
     def __init__(self) -> None:
