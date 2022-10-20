@@ -144,6 +144,7 @@ class Stock:
 
     def Get_LastTrans_Date(self):
         return self.df_data['Date'][0]
+
     def GetLastPrice(self):
         return self.df_data['Close'][0]
 
@@ -240,11 +241,11 @@ class Stock:
         output += f'\n10 (phiên): {self.GetPriceAtPrev(10)} | {"{:.2f}".format(self.GetProfitAtPrev(10))} (%)'
         output += f'\n20 (phiên): {self.GetPriceAtPrev(20)} | {"{:.2f}".format(self.GetProfitAtPrev(20))} (%)'
         output += f'\nKL cao nhất: {str(self.MAX_V)} | KL thấp nhất: {str(self.MIN_V)}'
-        output += f'\nThanh khoản cao nhất: {str(np.max(self.df_data["Money"]))} | Thanh khoản thấp nhất: {str(np.min(self.df_data["Money"]))}'
+        output += f'\nThanh khoản cao nhất: {np.max(self.df_data["Money"]):,.2f} | Thanh khoản thấp nhất: {str(np.min(self.df_data["Money"]))}'
         output += f'\nNến hiện tại {self.STICKS[0].Describe()}'
 
         analysis_intraday = AnalysisIntradayData(symbol=self.name)
-        output += f'\nAnalysis IntradayData:\n{analysis_intraday.GetSummary()}\n'
+        output += f'\nAnalysis Intraday-Data:\n{analysis_intraday.GetSummary()}\n'
 
         #output += f'\nDự báo (nến) {self.STICKS[0].Forecast_By_CandleStick()}'
         # output += f'\nDự báo (nến) {getMaxStickVolume(self.name).to_markdown()}'

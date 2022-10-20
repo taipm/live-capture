@@ -1,21 +1,12 @@
 # -*- coding: utf-8 -*-
 import datetime
-from email import header
 from requests.exceptions import HTTPError
 import pandas as pd
 import json
 from urllib.request import urlopen
-
-import pandas as pd
 import requests
 from pandas import json_normalize
-
 from datetime import datetime
-from datetime import timedelta
-import time
-from io import BytesIO
-import openpyxl
-
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -86,37 +77,37 @@ def GetStockData(symbol):
                 print('Cổ phiếu chưa có trong danh mục')
                 return pd.DataFrame()        
 
-def Get_Intraday_Sticks(symbol):
-        url = f'https://s.cafef.vn/Lich-su-giao-dich-{symbol}-6.chn#data'
-        data = pd.read_html(url)
+# def Get_Intraday_Sticks(symbol):
+#         url = f'https://s.cafef.vn/Lich-su-giao-dich-{symbol}-6.chn#data'
+#         data = pd.read_html(url)
         
-        df_sticks = data[len(data)-1]
-        df_sticks = pd.DataFrame(df_sticks.values,columns=['Time','PriceX','Volume','Sum Volume','Percent'])
+#         df_sticks = data[len(data)-1]
+#         df_sticks = pd.DataFrame(df_sticks.values,columns=['Time','PriceX','Volume','Sum Volume','Percent'])
 
-        #Tách giá
-        df_sticks['Price'] = df_sticks['PriceX'].apply(lambda x: x.split(' ')[0])
-        df_sticks['Price']
+#         #Tách giá
+#         df_sticks['Price'] = df_sticks['PriceX'].apply(lambda x: x.split(' ')[0])
+#         df_sticks['Price']
 
-        df_sticks['%'] = df_sticks['PriceX'].apply(lambda x: x.split(' ')[2])
-        df_sticks['%'] = df_sticks['%'].apply(lambda x: x[1:len(x)-2])
+#         df_sticks['%'] = df_sticks['PriceX'].apply(lambda x: x.split(' ')[2])
+#         df_sticks['%'] = df_sticks['%'].apply(lambda x: x[1:len(x)-2])
 
-        del df_sticks['PriceX']
+#         del df_sticks['PriceX']
 
-        #cols = ['Volume','Sum Volume','Price','%','Percent']
-        cols = ['Volume','Sum Volume','Price','%']
-        df_sticks[cols] = df_sticks[cols].apply(pd.to_numeric, downcast='float', errors='coerce')
+#         #cols = ['Volume','Sum Volume','Price','%','Percent']
+#         cols = ['Volume','Sum Volume','Price','%']
+#         df_sticks[cols] = df_sticks[cols].apply(pd.to_numeric, downcast='float', errors='coerce')
 
 
 
-        df_sticks['Time'] = df_sticks['Time'].apply(lambda x: datetime.datetime.today().strftime('%Y-%m-%d') + ' ' + str(x))
-        df_sticks['Time'] = df_sticks['Time'].astype("datetime64")
-        df_sticks.set_index('Time')
+#         df_sticks['Time'] = df_sticks['Time'].apply(lambda x: datetime.datetime.today().strftime('%Y-%m-%d') + ' ' + str(x))
+#         df_sticks['Time'] = df_sticks['Time'].astype("datetime64")
+#         df_sticks.set_index('Time')
 
-        df_sticks['Money'] = df_sticks['Price']*df_sticks['Volume']
+#         df_sticks['Money'] = df_sticks['Price']*df_sticks['Volume']
 
-        return df_sticks
+#         return df_sticks
 
-def get_intraday_data (symbol, page_num, page_size):
+def get_intraday_data(symbol, page_num, page_size):
     """
     This function returns the stock realtime intraday data.
     Args:
@@ -139,13 +130,35 @@ def get_intraday_data (symbol, page_num, page_size):
     df = json_normalize(data['data']).rename(columns={'p':'price', 'v':'volume', 't': 'time'})
     return df
 
+def GetIntradayData(symbol):
+    _page_num = 0
+    _page_size = 5000
+    
+    df =  get_intraday_data(symbol=symbol, 
+                            page_num=_page_num, 
+                           page_size=_page_size)
+    
+    while True:
+        _page_num += 1
+        df_next =  get_intraday_data(symbol=symbol, 
+                            page_num=_page_num, 
+                           page_size=_page_size)
+        if df_next.empty:
+            break
+        else:
+            df = df.append(df_next)
+    return df
 
-# _page_num = 0
-# _page_size = 5000
-# x = get_intraday_data(symbol= 'HPG', page_num=_page_num,page_size=_page_size)
-# print(x.head(10))
-#df = GetStockData('VND')
-#print(df)
+def get_now_price(symbol):
+    df_data = GetIntradayData(symbol = symbol)
+    price = None
+    if (df_data.empty):
+        price = get_stock_data_from_api(symbol=symbol).iloc[0]['Close']*1000
+    else:
+        price = df_data.sort_values(by=['time'],ascending=False).iloc[:1]['price'].values[0]
+    
+    return price
 
-#symbol = 'VND'
-#print(GetStockData(symbol=symbol))
+
+#print(get_now_price("HPG"))
+# print(get_now_price_2("HPG"))

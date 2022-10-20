@@ -1,5 +1,9 @@
+from datetime import date
 from datetime import datetime
 from datetime import timedelta
+import numpy as np
+import pandas as pd
+
 
 #2022-10-14
 def parse_text_to_date(str_date):
@@ -24,12 +28,6 @@ def get_prev_date(str_date):
     return next_date
 
 
-from datetime import date
-from datetime import datetime
-from datetime import timedelta
-import numpy as np
-import calendar
-import pandas as pd
 
 TODAY = date.today()
 fmt_day = '%Y-%-m-%d'

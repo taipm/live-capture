@@ -4,6 +4,15 @@ import db
 from DateHelper import *
 from stock import Stock
 
+def parse_request(text):
+    if(text.startswith('#')):
+        return "Command"
+    else:
+        return "Text"
+
+print(parse_request('#HPG'))
+print(parse_request("HPG"))
+
 def parseTextCommand(text):
     items = text.split(' ')
     len_items = len(items)

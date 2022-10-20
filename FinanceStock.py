@@ -74,7 +74,7 @@ class FinanceStock:
         self.avg_cash = cash_avg
         self.avg_share = share_avg
 
-        return f'Years: {sum_of_year} -  share-avg: {share_avg:.2f} - cash-avg: {cash_avg:.2f}'
+        return f'Years: {sum_of_year} -  shares-avg: {share_avg:.2f} - cash-avg: {cash_avg:.2f}'
 
     def get_ROI(self, price):
         money = self.default_shares*price

@@ -1,5 +1,8 @@
 from math import *
 
+from Parameters import *
+
+
 def EvaluationOrder(old_vol, old_price, market_price, ratio_profit):
     print(f'{old_vol} {old_price} {market_price} {ratio_profit}')
     new_vol = ((market_price*(1-ratio_profit))*old_vol - old_price*old_vol)/(ratio_profit*market_price)
@@ -7,6 +10,8 @@ def EvaluationOrder(old_vol, old_price, market_price, ratio_profit):
     #new_vol = abs(new_vol)
     return new_vol
 
+def Get_Profit_BSC(vol, buy_price, sell_price):
+    buy_money = vol*buy_price*1000 + vol*buy_price*1000*BSC_BUY_FEE
 
 def test_evaluationOder():
     stock = 'HPG'

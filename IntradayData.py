@@ -1,26 +1,6 @@
 import pandas as pd
 from DateHelper import *
-import db
-
-def GetIntradayData(symbol):
-    _page_num = 0
-    _page_size = 5000
-    
-    df =  db.get_intraday_data(symbol=symbol, 
-                            page_num=_page_num, 
-                           page_size=_page_size)
-    
-    while True:
-        _page_num += 1
-        df_next =  db.get_intraday_data(symbol=symbol, 
-                            page_num=_page_num, 
-                           page_size=_page_size)
-        if df_next.empty:
-            print(f'page_num: {_page_num}')
-            break
-        
-        df = df.append(df_next)
-    return df
+from db import *
 
 # df = GetIntradayData("HAX")
 # print(df.tail(20))
