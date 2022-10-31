@@ -1,3 +1,4 @@
+from pathlib import Path
 from sre_constants import IN
 from time import sleep
 from telegram.ext.updater import Updater
@@ -9,7 +10,7 @@ from telegram.ext.filters import Filters
 from FinanceStock import FinanceStock
 from Imager import getTextFromImage
 from DateHelper import *
-from stock import Stock
+from Stock import Stock
 from watcher import get_last_image
 from apscheduler.schedulers.background import BlockingScheduler
 import telegram
@@ -95,24 +96,35 @@ def unknown(update: Update, context: CallbackContext):
 
 def unknown_text(update: Update, context: CallbackContext):
 	input_text = update.message.text
-	
-	if(len(input_text) == 3):
-		botAnswer = BotAnswer(input_text)
+	botAnswer = BotAnswer(input_text)
+
+	if(len(input_text) == 3):	
 		textOf_answer = botAnswer.answer()
 		update.message.reply_text(textOf_answer)
-
-		# file_path= botAnswer.answer_with_chart()
-		# print(file_path)
-		# update.message.reply_photo(chat_id=CHAT_ID, photo=open(file_path, 'rb'))
-		# s = Stock(name= input_text.upper())
-		# s.Prepare()
-		# update.message.reply_text(f'{s.Describe()}')
-		# # financeStock = FinanceStock(input_text)
-		# # basicInfo = financeStock.getBasicInfo().to_markdown()
-		# update.message.reply_text(f'{s.GetTCB()}')
-		# update.message.reply_text(
-		# 	markdown.markdown(f'{s.Describe()}'),
-		# 	parse_mode='MarkdownV2')
+	elif(len(input_text) > 3 and ',' in input_text):
+		file_path = botAnswer.answer_stocks()
+		#print(file_path)
+		#chat_id = update.message.chat_id
+		#document = open(file_path, 'rb')
+		#context.bot.send_document(chat_id, document)
+		update.message.reply_text(file_path)
+	elif(input_text.upper() == 'BANKS'):
+		text_command = db.get_banks_symbols_command()
+		botAnswer = BotAnswer(text_command)
+		file_path = botAnswer.answer_stocks()
+		update.message.reply_text(file_path)
+	
+	elif(input_text.upper() == 'CK'):
+		text_command = db.get_securities_symbols()
+		botAnswer = BotAnswer(text_command)
+		file_path = botAnswer.answer_stocks()
+		update.message.reply_text(file_path)
+		#update.message.reply_document(document=file)
+	elif(input_text.upper() == 'VN30'):
+		text_command = db.get_banks_symbols()
+		botAnswer = BotAnswer(text_command)
+		file_path = botAnswer.answer_stocks()
+		update.message.reply_text(file_path)
 	else:
 		rs = parseTextCommand(input_text)
 		

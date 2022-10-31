@@ -2,7 +2,41 @@ import Caculator
 from vnstock import *
 import db
 from DateHelper import *
-from stock import Stock
+from Stock import Stock
+
+
+class RequestCommand(enumerate):
+    basic_query = 0,
+    intraday_query = 1,
+    profit_query = 2,
+    order_query = 3
+
+# class CommandHandle:
+#     def __init__(self, command) -> None:
+#         pass
+
+#     def process_basic_query(self):
+#         pass
+
+#     def process_profit_order(self):
+#         stock = 
+
+class StockCommand:
+    # def __init__(self, symbol, request) -> None:
+    #     self.symbol = symbol
+    #     self.request = request
+    
+    def __init__(self, command) -> None:
+        self.command = cl
+    
+    def clean(self, command):
+        command = command
+
+
+def match_request(text):
+    stock = text.split(' ')[0]
+    request = text.split(' ')[1]
+    return StockCommand(symbl = stock, request = request)
 
 def parse_request(text):
     if(text.startswith('#')):
@@ -10,8 +44,8 @@ def parse_request(text):
     else:
         return "Text"
 
-print(parse_request('#HPG'))
-print(parse_request("HPG"))
+# print(parse_request('#HPG'))
+# print(parse_request("HPG"))
 
 def parseTextCommand(text):
     items = text.split(' ')

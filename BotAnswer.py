@@ -1,19 +1,9 @@
 from FinanceStock import FinanceStock
-from stock import Stock
-from BlogManager import Blog
-
-class QueryHandle:
-    pass
-
-class BlogPost:
-    def __init__(self, title, content, tags) -> None:
-        self.title = title
-        self.content = content
-        self.tags = tags
-
-    def update_to_blog(self):
-        blog = Blog()
-        blog.post(title=self.title,content=self.content, tags= self.tags)
+from Stock import Stock
+from BlogManager import *
+from vnstock import *
+from DateHelper import *
+from pathlib import Path
 
 class BotAnswer:
     def __init__(self, query) -> None:
@@ -33,6 +23,27 @@ class BotAnswer:
 
             return f'{output}'
 
+    def answer_stocks(self):
+        stocks = self.query.split(',')
+        lst = []
+        for stock in stocks:
+            lst.append(stock.strip().upper())
+        stocks = ','.join(lst)
+        if(len(stocks)>1):
+            print('Đang query nhiều cổ phiếu')
+            print(stocks)
+            board = price_board(stocks)
+            rs = board.transpose()
+            file_path = './data/' + 'your-file-' + 'Intraday-' +str(datetime.now()) + ".xlsx"
+            rs.to_excel(file_path)
+            print(rs)
+            blog = Blog()
+            file_url = blog.upload(file_path=file_path)
+            print(file_url)
+            return file_url
+            #return file_path
+
+
     def answer_with_chart(self):
         if(len(self.query)==3):
             print('Đang vẽ đồ thị')
@@ -45,3 +56,8 @@ class BotAnswer:
             # # basicInfo = financeStock.getBasicInfo().to_markdown()
             # update.message.reply_text(f'{s.GetTCB()}')
     
+def Test():
+    bot = BotAnswer('HPG, VND, FRT')
+    bot.answer_stocks()
+
+#Test()

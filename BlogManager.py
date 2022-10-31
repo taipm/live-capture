@@ -1,11 +1,10 @@
 from wordpress_xmlrpc import Client, WordPressPost
 from wordpress_xmlrpc.methods.posts import GetPosts, NewPost
 from wordpress_xmlrpc.methods.users import GetUserInfo
-
+from pathlib import Path
 from wordpress_xmlrpc import Client, WordPressPost
 from wordpress_xmlrpc.compat import xmlrpc_client
 from wordpress_xmlrpc.methods import media, posts
-
 import collections
 collections.Iterable = collections.abc.Iterable
 import ssl
@@ -50,14 +49,13 @@ class Blog:
         # prepare metadata
 
         data = {
-                'name': 'test.jpg',
-                'type': 'image/png',  # mimetype
+                'name':  Path(file_path).name,
+                'type': 'application/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',  # mimetype
         }
 
         # read the binary file and let the XMLRPC library encode it into base64
         with open(file_path, 'rb') as img:
             data['bits'] = xmlrpc_client.Binary(img.read())
-
             response = self.wp.call(media.UploadFile(data))
             # response == {
             #       'id': 6,
@@ -66,6 +64,7 @@ class Blog:
             #       'type': 'image/jpeg',
             # }
             attachment_id = response['id']
+            return response['url']
     # def upload_thumbnail(self):
     #     post = WordPressPost()
     #     post.title = 'Picture of the Day'

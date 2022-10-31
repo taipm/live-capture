@@ -8,6 +8,7 @@ import requests
 from pandas import json_normalize
 from datetime import datetime
 import ssl
+from vnstock import *
 ssl._create_default_https_context = ssl._create_unverified_context
 
 def get_stock_data_from_api(symbol):
@@ -74,38 +75,8 @@ def GetStockData(symbol):
                 df.set_index('Date')
                 return df
         else:
-                print('Cổ phiếu chưa có trong danh mục')
-                return pd.DataFrame()        
-
-# def Get_Intraday_Sticks(symbol):
-#         url = f'https://s.cafef.vn/Lich-su-giao-dich-{symbol}-6.chn#data'
-#         data = pd.read_html(url)
-        
-#         df_sticks = data[len(data)-1]
-#         df_sticks = pd.DataFrame(df_sticks.values,columns=['Time','PriceX','Volume','Sum Volume','Percent'])
-
-#         #Tách giá
-#         df_sticks['Price'] = df_sticks['PriceX'].apply(lambda x: x.split(' ')[0])
-#         df_sticks['Price']
-
-#         df_sticks['%'] = df_sticks['PriceX'].apply(lambda x: x.split(' ')[2])
-#         df_sticks['%'] = df_sticks['%'].apply(lambda x: x[1:len(x)-2])
-
-#         del df_sticks['PriceX']
-
-#         #cols = ['Volume','Sum Volume','Price','%','Percent']
-#         cols = ['Volume','Sum Volume','Price','%']
-#         df_sticks[cols] = df_sticks[cols].apply(pd.to_numeric, downcast='float', errors='coerce')
-
-
-
-#         df_sticks['Time'] = df_sticks['Time'].apply(lambda x: datetime.datetime.today().strftime('%Y-%m-%d') + ' ' + str(x))
-#         df_sticks['Time'] = df_sticks['Time'].astype("datetime64")
-#         df_sticks.set_index('Time')
-
-#         df_sticks['Money'] = df_sticks['Price']*df_sticks['Volume']
-
-#         return df_sticks
+                print(f'{symbol} - chưa có trong danh mục')
+                return pd.DataFrame()
 
 def get_intraday_data(symbol, page_num, page_size):
     """
@@ -159,6 +130,80 @@ def get_now_price(symbol):
     
     return price
 
+def get_banks_symbols():
+    bank_list = ['VPB', 'BID','CTG','VCB','TCB',
+                'TPB','VIB','MBB','ACB','EIB','STB',
+                'BVB','NAB','LPB']
+    return bank_list
+
+def get_banks_symbols_command():
+    bank_list = ['VPB', 'BID','CTG','VCB','TCB',
+                'TPB','VIB','MBB','ACB','EIB','STB',
+                'BVB','NAB','LPB']
+    output = ','.join(bank_list)
+    return output
+
+def get_securities_symbols():
+    lst = ['VCI','SSI','VND','BSI','CTS','TVS',
+        'FTS','SHS','VIX']
+    ouput = ','.join(lst)
+
+    return ouput
+
+def get_vn30_symbols():
+    lst = ['PLX','VCB','HPG','FPT','VPB',
+            'SAB','POW','GVR','STB','SSI',
+            'MBB','TCB','ACB','VHM','TPB',
+            'VIB','CTG','BID','VRE','NVL',
+            'MSN','VIC','PDR','KDH','HDB',
+            'PNJ'
+            ]
+    ouput = ','.join(lst)
+
+    return ouput
+
+def get_all_stocks():
+    stocks = listing_companies()['ticker']
+    return stocks.to_list()
+
+def get_vn30_symbols_as_command():
+    lst = get_vn30_symbols()
+    ouput = ','.join(lst)
+    return ouput
+
+def get_bds_symbols():
+    lst = ['PDR','VHM','DXG','SCR','KDH',
+            'CII','NBB','CEO','DIG','NVL',
+            #'NLG','VRE','ACB','VHM','TPB',
+            'DPR','PHR','BCM'
+            #'VIB','CTG','BID','VRE','NVL',
+            #'MSN','VIC','PDR','KDH','HDB'
+            ]
+
+    return lst
+
+def get_bds_symbols_as_command():
+    lst = ['PDR','VHM','DXG','SCR','KDH',
+            'CII','NBB','CEO','DIG','NVL',
+            'NLG','VRE','ACB','VHM','TPB',
+            #'VIB','CTG','BID','VRE','NVL',
+            #'MSN','VIC','PDR','KDH','HDB'
+            ]
+    ouput = ','.join(lst)
+
+    return ouput
+
+def get_danhmuc_symbols():
+    lst = ['VND','HAX','PDR','SCR','DXG',
+            'HPG','FPT','FRT','VCI','TPB',
+            'BID','BSI','MSH','VIB','HBC',
+            'IDC','NLG','BSR','ASM','SSI',
+            'PDR'
+            #'MSN','VIC','PDR','KDH','HDB'
+            ]
+    ouput = ','.join(lst)
+
+    return ouput
 
 #print(get_now_price("HPG"))
 # print(get_now_price_2("HPG"))

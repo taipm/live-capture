@@ -1,4 +1,5 @@
 from Caculator import *
+from DayStick import * #DateStick, DayData
 from candleStick import CandleStick
 import db
 import pandas as pd
@@ -9,6 +10,7 @@ import datetime as dt
 from IntradayData import *
 from stockApi import *
 from vnstock import *
+from Pivot import *
 
 sns.set()
 pd.options.display.float_format='{:,.2f}'.format
@@ -16,7 +18,7 @@ pd.set_option('display.width',85)
 
 class Stock:
     def __init__(self, name) -> None:
-        self.name = name
+        self.name = name.upper()
         
         self.P = 0
         self.MAX_P = 0
@@ -77,6 +79,181 @@ class Stock:
             return False
         return True
 
+    def get_percent_price(self, index):
+        if(index < 0):
+            return None
+        return self.df_data['%'][index]
+
+    def get_percent_vol_day(self):
+        return percent(self.df_data['Volume'][0], self.df_data['Volume'][1])
+    
+    def get_percent_vol_avg_week(self, index):
+        start = index
+        end = index + 5
+        vol_avg_week = np.average(self.df_data['Volume'][start:end])
+        return percent(self.df_data['Volume'][0], vol_avg_week)
+
+    def get_percent_vol_avg_10days(self, index):
+        start = index
+        end = index + 10
+        vol_avg_week = np.average(self.df_data['Volume'][start:end])
+        return percent(self.df_data['Volume'][0], vol_avg_week)
+
+    def get_percent_vol_avg_month(self, index):
+        start = index
+        end = index + 20
+        vol_avg_week = np.average(self.df_data['Volume'][start:end])
+        return percent(self.df_data['Volume'][0], vol_avg_week)
+
+    def is_min_vol(self,index):
+        count_of_days = 20
+        vol = self.df_data.iloc[index]['Volume']
+        min_vol = np.min(self.df_data['Volume'][index:index+count_of_days])
+        avg_vol = np.average(self.df_data['Volume'][index:index+count_of_days])
+        rate_of_profit = self.get_profit_by_index(index=index,pre_count_of_days=-1)
+        if(vol <= avg_vol and rate_of_profit <= 2 and rate_of_profit >= -3):
+            return True
+        else:
+            return False
+
+    def is_pivot_point(self,index):
+        rate_of_price = 2
+        rate_of_vol = 1.2
+        time_to_check = 10
+
+        if(self.get_percent_price(index=index)>=rate_of_price):
+            if(self.df_data['Close'][index] > self.df_data['Open'][index]):
+                if(self.df_data['Volume'][index] > np.max(self.df_data['Volume'][index+1:index+time_to_check])):
+                    if(self.get_percent_vol_avg_10days(index=index)>=rate_of_vol):
+                        return True
+
+    def get_pivots(self):
+        pivots = []
+        start = 0
+        end = len(self.df_data)-20
+        for i in range(start,end):
+            if self.is_pivot_point(i):
+                p = Pivot(symbol=self.name,index=i)
+                pivots.append(p)
+        return pivots
+
+    def get_min_vols(self):
+        results = []
+        start = 0
+        end = len(self.df_data)-20
+        for i in range(start,end):
+            if self.is_min_vol(i):
+                p = Pivot(symbol=self.name,index=i)
+                results.append(p)
+        return results
+
+    def get_data_by_index(self,index):
+        data = self.df_data.iloc[index]
+        return data
+
+    def get_profit_by_index(self,index, pre_count_of_days):
+        price = self.df_data.iloc[index]['Close']
+        n_price = self.df_data.iloc[index-pre_count_of_days]['Close']
+        return percent(price,n_price)
+    
+    def check_profit(self,index):
+        values = []
+        price = self.df_data.iloc[index]['Close']
+        pre_count_of_days = 10
+        for i in range(0,pre_count_of_days):
+            n_price = self.df_data.iloc[index-i]['Close']
+            profit = percent(price,n_price)
+            values.append(profit)
+            #values.append([i,profit])
+        #print(values)
+        # if(np.max(values) >= 3):
+        #     return f'{True} : {np.max(values)}'
+        # else:
+        #     return f'{False} : {np.min(values)}'
+        return np.max(values),np.min(values)
+    
+    def check_min_vol(self):
+        pivots = self.get_min_vols()
+        print(pivots)
+        count_yes = 0
+        count_no = 0
+        results = []
+
+        for p in pivots:
+            max_profit, min_profit = s.check_profit(p.index)
+            if(max_profit >= 3):
+                count_yes+=1
+            else:
+                count_no+=1
+            results.append([p.index,max_profit,min_profit])
+        print(f'{self.name} Min-Vol : OK {count_yes} : NO {count_no}')
+        if(count_no != 0):
+            print(f'Ty le: {(count_yes/(count_no+count_yes))*100} (%)')
+        else:
+            print(f'Ty le: 100 (%)')
+        #print(results)
+        return results
+
+    def check_pivots(self):
+        pivots = self.get_pivots()
+        count_yes = 0
+        count_no = 0
+        results = []
+
+        for p in pivots:
+            max_profit, min_profit = s.check_profit(p.index)
+            if(max_profit >= 3):
+                count_yes+=1
+            else:
+                count_no+=1
+            results.append([p.index,max_profit,min_profit])
+        print(f'{self.name} Pivot : OK {count_yes} : NO {count_no}')
+        if(count_no != 0):
+            print(f'Ty le: {(count_yes/(count_no+count_yes))*100} (%)')
+        else:
+            print(f'Ty le: 100 (%)')
+        #print(results)
+        return results
+
+    def Get_Profit(self,d_start_str,d_end_str):
+        p1 = self.Get_Price(d_start_str)
+        p2 = self.Get_Price(d_end_str)
+        value = ((p2-p1)/p1)*100
+        print(value)
+        return value
+
+    def GetProfitAtPrev(self,countOfPrevDay):
+        last_p = self.GetLastPrice()
+        prev_p = self.GetPriceAtPrev(countOfPrevDays=countOfPrevDay)
+        return ((last_p-prev_p)/prev_p)*100
+    # def to_date_sticks(self):
+    #     for i in len()
+    #     date_data = DateStick(
+    #         date=data_item['Date'],
+    #         open=data_item['Open'],
+    #         close=data_item['Close'],
+    #         high=data_item['High'],
+    #         low=data_item['Low'],
+    #         volume=data_item['Volume'],
+    #         foriegn_buy=data_item['NN Mua'],
+    #         foriegn_sell=data_item['NN Ban']
+    #     )
+
+
+
+
+    def get_pivots_as_string(self):
+        #pivots = []
+        start = 0
+        end = len(self.df_data)-20
+        output = f'{self.name}'
+        for i in range(start,end):
+            if self.is_pivot_point(i):
+                if(i <= 30):
+                    output += f'\n{i} - Pivot {self.PRICES[i]} - {self.df_data["%"][i]}'
+                    #pivots = pivots.append(i)
+        return output
+    
     # def GetDataSticks(self):
     #     df_sticks = GetSticks_Intraday(self.name)
     #     return df_sticks
@@ -110,7 +287,6 @@ class Stock:
         self.StrSummary += self.Suggestion()
         
     def Get_Price(self, d_str):
-        #print(d_str)
         item = self.df_data[self.df_data['Date'] == dt.datetime.strptime(d_str, '%Y-%m-%d').date()]
         return item['Close'].values
     
@@ -129,18 +305,6 @@ class Stock:
     
     def GetPriceAtPrev(self,countOfPrevDays):
         return self.GetDataItemAtPrev(countOfPrevDays=countOfPrevDays)['Close']
-
-    def Get_Profit(self,d_start_str,d_end_str):
-        p1 = self.Get_Price(d_start_str)
-        p2 = self.Get_Price(d_end_str)
-        value = ((p2-p1)/p1)*100
-        print(value)
-        return value
-
-    def GetProfitAtPrev(self,countOfPrevDay):
-        last_p = self.GetLastPrice()
-        prev_p = self.GetPriceAtPrev(countOfPrevDays=countOfPrevDay)
-        return ((last_p-prev_p)/prev_p)*100
 
     def Get_LastTrans_Date(self):
         return self.df_data['Date'][0]
@@ -243,7 +407,8 @@ class Stock:
         output += f'\nKL cao nhất: {str(self.MAX_V)} | KL thấp nhất: {str(self.MIN_V)}'
         output += f'\nThanh khoản cao nhất: {np.max(self.df_data["Money"]):,.2f} | Thanh khoản thấp nhất: {str(np.min(self.df_data["Money"]))}'
         output += f'\nNến hiện tại {self.STICKS[0].Describe()}'
-
+        if(self.get_pivots() != None):
+            output += f'\n Điểm pivots: \n {self.get_pivots_as_string()}'
         analysis_intraday = AnalysisIntradayData(symbol=self.name)
         output += f'\nAnalysis Intraday-Data:\n{analysis_intraday.GetSummary()}\n'
 
@@ -414,10 +579,25 @@ class Stock:
                         plt.annotate(note + f'\n{index}',(index,price),arrowprops=dict(facecolor='blue', shrink=0.05))                
         plt.legend()
         plt.show()
-        
 
-# s = Stock(name="VND")
-# s.Prepare()
+stocks = ['KSB','TPB','VND','KBC','CEO','BID','CTG','HPG']
+for s in stocks:
+    s = Stock(name=s)
+    s.Prepare()
+    d = DayData(symbol=s.name, index=0,df_all_data=s.df_data)
+    d.to_string()
+# stocks = ['KSB','TPB','VND','KBC','CEO','BID','CTG']
+# for s in stocks:
+#     s = Stock(name=s)
+#     #s.check_pivots()
+#     s.check_min_vol()
+
+
+
+#print(s.get_profit_by_index(0,-1)) #so voi phien truoc (-1)
+# print(s.get_profit_by_index(1,-1)) #so voi phien truoc (-1)
+# print(s.get_profit_by_index(1,1)) #so voi phien sau (-1)
+
 # path = s.draw()
 # print(path)
 # print(s.TCB_Suggest_Price)

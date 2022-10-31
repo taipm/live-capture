@@ -1,5 +1,5 @@
 from math import *
-
+import numpy as np
 from Parameters import *
 
 
@@ -12,6 +12,7 @@ def EvaluationOrder(old_vol, old_price, market_price, ratio_profit):
 
 def Get_Profit_BSC(vol, buy_price, sell_price):
     buy_money = vol*buy_price*1000 + vol*buy_price*1000*BSC_BUY_FEE
+    
 
 def test_evaluationOder():
     stock = 'HPG'
@@ -34,8 +35,6 @@ def test_evaluationOder():
         print('Tính toán sai')
 
 #test_evaluationOder()dad
-
-import numpy as np
 def split_array(arr, sizeOf_item = 5): #SAI, ĐANG CHIA 05 PHẦN
     return np.array_split(arr, sizeOf_item)
 
