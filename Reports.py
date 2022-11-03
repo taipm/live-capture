@@ -77,8 +77,8 @@ def get_all_stocks_min_vol(fileName):
 # file_name = StrTODAY + '-min-vols.xlsx'
 # get_all_stocks_min_vol(fileName=file_name)
 
-s = Stock(name='BID')
-rs = s.get_min_vols()
-for item in rs:
-    print(item.to_string())
+# s = Stock(name='BID')
+# rs = s.get_min_vols()
+# for item in rs:
+#     print(item.to_string())
 #get_all_stocks_to_buy()

@@ -1,87 +1,213 @@
+from operator import index
 from DateHelper import *
-from DayStick import *
+from RichNumber import RichNumber
 
 class DayData:
-    def __init__(self, symbol) -> None:
-        self.symbol = symbol.upper()
-        self.df_data = db.GetStockData(self.symbol)
-        self.end_date = pd.to_datetime(self.df_data['Date'][0]).date()
-        self.start_date = pd.to_datetime(self.df_data['Date'][len(self.df_data)-1]).date()
-        self.count_of_days = len(self.df_data)
-        self.sticks = []
+    def __init__(self, symbol, index, df_all_data) -> None:
+        self.symbol = symbol.upper()        
+        self.df_all_data = df_all_data
+        self.df_all_data['%'] = ((df_all_data['Close']-df_all_data['Open'])/(df_all_data['Open']))*100
+        #self.df_all_data['Oscillation'] = self
+        self.index = index
+        self.T_days = 10        
+        self.data_item = self.df_all_data.iloc[index]
+        self.date  = self.data_item['Date']
+        self.close = self.data_item['Close']
+        self.open = self.data_item['Open']
+        self.high = self.data_item['High']
+        self.low = self.data_item['Low']
+        self.volume = self.data_item['Volume']
 
-    def to_string(self):
-        print(f'Count of days: {self.count_of_days} - Start: {self.start_date} - End: {self.end_date}')
-
-    def get_date_data_stick(self,date):
-        data = self.df_data[self.df_data['Date'] == parse_text_to_date(str(date))]
-        date_stick = DateStick(symbol=self.symbol,
-            date = date,
-            open = data['Open'].values,
-            close = data['Close'].values,
-            high = data['High'].values,
-            low = data['Low'].values,
-            volume= data['Volume'].values
-        )
-        return date_stick
-    
-    def get_next_stick(self, date):
-        next_date = get_after_date(date)
-        return self.get_date_data_stick(date = str(next_date))
-    
-    def get_prev_stick(self, date):
-        prev_date = get_prev_date(date)
-        return self.get_date_data_stick(date = str(prev_date))
-    
-    def to_sticks(self):
-        start = self.start_date
-        end = self.end_date
-        delta = timedelta(days=1)
+        self.foriegn_buy = self.data_item['NN Mua']
+        self.foriegn_sell = self.data_item['NN Ban']
         
-        while (start <= end):
-            date = start
-            stick = self.get_date_data_stick(date=date)
-            self.sticks.append(stick)
-            start += delta
+        self.df_data = self.df_all_data[self.index:self.index+self.T_days]        
+        self.df_next_data = self.get_df_next_data()
 
-        return self.sticks
+        self.sum_foriegn = np.sum(self.df_data['NN'])
+        self.sum_margin_price = np.sum(self.df_data['%'])
+        self.sum_vol = np.sum(self.df_data['Volume'])
 
-    def get_forcast(self, date):
-        stick = self.get_date_data_stick(date=date)
-        if(stick.close == stick.low):
-            return "UP"
-        elif(stick.close == stick.high):
-            return "UP"
+        self.max_desc_price = np.min(self.df_data['%'])
+        self.max_inc_price = np.max(self.df_data['%'])
+        self.min_price = np.min(self.df_data['Close'])
+        self.max_price = np.max(self.df_data['Close'])
+        
+        self.avg_vol = np.average(self.df_data['Volume'])
+        self.min_vol = np.min(self.df_data['Volume'])
+        self.max_vol = np.max(self.df_data['Volume'])
+
+        self.avg_oscillation = np.average(self.df_data['Oscillation'])
+        self.avg_oscillation_low = np.average(self.df_data['Oscillation-Low-Open'])
+        self.avg_oscillation_high = np.average(self.df_data['Oscillation-Open-High'])
+
+    @property
+    def today_money(self):
+        return self.volume*self.price
+
+    @property
+    def price(self):
+        if self.close > 0:
+            return self.close
         else:
+            return self.open
+    @property
+    def count_red(self):
+        return len(self.df_data[self.df_data['%']<0])
+    @property
+    def count_green(self):
+        return len(self.df_data[self.df_data['%']>0])
+    @property
+    def count_yellow(self):
+        return len(self.df_data[self.df_data['%']==0])
+    @property
+    def oscillation(self):
+        return self.df_data['Oscillation'][0]
+    @property
+    def max_inc_oscillation_open(self):
+        return np.max(self.df_data['Oscillation-Open-High'])
+    @property
+    def max_desc_oscillation_open(self):
+        return np.min(self.df_data['Oscillation-Low-Open'])
+    @property
+    def target_buy_price(self):
+        price = (self.avg_oscillation_low/100)*self.price + self.price
+        return price
+    @property
+    def target_sell_price(self):        
+        price = (self.avg_oscillation_high/100)*self.price + self.price
+        return price
+
+    def get_df_next_data(self):
+        T_next_days = 10
+        try:
+            df_next_data = self.df_all_data[index:index-T_next_days]
+            return df_next_data
+        except:
             return None
 
-    def get_check_forcast(self, date):
-        current_stick = self.get_date_data_stick(date=date)
-        next_date = get_next_date(str_date=date,days=3)
-        next_stick = self.get_date_data_stick(date=next_date)
-        print(f'{self.symbol} - Current: {current_stick.close} ({date}) - Next: {next_stick.close} ({next_date})')
-
-        #result_of_forcast = self.get_check_forcast(date=date)
-
-        if(current_stick.close <= next_stick.close):
+    def is_min_vol(self):
+        days_to_count = self.T_days
+        min_vol = np.min(self.df_all_data[self.index:self.index + days_to_count]['Volume'])
+        if(self.volume == min_vol):
             return True
         else:
             return False
-    # def check_forcast(self, date):
-    #     stick = self.get_date_data_stick(date=date)
-    #     for days in range(0,5):
-    #         next_stick
+    
+    def is_max_vol(self):
+        days_to_count = self.T_days
+        max_vol = np.max(self.df_all_data[self.index:self.index + days_to_count]['Volume'])
+        if(self.volume == max_vol):
+            return True
+        else:
+            return False
 
-# d = DayData(symbol='FRT')
-# d.to_string()
-# date = "2022-10-10"
-# print(d.get_forcast(date=date))
-# print(d.get_check_forcast(date=date))
+    def is_min_price(self):
+        days_to_count = self.T_days
+        min_price = np.min(self.df_all_data[self.index:self.index + days_to_count]['Close'])
+        if(self.close == min_price):
+            return True
+        else:
+            return False
 
-# sticks = d.to_sticks()
-# for stick in sticks:
-#     f = stick.forcast()
-#     if(f):
-#         print(stick.forcast())
-#         print(stick.to_string())
+    def is_max_price(self):
+        days_to_count = self.T_days
+        max_price = np.max(self.df_all_data[self.index:self.index + days_to_count]['Close'])
+        if(self.close == max_price):
+            return True
+        else:
+            return False
 
+    def is_min_foriegn(self):
+        days_to_count = self.T_days
+        min_foriegn = np.min(self.df_all_data[self.index:self.index + days_to_count]['NN'])
+        if(self.close == min_foriegn):
+            return True
+        else:
+            return False
+
+    def is_max_foriegn(self):
+        days_to_count = self.T_days
+        max_foriegn = np.max(self.df_all_data[self.index:self.index + days_to_count]['NN'])
+        if(self.close == max_foriegn):
+            return True
+        else:
+            return False
+
+    def get_margin_price(self):
+        return self.df_data['%'][0]
+
+    
+    def get_distance_price(self):
+        min = self.min_price
+        max = self.max_price
+        distance = ((max-min)/min)*100
+        return distance
+
+    def get_index_of_min_price(self): #MinP = Min Price
+        min_price = np.min(self.df_data['Close'])
+        index_of_min = self.df_data.index[self.df_data['Close']==min_price][0]#.tolist()
+        return index_of_min
+    
+    def get_max_profit(self):
+        min_price = self.min_price
+        index_of_min = self.get_index_of_min_price()
+        max_from_min_index = np.max(self.df_data['Close'][0:index_of_min])
+        profit = percent(min_price,max_from_min_index)
+        return profit
+    
+    def get_max_desc_price(self):
+        return np.min(self.df_data['%'])
+    
+    def get_max_inc_price(self):
+        return np.max(self.df_data['%'])
+
+    def has_big_down_price(self):
+        if(self.get_max_desc_price() <= -5):
+            return True
+        return False
+    
+    def has_big_up_price(self):
+        if(self.get_max_inc_price() >= 5):
+            return True
+        return False
+
+    def is_buy(self):
+        _result = False
+        if(self.is_max_vol() and self.get_margin_price ()<0):
+            _result = True
+        if(self.has_big_down_price() and self.has_big_up_price()):
+            _result = True
+        return _result
+
+    def get_signal(self):
+        if (self.sum_margin_price <= -25):
+            return True,'Chiết khấu sâu'
+        else:
+            return None,"Chưa xác định"
+
+    def get_momentum(self):
+        return self.get_distance_price()/self.T_days
+
+    def get_info(self):
+        output = f'{self.symbol} - Phiên [{self.index}] - {self.close} [{self.get_margin_price():,.2f} (%)] - GTGD: {self.today_money:,.2f}'+\
+        f'\nBiến động : '+\
+        f'\n=> Cao nhất: {np.max(self.df_data["Oscillation"]):,.2f} (%)| TN {np.min(self.df_data["Oscillation"]):,.2f} (%) | TB: {self.avg_oscillation:,.2f} | HT: {self.oscillation:,.2f} (%)'+\
+        f'\nMax tăng: {self.max_inc_oscillation_open:,.2f} (%) | Max giảm: {self.max_desc_oscillation_open:,.2f} (%) | TB-Tăng: {np.average(self.avg_oscillation_high):,.2f} (%)| TB-Giảm: {self.avg_oscillation_low:,.2f} (%)'+\
+        f'\nMục tiêu: Mua {self.target_buy_price:,.2f} ({self.avg_oscillation_low:,.2f} (%)) - Bán: {self.target_sell_price:,.2f} ({self.avg_oscillation_high:,.2f}) (%)'+\
+        f' => LN: {percent(self.target_sell_price,self.target_buy_price):,.2f} (%)'+\
+        f'\nBước giá {RichNumber(self.target_buy_price).rich_text}'+\
+        f'\nTrong {self.T_days} phiên : {self.sum_margin_price:,.2f}(%)'+\
+        f'\nTăng {self.count_green} | Giảm {self.count_red} | Tham chiếu {self.count_yellow} : Tỷ lệ {self.count_green/self.count_red:,.2f}'+\
+        f'\n03 phiên: {self.df_data["%"][0]:,.2f} | {self.df_data["%"][1]:,.2f} | {self.df_data["%"][2]:,.2f} | Tổng: {np.sum(self.df_data["%"][0:2]):,.2f} (%)'+\
+        f'\nTín hiêu mua: {self.get_signal()} | Momentium: {self.get_momentum():,.2f}'+\
+        f'\nGiá CN/TN: {self.max_price} | {self.min_price} [{self.get_index_of_min_price()}] [d = {self.get_distance_price():,.2f} (%)]'+\
+        f'\nLN cao nhất: {self.get_max_profit():,.2f} (%)'+\
+        f'\nKLGD TB : {self.avg_vol:,.2f} - Min vol: {self.is_min_vol()} - Max vol: {self.is_max_vol()}, '+\
+        f'\nMin price : {self.is_min_price()} , Max price: {self.is_max_price()}, '+\
+        f'\nNN(Mua-Bán) {self.sum_foriegn:,.2f} ~ {(self.sum_foriegn/self.sum_vol)*100:,.2f} (%) - Min NN : {self.is_min_foriegn()}, - Max NN {self.is_max_foriegn()}'+\
+        f'\n{"-"*30}'
+        return output
+
+    def to_string(self):
+        print(self.get_info())

@@ -9,6 +9,8 @@ from pandas import json_normalize
 from datetime import datetime
 import ssl
 from vnstock import *
+import numpy as np
+
 ssl._create_default_https_context = ssl._create_unverified_context
 
 def get_stock_data_from_api(symbol):
@@ -18,7 +20,8 @@ def get_stock_data_from_api(symbol):
                 data_json = json.loads(response.read())
                                 
                 df = pd.json_normalize(data_json['companyStocks'])
-                df = df[['stockCode','giaTriTangGiam','phanTramTangGiam','dongCua','khoiLuong','moCua','caoNhat','thapNhat','giaoDichThoaThuan','nuocNgoaiMua','nuocNgoaiBan','postedDate']]        
+                df = df[['stockCode','giaTriTangGiam','phanTramTangGiam','dongCua',
+                        'khoiLuong','moCua','caoNhat','thapNhat','giaoDichThoaThuan','nuocNgoaiMua','nuocNgoaiBan','postedDate']]        
         
                 df['Date'] = pd.to_datetime(df['postedDate']).dt.date#,format='%Y%m%d', errors='ignore')
                 df = df.sort_values(['Date'], ascending=False)
@@ -61,6 +64,9 @@ def get_stock_data_from_api(symbol):
                 df['Money'] = (df['Close']*df['Volume']*1000*100)/1000000000 #Giá trị giao dịch (tỷ)
                 df['NN'] = df['NN Mua'] - df['NN Ban']
                 df['M(NN)'] = df['NN']*df['Volume']*1000*100/1000000000 #Giá trị giao dịch của khối ngoại (tỷ)
+                df['Oscillation'] = np.abs(((df['Low']-df['High'])/df['Low'])*100)
+                df['Oscillation-Low-Open'] = ((df['Low']-df['Open'])/df['Open'])*100
+                df['Oscillation-Open-High'] = ((df['High']-df['Open'])/df['Open'])*100
 
                 df = df.drop_duplicates(subset=['Date'])                
                 return df
@@ -77,6 +83,19 @@ def GetStockData(symbol):
         else:
                 print(f'{symbol} - chưa có trong danh mục')
                 return pd.DataFrame()
+
+def test_Oscillation():
+    symbol = 'VND'
+    data = GetStockData(symbol=symbol).iloc[0]
+    high = data['High']
+    low = data['Low']
+    open = data['Open']
+    osci_open = data['Oscillation-Low-Open']
+
+    print(f'L {low} : O {open} -> {open-low:,.2f} : {osci_open:,.2f}')
+
+#test_Oscillation()
+
 
 def get_intraday_data(symbol, page_num, page_size):
     """

@@ -1,6 +1,7 @@
 from DateHelper import percent
-from stockApi import *
 from Caculator import *
+import pandas as pd
+from StockOrder import *
 class TradingBook:
     def __init__(self,symbol) -> None:
         self.symbol = symbol.upper()
@@ -36,5 +37,5 @@ class TradingBook:
         return output_text
 
 
-t = TradingBook(symbol='VND')
-t.Buy(vol=100,price=10)
+# t = TradingBook(symbol='VND')
+# t.Buy(vol=100,price=10)

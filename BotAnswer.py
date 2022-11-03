@@ -1,26 +1,46 @@
 from FinanceStock import FinanceStock
+from IntradayData import AnalysisIntradayData
 from Stock import Stock
 from BlogManager import *
 from vnstock import *
 from DateHelper import *
 from pathlib import Path
-
+from DayData import *
+from TextCommand import BotCommand
 class BotAnswer:
     def __init__(self, query) -> None:
         self.query = query
         self.posts = []
+    
+    def is_number(self):
+        print(self.query)
+        if(self.query.isnumeric()):
+            print('Là số')
+            return True
+        else:
+            print('Là chữ')
+            return False
 
     def answer(self):
         output = ''
-        if(len(self.query)==3):
+        print(self.query)
+        if(self.is_number()):
+            print(self.query)
+            return RichNumber(self.query).rich_text
+        elif(len(self.query)==3):
             s = Stock(name= self.query.upper())
             s.Prepare()
             post = BlogPost(title=self.query,content=s.Describe(),tags=s.name)
             post.update_to_blog()
-            
             output += s.Describe()
-            output += '\nCổ tức: ' + FinanceStock(symbol=self.query.upper()).get_avg_dividend()
-
+            
+            output += DayData(s.name,index=0,df_all_data= s.df_data).get_info()            
+            f = FinanceStock(symbol=self.query.upper())            
+            output+= f'\n{f.get_summary()}'
+            analysis_intraday = AnalysisIntradayData(symbol=s.name)
+            output += f'\nIntraday:\n{analysis_intraday.GetSummary()}'
+            output += '\nCổ tức: ' + f.get_avg_dividend()
+            output += f'\nhttps://fireant.vn/top-symbols/content/symbols/{s.name}'
             return f'{output}'
 
     def answer_stocks(self):
@@ -56,6 +76,11 @@ class BotAnswer:
             # # basicInfo = financeStock.getBasicInfo().to_markdown()
             # update.message.reply_text(f'{s.GetTCB()}')
     
+    def answer_two_numbers(self):
+        command = BotCommand(self.query)
+        a,b = command.is_two_numbers()
+        return percent(a,b)
+
 def Test():
     bot = BotAnswer('HPG, VND, FRT')
     bot.answer_stocks()

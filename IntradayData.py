@@ -1,30 +1,14 @@
 import pandas as pd
 from DateHelper import *
+from IntradayDb import IntradayDb
 from db import *
-
-# df = GetIntradayData("HAX")
-# print(df.tail(20))
-
-class IntradayDb:
-    
-    def __init__(self,symbol) -> None:
-        self.symbol = symbol.upper()
-        self.db_file_path = './data/' + self.symbol + '-Intraday-' + StrTODAY + ".xlsx"
-    
-    def GetLastData(self):
-        df = pd.read_excel(self.db_file_path)
-        return df
-
-    def UpdateDb(self):
-        df = GetIntradayData(self.symbol)
-        if(not df.empty):
-            df.to_excel(self.db_file_path)
 
 class AnalysisIntradayData:
     def __init__(self, symbol) -> None:
         self.symbol = symbol.upper()
 
         self.df_data = GetIntradayData(symbol=self.symbol)
+        self.last_price = self.get_last_stick()['price'][0]/1000
 
         self.df_big_sticks = self.Get_Big_Sticks()
         self.df_big_buy_sticks = self.df_big_sticks[self.df_big_sticks['a']=='BU']
@@ -41,7 +25,6 @@ class AnalysisIntradayData:
         self.rateOf_Sell_Volume = self.sum_Volume_Sell/self.sum_Volume
         self.rateOf_Buy_Over_Sell_Volume = self.sum_Volume_Buy/self.sum_Volume_Sell
 
-
         self.countOf_Orders = len(self.df_data.index)
         self.countOf_BuyOrders = len(self.df_buy.index)
         self.countOf_SellOrders = len(self.df_sell.index)
@@ -51,6 +34,11 @@ class AnalysisIntradayData:
 
         self.db = IntradayDb(self.symbol)
         self.db.UpdateDb()
+
+    @property
+    def avg_price(self):
+        avg_price = (np.sum(self.df_data['volume']*self.df_data['price']))/np.sum(self.df_data['volume'])/1000
+        return avg_price
 
     def get_last_stick(self):
         return self.df_data.sort_values(by=['time'],ascending=False).iloc[:1]
@@ -65,7 +53,8 @@ class AnalysisIntradayData:
         sum_buy = df[df['a']=='BU']['volume'].sum()
         sum_sell = df[df['a']=='SD']['volume'].sum()
 
-        output = df.to_markdown() + "\n" + f'volume: {sum_buy-sum_sell}'
+        #df = df()
+        output = df.to_markdown() + "\n" + f'volume: {sum_buy-sum_sell:,.2f} ~ {(sum_buy-sum_sell)*self.avg_price*1000:,.2f}'
         
         if(sum_buy/sum_sell >=1.2):
             output += ' => Đang mua vào'
@@ -105,19 +94,32 @@ class AnalysisIntradayData:
             analysis_result += ' - NA'        
         return analysis_result
 
+    @property
+    def rate_of_active_buy(self):
+        return self.sum_Volume_Buy/self.sum_Volume
+
+    @property
+    def Liquidity(self):
+        liquidity = np.sum(self.df_data['price']*self.df_data['volume'])
+        return liquidity
+
+    
     def GetSummary(self):
         summary_text = (
-            f'Shark action: {self.analysis_shark_action()}\n'+\
-            f'Volume: {self.sum_Volume:,.0f} | Rate (Buy): {self.rateOf_Buy_Volume:.2f} (%) | Rate (Buy/Sell): {self.rateOf_Buy_Over_Sell_Volume:.2f}\n'
-            f'Orders: {self.countOf_Orders:,.0f} | Rate (Buy orders): {self.rateOf_Buy_Orders:.2f} (%) | Rate (Buy/Sell Orders): {self.rateOf_Buy_Over_Sell_Orders:.2f} (%)\n'
-            f'Forcast: {self.symbol} - {self.GetForcast()}\n'
-            f'Top sticks: \n'
-            f'{self.get_top_sticks_markdown(20)}'
+            f'{self.symbol} - Giá TB: {self.avg_price:,.2f} | Giá HT {self.last_price:,.2f} ~ {percent(self.last_price,self.avg_price):,.2f} (%)'
+            f'\nThanh khoản: {self.Liquidity:,.2f}'
+            f'\nShark action: {self.analysis_shark_action()}'+\
+            f'\nVolume: {self.sum_Volume:,.0f} | Rate (Buy): {self.rateOf_Buy_Volume:.2f} (%) | Rate (Buy/Sell): {self.rateOf_Buy_Over_Sell_Volume:.2f}'
+            f'\nSố lệnh: {self.countOf_Orders:,.0f} | TL lệnh mua: {self.rateOf_Buy_Orders:.2f} (%)'
+            f'\nDự báo: {self.symbol} - {self.GetForecast()}'
+            f'\nMua chủ động: {self.sum_Volume_Buy:,.0f} - Bán chủ động: {self.sum_Volume_Sell:,.0f} : Tỷ lệ {self.rate_of_active_buy:,.2f}'
+            f'\nTop sticks:'
+            f'\n{self.get_top_sticks_markdown(10)}'
         )
 
         return summary_text
        
-    def GetForcast(self):
+    def GetForecast(self):
         if(self.rateOf_Buy_Over_Sell_Orders > 1) and (self.rateOf_Buy_Over_Sell_Volume > 1):
             return 'BUY'
         elif (self.rateOf_Buy_Over_Sell_Orders < 1) and (self.rateOf_Buy_Over_Sell_Volume < 1):
@@ -129,6 +131,7 @@ class AnalysisIntradayData:
         return self.df_buy['volume'].max()
 
 # x = AnalysisIntradayData(symbol='VND')
+# print(x.GetSummary())
 # print(x.get_last_stick())
 # sticks = x.get_top_sticks(10)
 # print(sticks)

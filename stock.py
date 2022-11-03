@@ -1,5 +1,5 @@
 from Caculator import *
-from DayStick import * #DateStick, DayData
+from DayData import * #DateStick, DayData
 from candleStick import CandleStick
 import db
 import pandas as pd
@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import datetime as dt
 from IntradayData import *
-from stockApi import *
 from vnstock import *
 from Pivot import *
 
@@ -70,9 +69,6 @@ class Stock:
         
     def load_basic_data(self):
         return price_board(self.name)
-
-    def GetTCB(self):
-        return price_board(self.name).transpose()
 
     def IsLoadData(self):
         if self.df_data.empty:
@@ -246,12 +242,14 @@ class Stock:
         #pivots = []
         start = 0
         end = len(self.df_data)-20
-        output = f'{self.name}'
+        output = ''
         for i in range(start,end):
             if self.is_pivot_point(i):
                 if(i <= 30):
                     output += f'\n{i} - Pivot {self.PRICES[i]} - {self.df_data["%"][i]}'
                     #pivots = pivots.append(i)
+        if(len(output)>1):
+            output = f'{self.name}' + "\nPivots:" + output
         return output
     
     # def GetDataSticks(self):
@@ -407,10 +405,10 @@ class Stock:
         output += f'\nKL cao nhất: {str(self.MAX_V)} | KL thấp nhất: {str(self.MIN_V)}'
         output += f'\nThanh khoản cao nhất: {np.max(self.df_data["Money"]):,.2f} | Thanh khoản thấp nhất: {str(np.min(self.df_data["Money"]))}'
         output += f'\nNến hiện tại {self.STICKS[0].Describe()}'
+        output += f'\n{"-"*30}'
         if(self.get_pivots() != None):
             output += f'\n Điểm pivots: \n {self.get_pivots_as_string()}'
-        analysis_intraday = AnalysisIntradayData(symbol=self.name)
-        output += f'\nAnalysis Intraday-Data:\n{analysis_intraday.GetSummary()}\n'
+        
 
         #output += f'\nDự báo (nến) {self.STICKS[0].Forecast_By_CandleStick()}'
         # output += f'\nDự báo (nến) {getMaxStickVolume(self.name).to_markdown()}'
@@ -580,12 +578,13 @@ class Stock:
         plt.legend()
         plt.show()
 
-stocks = ['KSB','TPB','VND','KBC','CEO','BID','CTG','HPG']
-for s in stocks:
-    s = Stock(name=s)
-    s.Prepare()
-    d = DayData(symbol=s.name, index=0,df_all_data=s.df_data)
-    d.to_string()
+# stocks = ['HAX']
+# for s in stocks:
+#     s = Stock(name=s)
+#     s.Prepare()
+#     d = DayData(symbol=s.name, index=0,df_all_data=s.df_data)
+#     print(d.get_info())
+
 # stocks = ['KSB','TPB','VND','KBC','CEO','BID','CTG']
 # for s in stocks:
 #     s = Stock(name=s)

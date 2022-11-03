@@ -1,6 +1,9 @@
 from cmath import cos
 import math
+from unicodedata import name
 from vnstock import *
+
+from DateHelper import percent
 
 #Compound: Lãi kép
 def compound_share(beginValue = 100, rate = 0.1, repeatedTime = 1):
@@ -18,6 +21,67 @@ def compound_share(beginValue = 100, rate = 0.1, repeatedTime = 1):
 class FinanceStock:
     def __init__(self, symbol) -> None:
         self.symbol = symbol.upper()
+        self.df_basic_data = self.GetTCB()
+        
+        self.Price = self.df_basic_data['Giá Khớp Lệnh'][0]
+        self.RSI = self.df_basic_data['RSI'][0]
+        self.ROE = self.df_basic_data['ROE'][0]*100
+        self.PE = self.df_basic_data['P/E'][0]
+        self.PB = self.df_basic_data['P/B'][0]
+        self.MA20 = self.df_basic_data['MA20'][0]
+        self.MA50 = self.df_basic_data['MA50'][0]
+        self.MA100 = self.df_basic_data['MA100'][0]
+        self.signal_KT = self.df_basic_data['Tín hiệu KT'][0]
+        self.signal_TBD = self.df_basic_data['Tín hiệu TB động'][0]
+        self.MACD_Signal = self.df_basic_data['MACD Signal'][0]
+        self.MACD_Volume = self.df_basic_data['MACD Volume'][0]
+        self.Du_Mua = self.df_basic_data['Khối lượng Dư mua'][0]
+        self.Du_Ban = self.df_basic_data['Khối lượng Dư bán'][0]
+        self.Price_At_Max_Vol = self.df_basic_data['Khớp nhiều nhất'][0]
+        self.Evalue_Price = self.df_basic_data['TCBS định giá'][0]
+        
+    def get_basic_analysis(self):
+        return self.df_basic_data
+
+    @property
+    def basic_review(self):
+        safe_ROE = 15
+        safe_PE = 15
+
+        if(self.PE >= safe_PE):
+            return f'\n{self.PE} : Quá cao'
+        elif(self.PE <= safe_PE and self.ROE >= safe_ROE):
+            return f'\nP/E: {self.PE} - ROE: {self.ROE:,.2f} (%) : Hấp dẫn'
+    @property
+    def rsi_review(self):
+        if self.RSI <= 30:
+            return f'RSI: {self.RSI:,.2f} : Quá bán'
+        elif self.RSI >= 90:
+            return f'RSI: {self.RSI:,.2f} : Quá mua'
+        elif self.RSI >= 75:
+            return f'RSI: {self.RSI:,.2f} : Đang mạnh (Mark Minervini) - Xem xét'
+        else:
+            return f'RSI: {self.RSI:,.2f} : Chưa xác định'
+
+    def get_signals(self):
+        message = f'{self.symbol} - Tín hiệu :'+\
+            f'\nPE: {self.PE} - PB: {self.PB} - ROE: {self.ROE:,.2f} - Định giá: {self.Evalue_Price:,.2f} ~ {percent(self.Price,self.Evalue_Price):,.2f} (%)' +\
+            f'\nRSI : {self.rsi_review} - Kỹ thuật: {self.signal_KT}' +\
+            f'\nTrung bình động: {self.signal_TBD}'+\
+            f'\nMACD (signal): {self.MACD_Signal} - MACD (volume): {self.MACD_Volume}'+\
+            f'\n{"-"*30}'
+
+        return message
+    
+    def get_summary(self):
+        message = f'\n{self.get_signals()}' +\
+            f'\n{self.basic_review}'+\
+            f'\n{"-"*30}'
+        return message
+
+    def GetTCB(self):
+        data = price_board(self.symbol)
+        return data
 
     def getBasicInfo(self):
         query = self.symbol
@@ -37,7 +101,6 @@ class FinanceStock:
     def get_avg_dividend(self):
 
         df = self.get_dividend_history()
-        print(df)
 
         df_cash = df[df['issueMethod']=='cash']#['cashDividendPercentage']
         df_share = df[df['issueMethod']=='share']#['cashDividendPercentage']
@@ -55,7 +118,6 @@ class FinanceStock:
 
         for i in range(start_year,end_year):
             year = start_year + count_year
-            #print(f'Start: {start_year} End {end_year} - Now: {year} count_year: {count_year}')
             rate_of_cash = df_cash[df_cash['cashYear'] == year]['cashDividendPercentage'].sum()
             rate_of_share = df_share[df_share['cashYear'] == year]['cashDividendPercentage'].sum()
 
@@ -80,8 +142,13 @@ class FinanceStock:
         money = self.default_shares*price
 
 
-# stock = 'HAX'
+# stock = 'HPG'
 # f = FinanceStock(symbol=stock)
+# print(f.basic_review)
+# print(f.get_signals())
+# print(f.RSI)
+# print(f.Price)
+#print(f.get_basic_analysis())
 # print(f.getBasicInfo())
 # print(f.get_avg_dividend())
 

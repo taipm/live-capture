@@ -4,39 +4,48 @@ import db
 from DateHelper import *
 from Stock import Stock
 
-
-class RequestCommand(enumerate):
-    basic_query = 0,
-    intraday_query = 1,
-    profit_query = 2,
-    order_query = 3
-
-# class CommandHandle:
+# class StockCommand:
+#     # def __init__(self, symbol, request) -> None:
+#     #     self.symbol = symbol
+#     #     self.request = request
+    
 #     def __init__(self, command) -> None:
-#         pass
-
-#     def process_basic_query(self):
-#         pass
-
-#     def process_profit_order(self):
-#         stock = 
-
-class StockCommand:
-    # def __init__(self, symbol, request) -> None:
-    #     self.symbol = symbol
-    #     self.request = request
+#         self.command = cl
     
-    def __init__(self, command) -> None:
-        self.command = cl
+#     def clean(self, command):
+#         command = command
+
+
+# def match_request(text):
+#     stock = text.split(' ')[0]
+#     request = text.split(' ')[1]
+#     return StockCommand(symbl = stock, request = request)
+
+class BotCommand:
+    def __init__(self, text) -> None:
+        self.text = text.strip()
     
-    def clean(self, command):
-        command = command
+    def is_two_numbers(self):
+        if(self.text.startswith('?')):
+            self.text = self.text[1:].strip()
+        print(self.text)
+        items = self.text.split(' ')
+        print(items)
+        check = True
+        for item in items:
+            if item.isnumeric() == False:
+                check = False
+                break
+        if(check):
+            #numbers = items
+            if(len(items) == 2):
+                return float(items[0]), float(items[1])
+        else:
+            return None
 
-
-def match_request(text):
-    stock = text.split(' ')[0]
-    request = text.split(' ')[1]
-    return StockCommand(symbl = stock, request = request)
+# command = BotCommand('? 1 2')
+# a, b = command.is_two_numbers()
+# print(percent(a,b))
 
 def parse_request(text):
     if(text.startswith('#')):

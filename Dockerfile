@@ -17,9 +17,9 @@ COPY . .
 #     && rm -rf /tmp/pip-tmp
 
 #RUN pip3 uninstall python-telegram-bot
-RUN apt-get update \
-  && apt-get -y install tesseract-ocr \
-  && apt-get -y install tesseract-ocr-vie
+# RUN apt-get update \
+#   && apt-get -y install tesseract-ocr \
+#   && apt-get -y install tesseract-ocr-vie
   #&& apt-get install -y python3 python3-distutils python3-pip \
   #&& cd /usr/local/bin \
   #&& ln -s /usr/bin/python3 python \
@@ -28,9 +28,9 @@ RUN apt-get update \
 
 RUN pip3 install --upgrade pip
 RUN pip3 install python-telegram-bot
-RUN pip3 install tesseract
-RUN pip3 install pytesseract
-RUN pip3 install selenium
+#RUN pip3 install tesseract
+#RUN pip3 install pytesseract
+#RUN pip3 install selenium
 RUN pip3 install APScheduler
 RUN pip3 install requests
 RUN pip3 install numpy
