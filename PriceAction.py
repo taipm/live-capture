@@ -13,15 +13,6 @@ class PriceItem:
     def to_string(self):
         return f'{self.index} : {self.price:,.2f}'
 
-class TelegramTextOutput:
-    def __init__(self, text) -> None:
-        self.input = text
-        self.output = self.to_output()
-    
-    def to_output(self):
-        output = self.input
-        return output
-
 class PriceAction:
     def __init__(self, symbol, df_data, days) -> None:
         self.symbol = symbol.upper()
