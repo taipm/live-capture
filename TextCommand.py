@@ -1,29 +1,59 @@
 import Caculator
 from vnstock import *
+from TextHelper import *
 import db
 from DateHelper import *
-from Stock import Stock
+from Alpha import Alpha
 
-# class StockCommand:
-#     # def __init__(self, symbol, request) -> None:
-#     #     self.symbol = symbol
-#     #     self.request = request
-    
-#     def __init__(self, command) -> None:
-#         self.command = cl
-    
-#     def clean(self, command):
-#         command = command
+class Command:
+    def __init__(self, text) -> None:
+        self.command = text.strip()
 
+class MathCommand(Command):
+    def __init__(self, command) -> None:        
+        super().__init__(command)
+        self.result = self.excute()
 
-# def match_request(text):
-#     stock = text.split(' ')[0]
-#     request = text.split(' ')[1]
-#     return StockCommand(symbl = stock, request = request)
+    def excute(self):
+        return Alpha(self.command).result
 
+    def to_string(self):        
+        return self.command
+class StockCommand:
+    """
+    LỆNH: VND(100,11.2)
+    Nghĩa là: Mua 100 con VND, giá 11.2
+    """
+    def __init__(self, command) -> None:
+        self.command = command.lower()
+        tokens = self.tokens()
+        self.symbol = tokens[0]
+        self.volume = tokens[1]
+        self.price = tokens[2]
+    def tokens(self):
+        symbol = self.command.split('(')[0]
+        volume = self.command.split('(')[1].split(',')[0]
+        price = self.command.split('(')[1].split(',')[1][0:len(self.command.split('(')[1].split(',')[1])-1]
+        return symbol,volume,price
+    def to_string(self):
+        return f'{self.symbol} | {self.volume} | {self.price}'
+
+s = StockCommand('VND(100,11.25')
+print(s.to_string())
 class BotCommand:
     def __init__(self, text) -> None:
         self.text = text.strip()
+        self.text = to_standard(self.text)
+        self.tokens = self.tokens()
+        
+    def is_one_number(self):
+        if(len(self.tokens) == 1 and self.text.isnumeric()):
+            return True
+        else:
+            return False
+            
+    def tokens(self):
+        return self.text.split(' ')
     
     def is_two_numbers(self):
         if(self.text.startswith('?')):
@@ -42,19 +72,14 @@ class BotCommand:
                 return float(items[0]), float(items[1])
         else:
             return None
-
-# command = BotCommand('? 1 2')
-# a, b = command.is_two_numbers()
-# print(percent(a,b))
+# b = BotCommand('a + b*c - d/e')
+# print(b.tokens)
 
 def parse_request(text):
     if(text.startswith('#')):
         return "Command"
     else:
         return "Text"
-
-# print(parse_request('#HPG'))
-# print(parse_request("HPG"))
 
 def parseTextCommand(text):
     items = text.split(' ')
@@ -90,9 +115,7 @@ def parseTextCommand(text):
         money = vol*price
         
         print(f'{symbol} {vol} {price} m_price: {target_price}')
-        ratio = -3/100        
-        #market_price = db.get_stock_data_from_api(symbol=symbol).iloc[0]['Close']*1000
-        #m_price = market_price
+        ratio = -3/100              
 
         new_vol = Caculator.EvaluationOrder(old_vol=vol,old_price=price,ratio_profit=ratio, market_price=target_price)
         sum_vol = vol + new_vol
@@ -108,9 +131,3 @@ def parseTextCommand(text):
 
     else:
         return ""
-
-
-#def planning()
-
-# print(parseTextCommand("VND 500 17250"))
-# print(parseTextCommand("VND 500 17250 13400"))

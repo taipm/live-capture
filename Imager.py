@@ -2,7 +2,7 @@ import os
 import pytesseract
 from PIL import Image
 
-from watcher import get_last_image
+#from watcher import get_last_image
 
 def getTextFromImage(filePath):
     print(filePath)

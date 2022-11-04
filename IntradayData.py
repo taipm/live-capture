@@ -74,9 +74,12 @@ class AnalysisIntradayData:
         rate_of_big_stick = 20/100
         limit_money = 200000000
         df_big_sticks_by_rate = self.df_data[self.df_data['volume']>=rate_of_big_stick]
-        df_big_sticks_by_rate = df_big_sticks_by_rate[df_big_sticks_by_rate['volume']*df_big_sticks_by_rate['price']>=limit_money]
+        df_big_sticks_by_rate = df_big_sticks_by_rate[df_big_sticks_by_rate['volume']*df_big_sticks_by_rate['price']>=limit_money].sort_values(by=['volume'],ascending=False)
 
         return df_big_sticks_by_rate
+
+    # def get_robot_sticks(self):
+
 
     def analysis_shark_action(self):
         sum_vol_big_sticks = self.df_big_sticks['volume'].sum()
