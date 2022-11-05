@@ -8,7 +8,8 @@ class AnalysisIntradayData:
         self.symbol = symbol.upper()
 
         self.df_data = GetIntradayData(symbol=self.symbol)
-        self.last_price = self.get_last_stick()['price'][0]/1000
+        self.las_stick = self.df_data.sort_values(by=['time'],ascending=False).iloc[:1]
+        self.last_price = self.las_stick['price'][0]/1000
 
         self.df_big_sticks = self.Get_Big_Sticks()
         self.df_big_buy_sticks = self.df_big_sticks[self.df_big_sticks['a']=='BU']
@@ -17,13 +18,13 @@ class AnalysisIntradayData:
         self.df_buy = self.df_data[self.df_data['a']=='BU']
         self.df_sell = self.df_data[self.df_data['a']=='SD']
 
-        self.sum_Volume_Buy = self.df_buy['volume'].sum() 
-        self.sum_Volume_Sell = self.df_sell['volume'].sum()
+        # self.sum_Volume_Buy = self.df_buy['volume'].sum() 
+        # self.sum_Volume_Sell = self.df_sell['volume'].sum()
         self.sum_Volume = self.df_data['volume'].sum()
 
-        self.rateOf_Buy_Volume = self.sum_Volume_Buy/self.sum_Volume
-        self.rateOf_Sell_Volume = self.sum_Volume_Sell/self.sum_Volume
-        self.rateOf_Buy_Over_Sell_Volume = self.sum_Volume_Buy/self.sum_Volume_Sell
+        self.rateOf_Buy_Volume = self.sum_vol_buy/self.sum_Volume
+        self.rateOf_Sell_Volume = self.sum_vol_sell/self.sum_Volume
+        self.rateOf_Buy_Over_Sell_Volume = self.sum_vol_buy/self.sum_vol_sell
 
         self.countOf_Orders = len(self.df_data.index)
         self.countOf_BuyOrders = len(self.df_buy.index)
@@ -40,21 +41,58 @@ class AnalysisIntradayData:
         avg_price = (np.sum(self.df_data['volume']*self.df_data['price']))/np.sum(self.df_data['volume'])/1000
         return avg_price
 
-    def get_last_stick(self):
-        return self.df_data.sort_values(by=['time'],ascending=False).iloc[:1]
-        
+    @property
+    def rate_of_shark(self):
+        return (self.vol_of_shark/self.sum_Volume)*100
+
+    @property
+    def vol_of_shark(self):
+        return self.df_big_sticks['volume'].sum()
+
+    @property
+    def vol_of_shark_buy(self):
+        return self.df_big_buy_sticks['volume'].sum()
+
+    @property
+    def vol_of_shark_sell(self):
+        return self.df_big_sell_sticks['volume'].sum()
+
+    @property
+    def rate_of_active_buy(self):
+        return self.sum_vol_buy/self.sum_Volume
+
+    @property
+    def sum_vol_buy(self):
+        return self.df_buy['volume'].sum()
+    
+    @property
+    def sum_vol_sell(self):
+        return self.df_sell['volume'].sum()
+    
+    @property
+    def sum_vol_net_buy(self):
+        return self.sum_vol_buy-self.sum_vol_sell
+
+    @property
+    def liquidity(self):
+        liquidity = np.sum(self.df_data['price']*self.df_data['volume'])
+        return liquidity
+    @property
+    def liquidity_of_shark(self):
+        liquidity = np.sum(self.df_big_sticks['price']*self.df_big_sticks['volume'])
+        return liquidity
+
     def get_top_sticks(self, n_sticks):
         return self.df_data.sort_values(by=['volume'],ascending=False).head(n_sticks)
     
     def get_top_sticks_markdown(self,n_sticks):
         df = self.get_top_sticks(n_sticks=n_sticks)
+
         df = df[['price','volume','a','time']]
-       
         sum_buy = df[df['a']=='BU']['volume'].sum()
         sum_sell = df[df['a']=='SD']['volume'].sum()
 
-        #df = df()
-        output = df.to_markdown() + "\n" + f'volume: {sum_buy-sum_sell:,.2f} ~ {(sum_buy-sum_sell)*self.avg_price*1000:,.2f}'
+        output = df.to_markdown() + "\n" + f'Volume (M-B): {self.sum_vol_buy-self.sum_vol_sell:,.2f} ~ {(sum_buy-sum_sell)*self.avg_price*1000:,.2f}'
         
         if(sum_buy/sum_sell >=1.2):
             output += ' => Đang mua vào'
@@ -78,16 +116,11 @@ class AnalysisIntradayData:
 
         return df_big_sticks_by_rate
 
-    # def get_robot_sticks(self):
-
-
     def analysis_shark_action(self):
-        sum_vol_big_sticks = self.df_big_sticks['volume'].sum()
-        sum_vol_buy_big_sticks = self.df_big_buy_sticks['volume'].sum()
-        sum_vol_sell_big_sticks = self.df_big_sell_sticks['volume'].sum()
-        rateOf_buy_sell = sum_vol_buy_big_sticks/sum_vol_sell_big_sticks
-        rateOf_shark = (sum_vol_big_sticks/self.sum_Volume)*100
-        analysis_result = f'{rateOf_shark:,.2f} (%) - Tỷ lệ (M/B): {rateOf_buy_sell:,.2f}'
+        rateOf_buy_sell = self.vol_of_shark_buy/self.vol_of_shark
+        analysis_result = f'Shark'+\
+            f'\n(Money): {self.liquidity_of_shark:,.2f} | (volume): {self.vol_of_shark:,.0f}'+\
+            f'\nTỷ lệ vol: {self.rate_of_shark:,.2f} (%) - Tỷ lệ (M/B): {rateOf_buy_sell:,.2f}'
 
         if(rateOf_buy_sell >= 2):
             analysis_result += ' - MUA MẠNH'
@@ -97,25 +130,16 @@ class AnalysisIntradayData:
             analysis_result += ' - NA'        
         return analysis_result
 
-    @property
-    def rate_of_active_buy(self):
-        return self.sum_Volume_Buy/self.sum_Volume
-
-    @property
-    def Liquidity(self):
-        liquidity = np.sum(self.df_data['price']*self.df_data['volume'])
-        return liquidity
-
     
     def GetSummary(self):
         summary_text = (
             f'{self.symbol} - Giá TB: {self.avg_price:,.2f} | Giá HT {self.last_price:,.2f} ~ {percent(self.last_price,self.avg_price):,.2f} (%)'
-            f'\nThanh khoản: {self.Liquidity:,.2f}'
-            f'\nShark action: {self.analysis_shark_action()}'+\
-            f'\nVolume: {self.sum_Volume:,.0f} | Rate (Buy): {self.rateOf_Buy_Volume:.2f} (%) | Rate (Buy/Sell): {self.rateOf_Buy_Over_Sell_Volume:.2f}'
+            f'\nThanh khoản: {self.liquidity:,.2f}'
+            f'\nKL: {self.sum_Volume:,.0f} | Rate (Buy): {self.rateOf_Buy_Volume:.2f} (%) | Rate (Buy/Sell): {self.rateOf_Buy_Over_Sell_Volume:.2f}'
             f'\nSố lệnh: {self.countOf_Orders:,.0f} | TL lệnh mua: {self.rateOf_Buy_Orders:.2f} (%)'
             f'\nDự báo: {self.symbol} - {self.GetForecast()}'
-            f'\nMua chủ động: {self.sum_Volume_Buy:,.0f} - Bán chủ động: {self.sum_Volume_Sell:,.0f} : Tỷ lệ {self.rate_of_active_buy:,.2f}'
+            f'\nMua/bán chủ động: {self.sum_vol_buy:,.0f} | {self.sum_vol_sell:,.0f} | Tỷ lệ {self.rate_of_active_buy:,.2f}'
+            f'\n{self.analysis_shark_action()}'
             f'\nTop sticks:'
             f'\n{self.get_top_sticks_markdown(10)}'
         )

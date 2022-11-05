@@ -61,9 +61,9 @@ def get_stock_data_from_api(symbol):
                 del df['giaoDichThoaThuan']
 
                 #STEP 2: MỞ RỘNG DỮ LIỆU
-                df['Money'] = (df['Close']*df['Volume']*1000*100)/1000000000 #Giá trị giao dịch (tỷ)
+                df['Money'] = (df['Close']*df['Volume']*1000)
                 df['NN'] = df['NN Mua'] - df['NN Ban']
-                df['M(NN)'] = df['NN']*df['Volume']*1000*100/1000000000 #Giá trị giao dịch của khối ngoại (tỷ)
+                df['M(NN)'] = df['NN']*df['Volume']*1000*100 #Giá trị giao dịch của khối ngoại (tỷ)
                 df['Oscillation'] = np.abs(((df['Low']-df['High'])/df['Low'])*100)
                 df['Oscillation-Low-Open'] = ((df['Low']-df['Open'])/df['Open'])*100
                 df['Oscillation-Open-High'] = ((df['High']-df['Open'])/df['Open'])*100
@@ -76,7 +76,8 @@ def get_stock_data_from_api(symbol):
 def GetStockData(symbol):    
         data = get_stock_data_from_api(symbol=symbol)
         if not data.empty:
-                df = pd.DataFrame(data=data)                     
+                df = pd.DataFrame(data=data)
+                df['Close'] = df['Close']
                 df = df.reset_index(drop=True)
                 df.set_index('Date')
                 return df

@@ -1,15 +1,15 @@
-from operator import index
 from DateHelper import *
 from RichNumber import RichNumber
+from CandleStick import CandleStick
 
 class DayData:
-    def __init__(self, symbol, index, df_all_data) -> None:
+    def __init__(self, symbol, index, df_all_data, count_days) -> None:
         self.symbol = symbol.upper()        
         self.df_all_data = df_all_data
         self.df_all_data['%'] = ((df_all_data['Close']-df_all_data['Open'])/(df_all_data['Open']))*100
-        #self.df_all_data['Oscillation'] = self
         self.index = index
-        self.T_days = 10        
+        self.T_days = count_days
+
         self.data_item = self.df_all_data.iloc[index]
         self.date  = self.data_item['Date']
         self.close = self.data_item['Close']
@@ -32,14 +32,20 @@ class DayData:
         self.max_inc_price = np.max(self.df_data['%'])
         self.min_price = np.min(self.df_data['Close'])
         self.max_price = np.max(self.df_data['Close'])
+        self.last_max_price = np.max(self.df_data['Close'][1:])
+        self.last_min_price = np.min(self.df_data['Close'][1:])
         
         self.avg_vol = np.average(self.df_data['Volume'])
         self.min_vol = np.min(self.df_data['Volume'])
         self.max_vol = np.max(self.df_data['Volume'])
+        self.last_max_vol = np.max(self.df_data['Volume'][1:])
+        self.last_min_vol = np.min(self.df_data['Volume'][1:])
 
         self.avg_oscillation = np.average(self.df_data['Oscillation'])
         self.avg_oscillation_low = np.average(self.df_data['Oscillation-Low-Open'])
         self.avg_oscillation_high = np.average(self.df_data['Oscillation-Open-High'])
+
+        self.CandleStick = CandleStick(open=self.open,close=self.close,high=self.high,low=self.low,volume=self.volume, index=0)
 
     @property
     def today_money(self):
@@ -51,6 +57,18 @@ class DayData:
             return self.close
         else:
             return self.open
+
+    def is_over_max_price(self):
+        if self.max_price > self.last_max_price:
+            return True
+        else:
+            return False
+    def is_under_min_price(self):
+        if self.min_price < self.last_min_price:
+            return True
+        else:
+            return False
+
     @property
     def count_red(self):
         return len(self.df_data[self.df_data['%']<0])
@@ -81,39 +99,19 @@ class DayData:
     def get_df_next_data(self):
         T_next_days = 10
         try:
-            df_next_data = self.df_all_data[index:index-T_next_days]
+            df_next_data = self.df_all_data[self.index:self.index-T_next_days]
             return df_next_data
         except:
             return None
 
     def is_min_vol(self):
-        days_to_count = self.T_days
-        min_vol = np.min(self.df_all_data[self.index:self.index + days_to_count]['Volume'])
-        if(self.volume == min_vol):
+        if(self.volume <= self.last_min_vol):
             return True
         else:
             return False
     
     def is_max_vol(self):
-        days_to_count = self.T_days
-        max_vol = np.max(self.df_all_data[self.index:self.index + days_to_count]['Volume'])
-        if(self.volume == max_vol):
-            return True
-        else:
-            return False
-
-    def is_min_price(self):
-        days_to_count = self.T_days
-        min_price = np.min(self.df_all_data[self.index:self.index + days_to_count]['Close'])
-        if(self.close == min_price):
-            return True
-        else:
-            return False
-
-    def is_max_price(self):
-        days_to_count = self.T_days
-        max_price = np.max(self.df_all_data[self.index:self.index + days_to_count]['Close'])
-        if(self.close == max_price):
+        if(self.volume >= self.last_max_vol):
             return True
         else:
             return False
@@ -137,7 +135,6 @@ class DayData:
     def get_margin_price(self):
         return self.df_data['%'][0]
 
-    
     def get_distance_price(self):
         min = self.min_price
         max = self.max_price
@@ -185,26 +182,28 @@ class DayData:
             return True,'Chiết khấu sâu'
         else:
             return None,"Chưa xác định"
-
-    def get_momentum(self):
+    @property
+    def momentum(self):
         return self.get_distance_price()/self.T_days
 
     def get_info(self):
         output = f'{self.symbol} - Phiên [{self.index}] - {self.close} [{self.get_margin_price():,.2f} (%)] - GTGD: {self.today_money:,.2f}'+\
         f'\nBiến động : '+\
-        f'\n=> Cao nhất: {np.max(self.df_data["Oscillation"]):,.2f} (%)| TN {np.min(self.df_data["Oscillation"]):,.2f} (%) | TB: {self.avg_oscillation:,.2f} | HT: {self.oscillation:,.2f} (%)'+\
-        f'\nMax tăng: {self.max_inc_oscillation_open:,.2f} (%) | Max giảm: {self.max_desc_oscillation_open:,.2f} (%) | TB-Tăng: {np.average(self.avg_oscillation_high):,.2f} (%)| TB-Giảm: {self.avg_oscillation_low:,.2f} (%)'+\
-        f'\nMục tiêu: Mua {self.target_buy_price:,.2f} ({self.avg_oscillation_low:,.2f} (%)) - Bán: {self.target_sell_price:,.2f} ({self.avg_oscillation_high:,.2f}) (%)'+\
-        f' => LN: {percent(self.target_sell_price,self.target_buy_price):,.2f} (%)'+\
+        f'\n=> CN: {np.max(self.df_data["Oscillation"]):,.2f} (%)| TN {np.min(self.df_data["Oscillation"]):,.2f} (%) | TB: {self.avg_oscillation:,.2f} | HT: {self.oscillation:,.2f} (%)'+\
+        f'\nMax tăng/giảm: {self.max_inc_oscillation_open:,.2f} (%) | {self.max_desc_oscillation_open:,.2f} (%)'+\
+        f'\nTB-Tăng: {np.average(self.avg_oscillation_high):,.2f} (%)| TB-Giảm: {self.avg_oscillation_low:,.2f} (%)'+\
+        f'\nMục tiêu: \n- Mua {self.target_buy_price:,.2f} ({self.avg_oscillation_low:,.2f} (%))'+\
+        f'\n- Bán: {self.target_sell_price:,.2f} ({self.avg_oscillation_high:,.2f}) (%)'+\
+        f'\n=> Lợi nhuận: {percent(self.target_sell_price,self.target_buy_price):,.2f} (%)'+\
         f'\nBước giá {RichNumber(self.target_buy_price).rich_text}'+\
         f'\nTrong {self.T_days} phiên : {self.sum_margin_price:,.2f}(%)'+\
         f'\nTăng {self.count_green} | Giảm {self.count_red} | Tham chiếu {self.count_yellow} : Tỷ lệ {self.count_green/self.count_red:,.2f}'+\
         f'\n03 phiên: {self.df_data["%"][0]:,.2f} | {self.df_data["%"][1]:,.2f} | {self.df_data["%"][2]:,.2f} | Tổng: {np.sum(self.df_data["%"][0:2]):,.2f} (%)'+\
-        f'\nTín hiêu mua: {self.get_signal()} | Momentium: {self.get_momentum():,.2f}'+\
+        f'\nTín hiêu mua: {self.get_signal()} | Momentium: {self.momentum:,.2f}'+\
         f'\nGiá CN/TN: {self.max_price} | {self.min_price} [{self.get_index_of_min_price()}] [d = {self.get_distance_price():,.2f} (%)]'+\
         f'\nLN cao nhất: {self.get_max_profit():,.2f} (%)'+\
         f'\nKLGD TB : {self.avg_vol:,.2f} - Min vol: {self.is_min_vol()} - Max vol: {self.is_max_vol()}, '+\
-        f'\nMin price : {self.is_min_price()} , Max price: {self.is_max_price()}, '+\
+        f'\nMin price : {self.is_under_min_price()} , Max price: {self.is_over_max_price()}, '+\
         f'\nNN(Mua-Bán) {self.sum_foriegn:,.2f} ~ {(self.sum_foriegn/self.sum_vol)*100:,.2f} (%) - Min NN : {self.is_min_foriegn()}, - Max NN {self.is_max_foriegn()}'+\
         f'\n{"-"*30}'
         return output

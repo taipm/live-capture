@@ -8,7 +8,6 @@ from telegram.ext.messagehandler import MessageHandler
 from telegram.ext.filters import Filters
 from FinanceStock import FinanceStock
 from DateHelper import*
-from Stock import Stock
 from apscheduler.schedulers.background import BlockingScheduler
 import telegram
 from BotAnswer import BotAnswer
@@ -110,7 +109,8 @@ def unknown_text(update: Update, context: CallbackContext):
 		try:
 			print('Đang xử lý')
 			textOf_answer = botAnswer.answer()
-			update.message.reply_text(textOf_answer)
+			#update.message.reply_text(textOf_answer)
+			update.message.reply_text(TextBuilder(textOf_answer).text_markdown, parse_mode="Markdown")
 		except:
 			rs = parseTextCommand(input_text)
 			

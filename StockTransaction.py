@@ -36,4 +36,4 @@ def test():
     t = Transaction(symbol='BSR',volume=2000,buy_price=17700, sell_price=17800)
     print(t.to_string())
 
-test()
+#test()

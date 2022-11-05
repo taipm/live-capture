@@ -17,28 +17,35 @@ class MathCommand(Command):
     def excute(self):
         return Alpha(self.command).result
 
-    def to_string(self):        
+    def to_string(self):
         return self.command
 class StockCommand:
     """
-    LỆNH: VND(100,11.2)
+    LỆNH: BUY(VND,100,11.2)
     Nghĩa là: Mua 100 con VND, giá 11.2
     """
     def __init__(self, command) -> None:
         self.command = command.lower()
         tokens = self.tokens()
-        self.symbol = tokens[0]
-        self.volume = tokens[1]
-        self.price = tokens[2]
-    def tokens(self):
-        symbol = self.command.split('(')[0]
-        volume = self.command.split('(')[1].split(',')[0]
-        price = self.command.split('(')[1].split(',')[1][0:len(self.command.split('(')[1].split(',')[1])-1]
-        return symbol,volume,price
-    def to_string(self):
-        return f'{self.symbol} | {self.volume} | {self.price}'
+        self.type = tokens[0].upper()
+        self.symbol = tokens[1].upper()
+        self.volume = float(tokens[2])
+        self.price = float(tokens[3])
 
-s = StockCommand('VND(100,11.25')
+    def tokens(self):
+        type = self.command.split('(')[0]
+        symbol = self.command.split('(')[1].split(',')[0]
+        volume = self.command.split('(')[1].split(',')[1]
+        price = self.command.split('(')[1].split(',')[2][0:len(self.command.split('(')[1].split(',')[2])-1]
+        return type, symbol,volume,price
+
+    def to_string(self):
+        return f'{self.type} | {self.symbol} | {self.volume:,.0f} | {self.price:,.2f}'
+
+s = StockCommand('BUY(VND,100,11.25)')
+print(s.to_string())
+
+s = StockCommand('SELL(VND,100,11.25)')
 print(s.to_string())
 class BotCommand:
     def __init__(self, text) -> None:
@@ -128,6 +135,5 @@ def parseTextCommand(text):
                 f'Kết quả:\n {symbol} - Vol: {sum_vol:,.0f} - Giá TB: {avg_price:,.2f} ({percent(target_price,avg_price):.2f} (%)) = Tiền: {sum_money:,.0f}'
                 ##f'Giá TB (mới): {avg_price:,.2f} - Profit: {percent(m_price,avg_price):.2f} (%)' +\
         return output_text
-
     else:
         return ""

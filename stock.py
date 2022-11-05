@@ -1,43 +1,30 @@
 from Caculator import *
 from DayData import * #DateStick, DayData
-from candleStick import CandleStick
+from CandleStick import CandleStick
+from IntradayData import *
 import db
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
+#import matplotlib.pyplot as plt
+#import seaborn as sns
 import datetime as dt
-from IntradayData import *
 from vnstock import *
 from Pivot import *
 
-sns.set()
-pd.options.display.float_format='{:,.2f}'.format
-pd.set_option('display.width',85)
+# sns.set()
+# pd.options.display.float_format='{:,.2f}'.format
+# pd.set_option('display.width',85)
 
 class Stock:
     def __init__(self, name) -> None:
         self.name = name.upper()
-        
-        self.P = 0
-        self.MAX_P = 0
-        self.MIN_P = 0
-        self.AVG_P = 0
-        self.Money = 0
-        
-        self.V = 0
-        self.MAX_V = 0
-        self.MIN_V = 0
-        self.AVG_V = 0
-
-        self.df_data = pd.DataFrame()
+        #self.df_data = pd.DataFrame()
         self.StrSummary = self.name
         self.FileName = ''
  
         self.df_data = self.Load_Daily_Data()
-        self.df_daily_data = self.df_data
-        self.df_weekly_data = split_array(arr = self.df_daily_data,sizeOf_item=5)
-
+        self.len = len(self.df_data)
+        #self.df_daily_data = self.df_data
         self.last_price = self.df_data['Close'][0]
         self.last_volume = self.df_data['Volume'][0]
         
@@ -50,30 +37,110 @@ class Stock:
         self.daily_open_prices = self.df_data['Open']
         self.daily_close_prices = self.df_data['Close']
 
+        #self.price = self.daily_prices[0]
+        self.max_price = np.max(self.daily_prices)
+        self.min_price = np.min(self.daily_prices)
+        self.vol = self.daily_volumes[0]
+        self.max_vol = np.max(self.daily_volumes)
+        self.min_vol = np.min(self.daily_volumes)
+        self.avg_vol = np.average(self.daily_volumes)
 
         self.TCB_Data = self.load_basic_data()#price_board(self.name)
-        self.Price = self.TCB_Data['Giá Khớp Lệnh'].values
-        self.TCB_Suggest_Price = self.TCB_Data['TCBS định giá'].values
-        self.RSI = self.TCB_Data['RSI'].values
-        self.P_B = self.TCB_Data['P/B'].values
-        self.P_E = self.TCB_Data['P/E'].values
-        self.ROE = self.TCB_Data['ROE'].values
+        #print(self.TCB_Data.transpose())
+        self.intraday_price = self.TCB_Data['Giá Khớp Lệnh'].values[0]/1000
+        self.TCB_valuation = self.TCB_Data['TCBS định giá'].values[0]/1000
+        self.max_price_year = self.TCB_Data['Đỉnh 1Y'].values[0]/1000
+        self.min_price_year = self.TCB_Data['Đáy 1Y'].values[0]/1000
+        self.MA20 = self.TCB_Data['MA20'].values[0]/1000
+        self.MA50 = self.TCB_Data['MA50'].values[0]/1000
+        self.MA100 = self.TCB_Data['MA100'].values[0]/1000
+        self.RSI = self.TCB_Data['RSI'].values[0]
+        self.PB = self.TCB_Data['P/B'].values[0]
+        self.PE = self.TCB_Data['P/E'].values[0]
+        self.ROE = self.TCB_Data['ROE'].values[0]*100
 
-        self.df_intraday_data = self.load_intraday_data()
+        self.STICKS = self.ToCandleSticks()
+        #self.df_intraday_data = self.load_intraday_data()
     
     def Load_Daily_Data(self) -> pd.DataFrame:
         return db.GetStockData(self.name)
+
+    @property
+    def price(self):
+        if(self.intraday_price != self.daily_prices[0]):
+            return self.intraday_price
+        else:
+            return self.daily_prices[0]
+    @property
+    def review_price(self):
+        output = f''
+        if(self.price >= self.max_price_year):
+            output += f'Vượt đỉnh năm: {percent(self.price,self.max_price_year):,.2f} (%)'
+        elif(self.price <= self.min_price_year):
+            output += f'Thủng dáy năm: {percent(self.price,self.min_price_year):,.2f} (%)'
+        else:
+            output += f'Chưa có gì đặc biệt'
+        return output
+    @property
+    def review_candle_stick(self):
+        stick = self.STICKS[0]
+        return stick.Get_Summary()
+    @property
+    def review_ROE(self):
+        output = f'ROE = {self.ROE:,.2f}'
+        if self.ROE <= 10:
+            output += f': Quá thấp'
+        elif self.ROE >= 15 and self.ROE < 20:
+            output += f': Hợp lý'
+        elif self.ROE >= 20:
+            output += f': Hấp dẫn'
+        return output
+
+    @property
+    def review_PB(self):
+        output = f'PB = {self.PB:,.2f}'
+        if self.PB <= 1:
+            output += f': Hấp dẫn'
+        elif self.PB >= 2 and self.PB < 3:
+            output += f': Hợp lý'
+        elif self.PB >= 3:
+            output += f': Quá cao'
+        return output
     
-    def load_intraday_data(self)->pd.DataFrame:
-        return GetIntradayData(self.name)
-        
+    @property
+    def review_RSI(self):
+        output = f'RSI = {self.RSI:,.2f}'
+        if self.RSI <= 30:
+            output += f': Quá bán'
+        if self.RSI <= 35 and self.RSI > 30:
+            output += f': Gần quá bán'
+        elif self.RSI >= 90:
+            output += f': Quá mua'
+        elif self.RSI >= 70 and self.RSI <= 85:
+            output += f': Đang năng động'
+        return output
+
+    @property
+    def review_TCB_valuation(self):
+        valuation = self.TCB_valuation
+        output = f'Giá: {self.price:,.2f} - Định giá: {valuation:,.2f} | Tỷ lệ: {self.price/valuation:,.2f} (%)'
+        if(self.price <= valuation):
+            output += ' => Hấp dẫn'
+        else:
+            output += ' => Cao, xem lại'
+        return output
+
+    @property
+    def review(self):
+        output = f'Nhận xét (cơ bản) :'+\
+            f'\n- {self.review_ROE}' +\
+            f'\n- {self.review_RSI}' +\
+            f'\n- {self.review_PB}' +\
+            f'\n- {self.review_TCB_valuation}'
+        return output
+
     def load_basic_data(self):
         return price_board(self.name)
-
-    def IsLoadData(self):
-        if self.df_data.empty:
-            return False
-        return True
 
     def get_percent_price(self, index):
         if(index < 0):
@@ -81,7 +148,7 @@ class Stock:
         return self.df_data['%'][index]
 
     def get_percent_vol_day(self):
-        return percent(self.df_data['Volume'][0], self.df_data['Volume'][1])
+        return percent(self.daily_volumes[0], self.daily_volumes[1])
     
     def get_percent_vol_avg_week(self, index):
         start = index
@@ -102,12 +169,9 @@ class Stock:
         return percent(self.df_data['Volume'][0], vol_avg_week)
 
     def is_min_vol(self,index):
-        count_of_days = 20
         vol = self.df_data.iloc[index]['Volume']
-        min_vol = np.min(self.df_data['Volume'][index:index+count_of_days])
-        avg_vol = np.average(self.df_data['Volume'][index:index+count_of_days])
         rate_of_profit = self.get_profit_by_index(index=index,pre_count_of_days=-1)
-        if(vol <= avg_vol and rate_of_profit <= 2 and rate_of_profit >= -3):
+        if(vol <= self.avg_vol and rate_of_profit <= 2 and rate_of_profit >= -3):
             return True
         else:
             return False
@@ -160,136 +224,25 @@ class Stock:
             n_price = self.df_data.iloc[index-i]['Close']
             profit = percent(price,n_price)
             values.append(profit)
-            #values.append([i,profit])
-        #print(values)
-        # if(np.max(values) >= 3):
-        #     return f'{True} : {np.max(values)}'
-        # else:
-        #     return f'{False} : {np.min(values)}'
         return np.max(values),np.min(values)
-    
-    def check_min_vol(self):
-        pivots = self.get_min_vols()
-        print(pivots)
-        count_yes = 0
-        count_no = 0
-        results = []
-
-        for p in pivots:
-            max_profit, min_profit = s.check_profit(p.index)
-            if(max_profit >= 3):
-                count_yes+=1
-            else:
-                count_no+=1
-            results.append([p.index,max_profit,min_profit])
-        print(f'{self.name} Min-Vol : OK {count_yes} : NO {count_no}')
-        if(count_no != 0):
-            print(f'Ty le: {(count_yes/(count_no+count_yes))*100} (%)')
-        else:
-            print(f'Ty le: 100 (%)')
-        #print(results)
-        return results
-
-    def check_pivots(self):
-        pivots = self.get_pivots()
-        count_yes = 0
-        count_no = 0
-        results = []
-
-        for p in pivots:
-            max_profit, min_profit = s.check_profit(p.index)
-            if(max_profit >= 3):
-                count_yes+=1
-            else:
-                count_no+=1
-            results.append([p.index,max_profit,min_profit])
-        print(f'{self.name} Pivot : OK {count_yes} : NO {count_no}')
-        if(count_no != 0):
-            print(f'Ty le: {(count_yes/(count_no+count_yes))*100} (%)')
-        else:
-            print(f'Ty le: 100 (%)')
-        #print(results)
-        return results
-
-    def Get_Profit(self,d_start_str,d_end_str):
-        p1 = self.Get_Price(d_start_str)
-        p2 = self.Get_Price(d_end_str)
-        value = ((p2-p1)/p1)*100
-        print(value)
-        return value
-
-    def GetProfitAtPrev(self,countOfPrevDay):
-        last_p = self.GetLastPrice()
-        prev_p = self.GetPriceAtPrev(countOfPrevDays=countOfPrevDay)
-        return ((last_p-prev_p)/prev_p)*100
-    # def to_date_sticks(self):
-    #     for i in len()
-    #     date_data = DateStick(
-    #         date=data_item['Date'],
-    #         open=data_item['Open'],
-    #         close=data_item['Close'],
-    #         high=data_item['High'],
-    #         low=data_item['Low'],
-    #         volume=data_item['Volume'],
-    #         foriegn_buy=data_item['NN Mua'],
-    #         foriegn_sell=data_item['NN Ban']
-    #     )
-
-
-
 
     def get_pivots_as_string(self):
-        #pivots = []
         start = 0
         end = len(self.df_data)-20
         output = ''
         for i in range(start,end):
             if self.is_pivot_point(i):
                 if(i <= 30):
-                    output += f'\n{i} - Pivot {self.PRICES[i]} - {self.df_data["%"][i]}'
-                    #pivots = pivots.append(i)
+                    output += f'\n{i} - Pivot {self.daily_prices[i]} - {self.df_data["%"][i]}'
         if(len(output)>1):
-            output = f'{self.name}' + "\nPivots:" + output
+            output = f'\nPivots:\n' + output
         return output
-    
-    # def GetDataSticks(self):
-    #     df_sticks = GetSticks_Intraday(self.name)
-    #     return df_sticks
-
-    def Prepare(self):
-        '''
-        Chuẩn bị đầy đủ dữ liệu và sẵn sàng thực hiện tính toán
-        ''' 
-        if not self.IsLoadData():
-            self.LoadData()
-        
-        self.PRICES = self.df_data['Close']
-        self.VOLS = self.df_data['Volume']
-        
-        self.P = self.PRICES[0]
-        self.MAX_P = np.max(self.PRICES)        
-        self.MIN_P = np.min(self.PRICES)        
-        self.AVG_P = np.mean(self.PRICES[0])
-
-        self.V = self.VOLS[0]
-        self.MAX_V = np.max(self.VOLS)
-        self.MIN_V = np.min(self.VOLS)
-        self.AVG_V = np.mean(self.VOLS)
-        
-        self.Money = self.V*self.P
-        
-        self.LEN_DATA = len(self.df_data)
-        
-        self.STICKS = self.ToCandleSticks()
-        self.StrSummary += self.Describe()
-        self.StrSummary += self.Suggestion()
         
     def Get_Price(self, d_str):
         item = self.df_data[self.df_data['Date'] == dt.datetime.strptime(d_str, '%Y-%m-%d').date()]
         return item['Close'].values
     
     def Get_Volume(self, d_str):
-        #print(d_str)
         item = self.df_data[self.df_data['Date'] == dt.datetime.strptime(d_str, '%Y-%m-%d').date()]
         return item['Volume'].values
     
@@ -303,8 +256,9 @@ class Stock:
     
     def GetPriceAtPrev(self,countOfPrevDays):
         return self.GetDataItemAtPrev(countOfPrevDays=countOfPrevDays)['Close']
-
-    def Get_LastTrans_Date(self):
+    
+    @property
+    def last_trans_date(self):
         return self.df_data['Date'][0]
 
     def GetLastPrice(self):
@@ -312,7 +266,7 @@ class Stock:
 
     def ToCandleSticks(self):
         sticks = list()
-        for i in range(0,self.LEN_DATA):
+        for i in range(0,self.len):
             stick = CandleStick(high = self.df_data['High'][i],
                                 close = self.df_data['Close'][i],
                                 open = self.df_data['Open'][i],
@@ -323,8 +277,8 @@ class Stock:
     
         return sticks
     
-    
-    def Get_TyLeSong(self,T,percent):
+    @property
+    def rate_of_waze(self):
         """
         Tỷ lệ sóng: Là số lần dao động cao trên khung thời gian
         - T: Là khung thời gian (số phiên)
@@ -332,10 +286,12 @@ class Stock:
         Kết quả:
         -1: Là lỗi (vượt quá không gian dữ liệu)
         """
-        
-        if(T > self.LEN_DATA):
+        T = 20
+        percent = 3
+
+        if(T > len(self.df_data)):
             return -1 #Lỗi
-        df = self.df_data[0:T] #Cắt dữ liệu cho khớp với số phiên
+        #df = self.df_data[0:T] #Cắt dữ liệu cho khớp với số phiên
         sticks = self.STICKS[0:T] #Lấy số nến
         count_amp = 0 #Đếm biên độ dao động
         for stick in sticks:
@@ -343,247 +299,27 @@ class Stock:
                 count_amp += 1
         
         return count_amp/T
-        
-    def AllForecasts(self): #Dự báo (forecast), hàm này quét toàn bộ dự báo của các nến
-        up_forecasts = list()
-        down_forcecasts = list()
 
-        for i in range(0,self.LEN_DATA):
-            stick = self.STICKS[i]           
-            forecast_Up = False
-            forecast_Down = False
-            
-            note = ""          
-            if(stick.Forecast_By_CandleStick() == True): #Đang tạm thời có chỉ báo fly
-                forecast_Up = True
-                note = f'F- + {"{:.2f}".format(self.STICKS[i].Percent())}'
-                up_forecasts.append([i,self.df_data['Close'][i],note])
-            
-            elif(stick.Forecast_By_CE() == True):
-                forecast_Up = True
-                note = f'CE- + {"{:.2f}".format(self.STICKS[i].Percent())}'
-                up_forecasts.append([i,self.df_data['Close'][i],note])
-            elif(stick.IsSell_SignalCandleStick() == True):
-                forecast_Down = True
-                note = f'S-InvertFly- + {"{:.2f}".format(self.STICKS[i].Percent())}'
-                down_forcecasts.append([i,self.df_data['Close'][i],note])
-                
-        #print("Có: " + str(len(forecasts)) + " điểm dự báo")
-        return up_forecasts #,down_forcecasts
-    
-    def CheckForecasts(self, T_n): #Nên check đến T10 (là quá mức)
-        forecasts = self.AllForecasts()
-        rs = list()
-        
-        for f in forecasts:
-            index = f[0]#Chỉ số
-            price = f[1]#Giá tại lúc dự báo (tăng)
-            note = f[2] #Ghi chú, tăng vì lý do gì
-            
-            if(index < T_n): #len(self.df_data)-10
-                next_index = -1
-                next_price = np.max(self.df_data['Close'][index-T_n:index]) #Lấy giá lớn nhất trong khoảng này
-                isCorrect = False
-                if (next_price > price):
-                    isCorrect = True
-                    next_index = list(self.df_data['Close']).index(next_price)#[index+1:index+T_n].index(next_price)                
-                rs.append([index,next_index,price,next_price,isCorrect])            
-            
-        #Chuyển dự báo thành ma trận dự báo
-        #df_forecasts = pd.DataFrame(data=rs, columns=['T0','TN','Price','T3-P','YN'])
-        #print(df_forecasts.head().to_markdown())
-        return rs
-    
     def Describe(self):
-        output = f'{self.name.upper()}- Last date: {self.Get_LastTrans_Date()}'
-        output += f'\nGiá cao nhất: {str(self.MAX_P)} | Giá thấp nhất: {str(self.MIN_P)} | Giá hiện tại: {self.P}'
-        output += f'\n&CN: {"{:.2f}".format(((self.P - self.MAX_P)/self.MAX_P)*100)} (%) | &TN: {"{:.2f}".format(((self.P - self.MIN_P)/self.MIN_P)*100)} (%)'
-        output += f'\n03 (phiên): {self.GetPriceAtPrev(3)} | {"{:.2f}".format(self.GetProfitAtPrev(3))} (%)'
-        output += f'\n05 (phiên): {self.GetPriceAtPrev(5)} | {"{:.2f}".format(self.GetProfitAtPrev(5))} (%)'
-        output += f'\n10 (phiên): {self.GetPriceAtPrev(10)} | {"{:.2f}".format(self.GetProfitAtPrev(10))} (%)'
-        output += f'\n20 (phiên): {self.GetPriceAtPrev(20)} | {"{:.2f}".format(self.GetProfitAtPrev(20))} (%)'
-        output += f'\nKL cao nhất: {str(self.MAX_V)} | KL thấp nhất: {str(self.MIN_V)}'
-        output += f'\nThanh khoản cao nhất: {np.max(self.df_data["Money"]):,.2f} | Thanh khoản thấp nhất: {str(np.min(self.df_data["Money"]))}'
-        output += f'\nNến hiện tại {self.STICKS[0].Describe()}'
+        output = f'{self.name} [{self.last_trans_date}] - {self.price}'
+        output += f'\nNhận xét (giá): {self.review_price}'
+        output += f'\nNhận xét (nến): {self.review_candle_stick}'
+        output += f'\nKL cao nhất: {self.max_vol:,.0f} | KL thấp nhất: {self.min_vol:,.0f}'
+        output += f'\nThanh khoản: {self.daily_money[0]:,.0f} | CN/TN: {np.max(self.daily_money):,.0f} | {np.min(self.daily_money):,.0f}'
+        output += f'\n{self.review}'
+        output += f'\n- Tỷ lệ sóng: {self.rate_of_waze:,.2f}'
         output += f'\n{"-"*30}'
-        if(self.get_pivots() != None):
-            output += f'\n Điểm pivots: \n {self.get_pivots_as_string()}'
-        
-
-        #output += f'\nDự báo (nến) {self.STICKS[0].Forecast_By_CandleStick()}'
-        # output += f'\nDự báo (nến) {getMaxStickVolume(self.name).to_markdown()}'
-        # output += f'\nCác dự báo quá khứ: '
-        # rs = ""
-        # for x in self.AllForecasts()[0:10]:
-        #     rs += '\n-> Phiên thứ: ' + str(x[0]) + ' | Giá : ' + str(x[1])
-        # output += rs
-        
-        #In kiểm tra dự báo
-        #check_forecasts = self.CheckForecasts(T_n=30)
-        # for item in check_forecasts:
-        #     print(str(item))
-        return output
-    
-    '''
-    CÁC HÀM BỔ TRỢ (DỰA TRÊN CÁC KHÁI NIỆM MỚI)
-    '''
-    def Suggestion(self):
-        #Tính toán 03 phiên
-        n_days = 3
-        p_amp = self.GetPriceDeeps(days=n_days,start=0) #Phiên hiện tại (start = 0)
-        p_max_amp = self.MaxGain(days=n_days)
-        p_min_amp = self.MaxLoss(days=n_days)
-
-        output = ""
-        output += f'\nTrong {n_days} phiên đã tăng/giảm {"{:.2f}".format(p_amp)} %.'
-        output += f'\nBiến động (tăng) lớn nhất: {n_days} phiên là {"{:.2f}".format(p_max_amp)} %.'
-        output += f'\nBiến động (giảm) lớn nhất: {n_days} phiên là {"{:.2f}".format(p_min_amp)} %.'
-        
-        if(p_amp >= 10): #Đã tăng khá rồi
-            output += '\nĐã tăng cao. Xem xét bán chốt lời hoặc hạn chế mua'
-        elif p_amp <=-10:
-            output += '\nĐã giảm sâu. Xem xét mua thêm'
-        else:
-            output += '\nBiến động chưa nhiều. Theo dõi'
+        if(len(self.get_pivots()) > 0):
+            output += f'\n{self.get_pivots_as_string()}'
         return output
 
-    def GetPriceDeeps(self, days, start): #Độ sâu biến động giá trong n phiên
-        '''
-        Được tính bằng giá đóng cửa hiện tại (bắt đầu bằng start) so với giá đóng cửa của n phiên lúc trước
-        '''
-        
-        price = self.PRICES[start] #Phiên bắt đầu
-        p_prev = self.PRICES[start + days-1] #Phiên kết thúc (dùng để so sánh)
-
-        p_amp = ((price - p_prev)/p_prev)*100 # Tính theo %
-        return p_amp
-
-    # def GetProfit(symbol,start,end):
-    #     #start = "01/01/2015"
-    #     #end  = dt.datetime.now().strftime("%d/%m/%Y")
-    #     company = symbol
-    #     df_stock = investpy.get_stock_historical_data(stock= company, country= 'vietnam', from_date = start, to_date = end)
-    #     p_start = df_stock['Close'][0]
-    #     p_end = df_stock['Close'][-1]
-    #     profit = ((p_end-p_start)/p_start)*100
-    #     print(f'{p_start} -> {p_end}')
-    #     return profit
-
-    
-    def MaxGain(self,days):
-        lst = list()
-        start = 0
-        stop = self.LEN_DATA - days
-        for i in range(start,stop):
-            lst.append(self.GetPriceDeeps(days=days,start=i))
-        #print(np.max(lst))
-        return np.max(lst)
-
-    def MaxLoss(self,days):
-        lst = list()
-        start = 0
-        stop = self.LEN_DATA - days
-        for i in range(start,stop):
-            lst.append(self.GetPriceDeeps(days=days,start=i))
-        #print(np.min(lst))
-        return np.min(lst)
-        
-    #TRỰC QUAN HÓA DỮ LIỆU
-    def draw(self):
-        print('Đang gọi hàm draw để lưu ảnh')
-        fig, (ax1, ax2, ax3) = plt.subplots(1,3, figsize=(10,4), sharey=True, dpi=120)
-
-        ax1.plot(self.PRICES, 'go-')
-        ax2.plot(self.PRICES, 'ro-')
-        ax3.plot(self.PRICES, 'bo-')
-        plt.tight_layout()
-        # plt.show()
-        file_path = f'./data/images/{self.name}.png'
-        plt.savefig(file_path)
-        return file_path
-        
-    def DrawWithForcecast(self,N):
-        """
-        Dự báo cho một nến
-
-        Args:
-            N (_type_): _description_
-        """
-        plt.rcParams["figure.figsize"] = (15,10)        
-        x = range(0,N)
-        
-        y = self.df_data['Close'][0:N]
-        y_low = self.df_data['Low'][0:N]
-        y_high = self.df_data['High'][0:N]
-        y_open = self.df_data['Open'][0:N]
-        #y_CE = self.df_data['Open'][0:N] 
-        plt.title(self.name)
-        plt.plot(x,y,'b-')
-        plt.plot(x,y_low,'r-')
-        plt.plot(x,y_high,'y-')
-        plt.plot(x,y_open,'g-')
-        plt.legend()
-        forecasts = self.AllForecasts()
-        for i in range(0,len(forecasts)):
-            index = forecasts[i][0]
-            price = forecasts[i][1]
-            note = forecasts[i][2]
-            if(note == "CE"):
-                plt.annotate(note + f'\n{index}',(index,price),arrowprops=dict(facecolor='orange', shrink=0.05))
-            else:
-                plt.annotate(note + f'\n{index}',(index,price),arrowprops=dict(facecolor='blue', shrink=0.05))
-            # if i%2 == 0:
-            #     plt.annotate("Chẵn",(x[i],y[i]))
-        #plt.legend()
-        plt.show()
-
-    def DrawWithForcecasts(self,N):
-        """
-        Dự báo cho nhiều tín hiệu liên tiếp
-
-        Args:
-            N (_type_): _description_
-        """
-        plt.rcParams["figure.figsize"] = (15,10)        
-        x = range(0,N)
-        y = self.df_data['Close'][0:N]
-        plt.title(self.name + " : TÍN HIỆU + VOL")
-        plt.plot(x,y)
-        forecasts = self.AllForecasts()
-        for i in range(0,len(forecasts)):
-            index = forecasts[i][0]
-            price = forecasts[i][1]            
-            note = forecasts[i][2]
-            
-            #Bổ sung điều kiện
-            #Các phiên phía trước
-            so_phien_vol = 15
-            start = index
-            end = index + so_phien_vol
-            
-            if(end <= len(self.df_data)):
-                #Dự báo tại stick hiện tại                
-                stick = self.STICKS[index]
-                #stick_01 = self.STICKS[index+1]
-                #stick_02 = self.STICKS[index+2]
-                
-                #check_vol = stick.VOL >= np.max([stick_01.VOL, stick_02.VOL])
-                #check_vol = stick.VOL >= np.median(self.df_data[start:end].Volume)
-                check_vol = stick.CLOSE <= np.mean(self.df_data[start:end].Close)
-                if (check_vol):
-                    if(note == "CE"):
-                        plt.annotate(note + f'\n{index}',(index,price),arrowprops=dict(facecolor='orange', shrink=0.05))
-                    else:
-                        plt.annotate(note + f'\n{index}',(index,price),arrowprops=dict(facecolor='blue', shrink=0.05))                
-        plt.legend()
-        plt.show()
-
-# stocks = ['HAX']
-# for s in stocks:
-#     s = Stock(name=s)
-#     s.Prepare()
-#     d = DayData(symbol=s.name, index=0,df_all_data=s.df_data)
-#     print(d.get_info())
+stocks = ['KBC','BSI','SCR']
+for s in stocks:
+    s = Stock(name=s)
+    #print(f'{s.name} - {s.rate_of_waze}')
+    print(f'{s.Describe()}')
+    # d = DayData(symbol=s.name, index=0,df_all_data=s.df_data,count_days=10)
+    # print(d.get_info())
 
 # stocks = ['KSB','TPB','VND','KBC','CEO','BID','CTG']
 # for s in stocks:
