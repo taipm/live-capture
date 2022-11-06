@@ -65,6 +65,7 @@ class PriceAction:
     @property
     def max_desc(self):
         return np.min(self.df_data['%'])
+    
     @property
     def price_is_max(self):
         trail_prices = self.prices[1:]
@@ -145,9 +146,9 @@ class PriceAction:
         else:
             return False
 
-import Stock
-s = Stock.Stock(name = 'HAG')
-s.Prepare()
+# import Stock
+# s = Stock.Stock(name = 'HAG')
+# s.Prepare()
 
-p = PriceAction(symbol=s.name,df_data=s.df_data,days=10)
-print(p.summary)
+# p = PriceAction(symbol=s.name,df_data=s.df_data,days=10)
+# print(p.summary)

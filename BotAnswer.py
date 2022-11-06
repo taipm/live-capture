@@ -29,18 +29,18 @@ class BotAnswer:
             return RichNumber(self.query).rich_text
         elif(len(self.query)==3):
             s = Stock(name= self.query.upper())
-            s.Prepare()
-            post = BlogPost(title=self.query,content=s.Describe(),tags=s.name)
-            post.update_to_blog()
-            output += s.Describe()
             
-            output += DayData(s.name,index=0,df_all_data= s.df_data).get_info()            
-            f = FinanceStock(symbol=self.query.upper())            
-            output+= f'\n{f.get_summary()}'
-            analysis_intraday = AnalysisIntradayData(symbol=s.name)
-            output += f'\nIntraday:\n{analysis_intraday.GetSummary()}'
+            output += s.Describe()
+            output += DayData(s.name,index=0,df_all_data= s.df_data,count_days=10).summary
+            # analysis_intraday = AnalysisIntradayData(symbol=s.name)
+            # output += f'\nIntraday:\n{analysis_intraday.GetSummary()}'
+            f = FinanceStock(symbol=s.name)
             output += '\nCổ tức: ' + f.get_avg_dividend()
             output += f'\nhttps://fireant.vn/top-symbols/content/symbols/{s.name}'
+            post = BlogPost(title=self.query,content=output,tags=s.name)
+            link = post.update_to_blog()
+            print(f'LINK: {link}')
+            output += f'\nBlog: {link}'
             return f'{output}'
 
     def answer_stocks(self):
@@ -71,10 +71,6 @@ class BotAnswer:
             s.Prepare()
             file_path = s.draw()
             return file_path
-            # update.message.reply_text(f'{s.Describe()}')
-            # # financeStock = FinanceStock(input_text)
-            # # basicInfo = financeStock.getBasicInfo().to_markdown()
-            # update.message.reply_text(f'{s.GetTCB()}')
     
     def answer_two_numbers(self):
         command = BotCommand(self.query)

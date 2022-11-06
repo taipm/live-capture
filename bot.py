@@ -35,24 +35,6 @@ def help(update: Update, context: CallbackContext):
 	/gmail - To get gmail URL
 	/geeks - To get the GeeksforGeeks URL""")
 
-
-def gmail_url(update: Update, context: CallbackContext):
-	update.message.reply_text(
-		"Your gmail link here (I am not\
-		giving mine one for security reasons)")
-
-
-def youtube_url(update: Update, context: CallbackContext):
-	update.message.reply_text("Youtube Link =>\
-	https://www.youtube.com/")
-
-
-def linkedIn_url(update: Update, context: CallbackContext):
-	update.message.reply_text(
-		"LinkedIn URL => \
-		https://www.linkedin.com/in/dwaipayan-bandyopadhyay-007a/")
-
-
 def geeks_url(update: Update, context: CallbackContext):
 	update.message.reply_text(
 		"GeeksforGeeks URL => https://www.geeksforgeeks.org/")
@@ -109,6 +91,7 @@ def unknown_text(update: Update, context: CallbackContext):
 		try:
 			print('Đang xử lý')
 			textOf_answer = botAnswer.answer()
+			print(textOf_answer)
 			#update.message.reply_text(textOf_answer)
 			update.message.reply_text(TextBuilder(textOf_answer).text_markdown, parse_mode="Markdown")
 		except:
@@ -139,10 +122,7 @@ def notify_ending(message):
 
 def main():
 	updater.dispatcher.add_handler(CommandHandler('start', start))
-	updater.dispatcher.add_handler(CommandHandler('youtube', youtube_url))
 	updater.dispatcher.add_handler(CommandHandler('help', help))
-	updater.dispatcher.add_handler(CommandHandler('linkedin', linkedIn_url))
-	updater.dispatcher.add_handler(CommandHandler('gmail', gmail_url))
 	updater.dispatcher.add_handler(CommandHandler('geeks', geeks_url))
 	updater.dispatcher.add_handler(CommandHandler('news', news_handler))		
 	updater.dispatcher.add_handler(MessageHandler(Filters.command, unknown)) # Filters out unknown commands
@@ -153,7 +133,7 @@ def main():
 	#updater.start_polling(timeout=600)
 	#updater.dispatcher.add_handler(MessageHandler(Filters.photo, image_handler))
 	#updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown_text))
-	updater.start_polling(timeout=600)
+	updater.start_polling(timeout=60)
 
 	#sched = BlockingScheduler()
 	#sched.add_job(prompt,'interval', seconds=15) 

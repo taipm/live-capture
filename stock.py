@@ -5,15 +5,9 @@ from IntradayData import *
 import db
 import pandas as pd
 import numpy as np
-#import matplotlib.pyplot as plt
-#import seaborn as sns
 import datetime as dt
 from vnstock import *
 from Pivot import *
-
-# sns.set()
-# pd.options.display.float_format='{:,.2f}'.format
-# pd.set_option('display.width',85)
 
 class Stock:
     def __init__(self, name) -> None:
@@ -24,7 +18,6 @@ class Stock:
  
         self.df_data = self.Load_Daily_Data()
         self.len = len(self.df_data)
-        #self.df_daily_data = self.df_data
         self.last_price = self.df_data['Close'][0]
         self.last_volume = self.df_data['Volume'][0]
         
@@ -45,7 +38,7 @@ class Stock:
         self.min_vol = np.min(self.daily_volumes)
         self.avg_vol = np.average(self.daily_volumes)
 
-        self.TCB_Data = self.load_basic_data()#price_board(self.name)
+        self.TCB_Data = self.load_basic_data()
         #print(self.TCB_Data.transpose())
         self.intraday_price = self.TCB_Data['Giá Khớp Lệnh'].values[0]/1000
         self.TCB_valuation = self.TCB_Data['TCBS định giá'].values[0]/1000
@@ -59,7 +52,16 @@ class Stock:
         self.PE = self.TCB_Data['P/E'].values[0]
         self.ROE = self.TCB_Data['ROE'].values[0]*100
 
+        self.signal_KT = self.TCB_Data['Tín hiệu KT'].values[0]
+        self.signal_TBD = self.TCB_Data['Tín hiệu TB động'].values[0]
+        self.MACD_Signal = self.TCB_Data['MACD Signal'].values[0]
+        self.MACD_Volume = self.TCB_Data['MACD Volume'].values[0]
+        self.Du_Mua = self.TCB_Data['Khối lượng Dư mua'].values[0]
+        self.Du_Ban = self.TCB_Data['Khối lượng Dư bán'].values[0]
+        self.Price_At_Max_Vol = self.TCB_Data['Khớp nhiều nhất'].values[0]
+
         self.STICKS = self.ToCandleSticks()
+        self.intraday = AnalysisIntradayData(self.name)
         #self.df_intraday_data = self.load_intraday_data()
     
     def Load_Daily_Data(self) -> pd.DataFrame:
@@ -74,17 +76,20 @@ class Stock:
     @property
     def review_price(self):
         output = f''
+        output += f'\n- MA20: {percent(self.price,self.MA20):,.2f}(5)'
+        output += f'\n- MA50: {percent(self.price,self.MA50):,.2f}(%)'
+        output += f'\n- MA100: {percent(self.price,self.MA100):,.2f}(%)'
+        output += f'\n'
+        if(self.price >= self.MA100 and self.price >= self.MA50 and self.price >= self.MA20):
+            output += f'- Vượt tất cả các mốc MA quan trọng\n'
         if(self.price >= self.max_price_year):
-            output += f'Vượt đỉnh năm: {percent(self.price,self.max_price_year):,.2f} (%)'
+            output += f'- Vượt đỉnh năm: {percent(self.price,self.max_price_year):,.2f} (%)'
         elif(self.price <= self.min_price_year):
-            output += f'Thủng dáy năm: {percent(self.price,self.min_price_year):,.2f} (%)'
+            output += f'- Thủng dáy năm: {percent(self.price,self.min_price_year):,.2f} (%)'
         else:
-            output += f'Chưa có gì đặc biệt'
+            output += f'- Chưa có gì đặc biệt'
         return output
-    @property
-    def review_candle_stick(self):
-        stick = self.STICKS[0]
-        return stick.Get_Summary()
+
     @property
     def review_ROE(self):
         output = f'ROE = {self.ROE:,.2f}'
@@ -123,11 +128,20 @@ class Stock:
     @property
     def review_TCB_valuation(self):
         valuation = self.TCB_valuation
-        output = f'Giá: {self.price:,.2f} - Định giá: {valuation:,.2f} | Tỷ lệ: {self.price/valuation:,.2f} (%)'
+        output = f'- Định giá: {valuation:,.2f} | {percent(self.price,valuation):,.2f} (%)'
         if(self.price <= valuation):
             output += ' => Hấp dẫn'
         else:
             output += ' => Cao, xem lại'
+        return output
+        
+    @property
+    def signals(self):
+        output = f'Tín hiệu (TA):'
+        output + f'\n- Kỹ thuật: {self.signal_KT}'
+        output += f'\n- Trung bình động: {self.signal_TBD}'
+        output += f'\n- MACD: {self.MACD_Signal}'
+        output += f'\n- MACD (Volume): {self.MACD_Volume}'
         return output
 
     @property
@@ -299,51 +313,42 @@ class Stock:
                 count_amp += 1
         
         return count_amp/T
+    @property
+    def liquidity(self):
+        return self.daily_money[0]/billion #Tỷ
+    @property
+    def liquidity_max(self):
+        return np.max(self.daily_money)/billion #Tỷ
+    @property
+    def liquidity_min(self):
+        return np.min(self.daily_money)/billion #Tỷ
 
     def Describe(self):
-        output = f'{self.name} [{self.last_trans_date}] - {self.price}'
-        output += f'\nNhận xét (giá): {self.review_price}'
-        output += f'\nNhận xét (nến): {self.review_candle_stick}'
-        output += f'\nKL cao nhất: {self.max_vol:,.0f} | KL thấp nhất: {self.min_vol:,.0f}'
-        output += f'\nThanh khoản: {self.daily_money[0]:,.0f} | CN/TN: {np.max(self.daily_money):,.0f} | {np.min(self.daily_money):,.0f}'
+        output = f'{self.name} [{self.last_trans_date}] - {self.price} | {self.df_data["%"][0]:,.2f}'
+        output += f'\nNhận xét (giá):\n{self.review_price}'
+        #output += f'\nNhận xét (nến): {self.review_candle_stick}'
+        output += f'\nKhối lượng CN/TN: {self.max_vol:,.0f} | {self.min_vol:,.0f}'
+        output += f'\nThanh khoản: {self.liquidity:,.2f} (tỷ) | CN/TN: {self.liquidity_max:,.2f} | {self.liquidity_min:,.2f}'
         output += f'\n{self.review}'
+        output += f'\n{self.signals}'
         output += f'\n- Tỷ lệ sóng: {self.rate_of_waze:,.2f}'
         output += f'\n{"-"*30}'
-        if(len(self.get_pivots()) > 0):
-            output += f'\n{self.get_pivots_as_string()}'
+        output += f'\n{self.get_pivots_as_string()}'
+        output += f'{"-"*30}'
+        output += f'\n{self.intraday.analysis_shark_action()}'
+        output += f'\n{self.intraday.GetSummary()}'
         return output
 
-stocks = ['KBC','BSI','SCR']
-for s in stocks:
-    s = Stock(name=s)
-    #print(f'{s.name} - {s.rate_of_waze}')
-    print(f'{s.Describe()}')
-    # d = DayData(symbol=s.name, index=0,df_all_data=s.df_data,count_days=10)
-    # print(d.get_info())
+# stocks = ['KBC']
+# for s in stocks:
+#     s = Stock(name=s)
+#     #print(f'{s.name} - {s.rate_of_waze}')
+#     #print(f'{s.Describe()}')
+#     d = DayData(symbol=s.name, index=0,df_all_data=s.df_data,count_days=10)
+#     print(d.summary)
 
 # stocks = ['KSB','TPB','VND','KBC','CEO','BID','CTG']
 # for s in stocks:
 #     s = Stock(name=s)
 #     #s.check_pivots()
 #     s.check_min_vol()
-
-
-
-#print(s.get_profit_by_index(0,-1)) #so voi phien truoc (-1)
-# print(s.get_profit_by_index(1,-1)) #so voi phien truoc (-1)
-# print(s.get_profit_by_index(1,1)) #so voi phien sau (-1)
-
-# path = s.draw()
-# print(path)
-# print(s.TCB_Suggest_Price)
-# print(s.RSI)
-# print(s.Price)
-# print(s.df_weekly_data)
-# # item = s.GetDataItemAtPrev(5).values
-# # print(item)
-# print(s.Describe())
-# #p = s.GetPrice('2022-08-05')
-#p = s.Get_Profit('2022-08-01','2022-08-05')
-# print(p)
-#s.DrawWithForcecast(N=30)
-#print(s.StrSummary)

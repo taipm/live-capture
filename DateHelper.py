@@ -25,6 +25,9 @@ def get_prev_date(str_date):
     next_date = date - timedelta(days=1)
     return next_date
 
+#NUMBER
+billion = 1000000000 #Tỷ
+
 TODAY = date.today()
 fmt_day = '%Y-%-m-%d'
 StrTODAY = TODAY.strftime(fmt_day)

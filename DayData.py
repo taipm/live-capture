@@ -185,20 +185,22 @@ class DayData:
     @property
     def momentum(self):
         return self.get_distance_price()/self.T_days
-
-    def get_info(self):
+    
+    @property
+    def summary(self):
         output = f'{self.symbol} - Phiên [{self.index}] - {self.close} [{self.get_margin_price():,.2f} (%)] - GTGD: {self.today_money:,.2f}'+\
-        f'\nBiến động : '+\
-        f'\n=> CN: {np.max(self.df_data["Oscillation"]):,.2f} (%)| TN {np.min(self.df_data["Oscillation"]):,.2f} (%) | TB: {self.avg_oscillation:,.2f} | HT: {self.oscillation:,.2f} (%)'+\
+        f'\nTrong {self.T_days} phiên : {self.sum_margin_price:,.2f}(%)'+\
+        f'\nTăng {self.count_green} | Giảm {self.count_red} | Tham chiếu {self.count_yellow} : Tỷ lệ {self.count_green/self.count_red:,.2f}'+\
+        f'\n03 phiên: {self.df_data["%"][0]:,.2f} | {self.df_data["%"][1]:,.2f} | {self.df_data["%"][2]:,.2f} | Tổng: {np.sum(self.df_data["%"][0:2]):,.2f} (%)'+\
+        f'\n- Biến động CN: {np.max(self.df_data["Oscillation"]):,.2f} (%)'+\
+        f'\n- Biến động TN {np.min(self.df_data["Oscillation"]):,.2f} (%)'+\
+        f'\n- Biến động TB: {self.avg_oscillation:,.2f} (%)+'\
+        f'\n- Biến động HT: {self.oscillation:,.2f} (%)'+\
         f'\nMax tăng/giảm: {self.max_inc_oscillation_open:,.2f} (%) | {self.max_desc_oscillation_open:,.2f} (%)'+\
         f'\nTB-Tăng: {np.average(self.avg_oscillation_high):,.2f} (%)| TB-Giảm: {self.avg_oscillation_low:,.2f} (%)'+\
         f'\nMục tiêu: \n- Mua {self.target_buy_price:,.2f} ({self.avg_oscillation_low:,.2f} (%))'+\
         f'\n- Bán: {self.target_sell_price:,.2f} ({self.avg_oscillation_high:,.2f}) (%)'+\
         f'\n=> Lợi nhuận: {percent(self.target_sell_price,self.target_buy_price):,.2f} (%)'+\
-        f'\nBước giá {RichNumber(self.target_buy_price).rich_text}'+\
-        f'\nTrong {self.T_days} phiên : {self.sum_margin_price:,.2f}(%)'+\
-        f'\nTăng {self.count_green} | Giảm {self.count_red} | Tham chiếu {self.count_yellow} : Tỷ lệ {self.count_green/self.count_red:,.2f}'+\
-        f'\n03 phiên: {self.df_data["%"][0]:,.2f} | {self.df_data["%"][1]:,.2f} | {self.df_data["%"][2]:,.2f} | Tổng: {np.sum(self.df_data["%"][0:2]):,.2f} (%)'+\
         f'\nTín hiêu mua: {self.get_signal()} | Momentium: {self.momentum:,.2f}'+\
         f'\nGiá CN/TN: {self.max_price} | {self.min_price} [{self.get_index_of_min_price()}] [d = {self.get_distance_price():,.2f} (%)]'+\
         f'\nLN cao nhất: {self.get_max_profit():,.2f} (%)'+\

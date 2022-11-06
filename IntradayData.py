@@ -75,11 +75,11 @@ class AnalysisIntradayData:
 
     @property
     def liquidity(self):
-        liquidity = np.sum(self.df_data['price']*self.df_data['volume'])
+        liquidity = np.sum(self.df_data['price']*self.df_data['volume'])/billion #Tỷ
         return liquidity
     @property
     def liquidity_of_shark(self):
-        liquidity = np.sum(self.df_big_sticks['price']*self.df_big_sticks['volume'])
+        liquidity = np.sum(self.df_big_sticks['price']*self.df_big_sticks['volume'])/billion #Tỷ
         return liquidity
 
     def get_top_sticks(self, n_sticks):

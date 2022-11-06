@@ -44,15 +44,6 @@ class FinanceStock:
         return self.df_basic_data
 
     @property
-    def basic_review(self):
-        safe_ROE = 15
-        safe_PE = 15
-
-        if(self.PE >= safe_PE):
-            return f'\n{self.PE} : Quá cao'
-        elif(self.PE <= safe_PE and self.ROE >= safe_ROE):
-            return f'\nP/E: {self.PE} - ROE: {self.ROE:,.2f} (%) : Hấp dẫn'
-    @property
     def rsi_review(self):
         if self.RSI <= 30:
             return f'RSI: {self.RSI:,.2f} : Quá bán'
@@ -62,22 +53,6 @@ class FinanceStock:
             return f'RSI: {self.RSI:,.2f} : Đang mạnh (Mark Minervini) - Xem xét'
         else:
             return f'RSI: {self.RSI:,.2f} : Chưa xác định'
-
-    def get_signals(self):
-        message = f'{self.symbol} - Tín hiệu :'+\
-            f'\nPE: {self.PE} - PB: {self.PB} - ROE: {self.ROE:,.2f} - Định giá: {self.Evalue_Price:,.2f} ~ {percent(self.Price,self.Evalue_Price):,.2f} (%)' +\
-            f'\nRSI : {self.rsi_review} - Kỹ thuật: {self.signal_KT}' +\
-            f'\nTrung bình động: {self.signal_TBD}'+\
-            f'\nMACD (signal): {self.MACD_Signal} - MACD (volume): {self.MACD_Volume}'+\
-            f'\n{"-"*30}'
-
-        return message
-    
-    def get_summary(self):
-        message = f'\n{self.get_signals()}' +\
-            f'\n{self.basic_review}'+\
-            f'\n{"-"*30}'
-        return message
 
     def GetTCB(self):
         data = price_board(self.symbol)

@@ -42,11 +42,6 @@ class StockCommand:
     def to_string(self):
         return f'{self.type} | {self.symbol} | {self.volume:,.0f} | {self.price:,.2f}'
 
-s = StockCommand('BUY(VND,100,11.25)')
-print(s.to_string())
-
-s = StockCommand('SELL(VND,100,11.25)')
-print(s.to_string())
 class BotCommand:
     def __init__(self, text) -> None:
         self.text = text.strip()
