@@ -1,8 +1,10 @@
 from UrlHelper import getHtmlFromUrl, getTextFromUrl
 import pandas as pd
+import numpy as np
 import html5lib
 import lxml
 from bs4 import BeautifulSoup
+from DateHelper import *
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -16,10 +18,6 @@ class VnIndex:
     
     def get_history_data(self):        
         df_data = pd.read_html(self.url_history)[2].iloc[2:]
-        # data_items = []
-        # for i in range(0,len(df_data)-1):
-        #     data_items.append(VnindexDay())
-        #print(df_data.to_markdown())
         return df_data
     
     def to_df_data(self):
@@ -33,22 +31,35 @@ class VnIndex:
         del df[3]
         df['volume'] = df[4]
         del df[4]
-        df['liquidity'] = df[5]
+        df['liquidity'] = df[5].map(lambda x:float(float(x)/billion))
         del df[5]
         df['volume_agree'] = df[6]
         del df[6]
-        df['liquidity_agree'] = df[7]
+        df['liquidity_agree'] = df[7].map(lambda x:float(float(x)/billion))
         del df[7]
-        df['open'] = df[8]
+        df['open'] = df[8].map(lambda x:float(x))
         del df[8]
         df['high'] = df[9]
         del df[9]
         df['low'] = df[10]
         del df[10]
 
+        df['mark'] = df['change'].map(lambda x : float(x.split(' ')[0]))
+        df['%'] = df['change'].map(lambda x : float(x.split(' ')[1][1:]))
+        del df['change']
+
         return df
+
+    @property
+    def sum_mark(self):
+        return np.sum(self.df_data['mark'])
+    @property
+    def sum_pct(self):
+        return np.sum(self.df_data['%'])
+
 vni = VnIndex()
 print(vni.df_data.to_markdown())
+print(vni.sum_pct)
 
 # class StockInfo:
 #     def __init__(self, symbol) -> None:

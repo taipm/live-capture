@@ -44,6 +44,8 @@ RUN pip3 install openpyxl
 RUN pip3 install markdown
 RUN pip3 install python-wordpress-xmlrpc
 RUN pip3 install wolframalpha
+RUN pip3 install html5lib
+RUN pip3 install translate
 #RUN pip3 install json-normalize
 
 #RUN sudo apt-get install tesseract-ocr-vie

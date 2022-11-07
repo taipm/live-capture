@@ -7,10 +7,11 @@ from urllib.request import urlopen
 import requests
 from pandas import json_normalize
 from datetime import datetime
-import ssl
+
 from vnstock import *
 import numpy as np
 
+import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
 def get_stock_data_from_api(symbol):

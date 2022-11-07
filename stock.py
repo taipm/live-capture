@@ -364,11 +364,11 @@ class Stock:
 #     #s.check_pivots()
 #     s.check_min_vol()
 
-import heapq
-s = Stock(name = 'HAG')
-p = PriceAction(symbol=s.name,df_data=s.df_data,days=10)
-print(p.analysis_last_price)
-top_10 = heapq.nlargest(n=10,iterable=p.prices)
-print(top_10)
-low_10 = heapq.nsmallest(n=10,iterable=p.prices)
-print(low_10)
+# import heapq
+# s = Stock(name = 'HAG')
+# p = PriceAction(symbol=s.name,df_data=s.df_data,days=10)
+# print(p.analysis_last_price)
+# top_10 = heapq.nlargest(n=10,iterable=p.prices)
+# print(top_10)
+# low_10 = heapq.nsmallest(n=10,iterable=p.prices)
+# print(low_10)

@@ -1,7 +1,13 @@
 import requests
 from bs4 import BeautifulSoup
 from TextHelper import *
+import pandas as pd
+import html5lib
+from urllib.request import Request, urlopen
+import re
 
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 class StockInfo:
     def __init__(self, symbol) -> None:
         self.symbol = symbol.upper()
@@ -9,12 +15,19 @@ class StockInfo:
         self.textContent = self.read_url()        
         self.text = self.clean()
         self.lines = self.text.splitlines()
+        self.tables = pd.read_html(self.url)
 
     def read_url(self):
         URL = self.url
         page = requests.get(URL)
-        soup = BeautifulSoup(page.content, "html.parser")        
+        soup = BeautifulSoup(page.content, "html.parser")
         return to_standard(soup.text)
+
+    def get_stock_info(self):
+        return self.tables[0]
+
+    def get_stocks_in_sector(self):
+        return self.tables[1][self.tables[1]['Giá'] > 0]
 
     def to_string(self):
         for line in self.lines:
@@ -27,9 +40,18 @@ class StockInfo:
         end_index = self.textContent.index(end_get)
         return self.textContent[start_index:end_index]
     
+    def get_news(self):
+        rs = []
+        for l in self.lines:
+            if self.symbol + ":" in l:
+                rs.append(l)
+        return rs
+    
 
-# s = StockInfo("VND")
-# #print(s.text)
-# s.to_string()
+s = StockInfo("MWG")
+#print(s.text)
+print(s.get_stock_info().to_markdown())
+print(s.get_stocks_in_sector().to_markdown())
+print(s.get_news())
 
 

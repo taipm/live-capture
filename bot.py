@@ -13,6 +13,7 @@ import telegram
 from BotAnswer import BotAnswer
 from Reports import get_stocks_by_suc_manh
 from TextCommand import *
+from BotTranslator import BotTranslator
 
 #from watcher import get_last_image
 #from Imager import getTextFromImage
@@ -85,8 +86,11 @@ def unknown_text(update: Update, context: CallbackContext):
 		file_path = botAnswer.answer_stocks()
 		update.message.reply_text(file_path)
 	elif('?' in input_text):
-		botAnswer = BotAnswer(input_text)
-		update.message.reply_text(botAnswer.answer_two_numbers())
+		answer = Alpha(input_text[1:].strip()).result
+		update.message.reply_text(answer)
+	elif('!' in input_text):
+		answer = BotTranslator(inputText = input_text[1:].strip()).transText
+		update.message.reply_text(answer)
 	elif('#' in input_text):
 		print('Đang tìm cổ phiếu theo sức mạnh')
 		df = get_stocks_by_suc_manh(input_text[1:].strip())
