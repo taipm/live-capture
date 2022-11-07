@@ -24,18 +24,31 @@ class AnalysisIntradayData:
 
         self.rateOf_Buy_Volume = self.sum_vol_buy/self.sum_Volume
         self.rateOf_Sell_Volume = self.sum_vol_sell/self.sum_Volume
-        self.rateOf_Buy_Over_Sell_Volume = self.sum_vol_buy/self.sum_vol_sell
+        #self.rateOf_Buy_Over_Sell_Volume = self.sum_vol_buy/self.sum_vol_sell
 
         self.countOf_Orders = len(self.df_data.index)
         self.countOf_BuyOrders = len(self.df_buy.index)
         self.countOf_SellOrders = len(self.df_sell.index)
+
         self.rateOf_Buy_Orders = self.countOf_BuyOrders/self.countOf_Orders
         self.rateOf_Sell_Orders = self.countOf_SellOrders/self.countOf_Orders
-        self.rateOf_Buy_Over_Sell_Orders = self.countOf_BuyOrders/self.countOf_SellOrders
+        #self.rateOf_Buy_Over_Sell_Orders = self.countOf_BuyOrders/self.countOf_SellOrders
 
         self.db = IntradayDb(self.symbol)
         self.db.UpdateDb()
-
+        
+    @property
+    def rateOf_Buy_Over_Sell_Volume(self):
+        if(self.sum_vol_sell > 0):
+            return self.sum_vol_buy/self.sum_vol_sell
+        else:
+            return 100
+    @property
+    def rateOf_Buy_Over_Sell_Orders(self):
+        if(self.countOf_SellOrders > 0):
+            return self.countOf_BuyOrders/self.countOf_SellOrders
+        else:
+            return 100
     @property
     def avg_price(self):
         avg_price = (np.sum(self.df_data['volume']*self.df_data['price']))/np.sum(self.df_data['volume'])/1000
@@ -159,7 +172,7 @@ class AnalysisIntradayData:
 
 # x = AnalysisIntradayData(symbol='VND')
 # print(x.GetSummary())
-# print(x.get_last_stick())
+# print(x.las_stick)
 # sticks = x.get_top_sticks(10)
 # print(sticks)
 

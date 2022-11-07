@@ -11,6 +11,7 @@ from DateHelper import*
 from apscheduler.schedulers.background import BlockingScheduler
 import telegram
 from BotAnswer import BotAnswer
+from Reports import get_stocks_by_suc_manh
 from TextCommand import *
 
 #from watcher import get_last_image
@@ -86,7 +87,10 @@ def unknown_text(update: Update, context: CallbackContext):
 	elif('?' in input_text):
 		botAnswer = BotAnswer(input_text)
 		update.message.reply_text(botAnswer.answer_two_numbers())
-		
+	elif('#' in input_text):
+		print('Đang tìm cổ phiếu theo sức mạnh')
+		df = get_stocks_by_suc_manh(input_text[1:].strip())
+		update.message.reply_text(df.to_markdown(),parse_mode='Markdown')
 	else:
 		try:
 			print('Đang xử lý')

@@ -125,10 +125,7 @@ def GetIntradayData(symbol):
     _page_num = 0
     _page_size = 5000
     
-    df =  get_intraday_data(symbol=symbol, 
-                            page_num=_page_num, 
-                           page_size=_page_size)
-    
+    df =  get_intraday_data(symbol=symbol, page_num=_page_num, page_size=_page_size)    
     while True:
         _page_num += 1
         df_next =  get_intraday_data(symbol=symbol, 
@@ -152,9 +149,21 @@ def get_now_price(symbol):
 
 def get_banks_symbols():
     bank_list = ['VPB', 'BID','CTG','VCB','TCB',
-                'TPB','VIB','MBB','ACB','EIB','STB',
+                'TPB','VIB','MBB','ACB','EIB',
+                'STB','HDB',
                 'BVB','NAB','LPB']
-    return bank_list
+    return list(set(bank_list))
+
+def get_bds_symbols():
+    lst = ['PDR','VHM','DXG','SCR','KDH',
+            'CII','NBB','CEO','DIG','NVL',
+            #'NLG','VRE','ACB','VHM','TPB',
+            'DPR','PHR','BCM','KBC','VHM',
+            'CRE','SZC','PHR','DPR','GVR'
+            #'VIB','CTG','BID','VRE','NVL',
+            #'MSN','VIC','PDR','KDH','HDB'
+            ]
+    return list(set(lst))
 
 def get_banks_symbols_command():
     bank_list = ['VPB', 'BID','CTG','VCB','TCB',
@@ -164,11 +173,15 @@ def get_banks_symbols_command():
     return output
 
 def get_securities_symbols():
+    lst = ['VCI','SSI','VND','BSI','CTS','TVS','HCM',
+        'FTS','SHS','VIX']
+    return lst
+
+def get_securities_symbols_command():
     lst = ['VCI','SSI','VND','BSI','CTS','TVS',
         'FTS','SHS','VIX']
-    ouput = ','.join(lst)
-
-    return ouput
+    output = ','.join(lst)
+    return output
 
 def get_vn30_symbols():
     lst = ['PLX','VCB','HPG','FPT','VPB',
@@ -178,8 +191,7 @@ def get_vn30_symbols():
             'MSN','VIC','PDR','KDH','HDB',
             'PNJ'
             ]
-    ouput = ','.join(lst)
-
+    ouput = list(set(lst))
     return ouput
 
 def get_all_stocks():
@@ -191,39 +203,21 @@ def get_vn30_symbols_as_command():
     ouput = ','.join(lst)
     return ouput
 
-def get_bds_symbols():
-    lst = ['PDR','VHM','DXG','SCR','KDH',
-            'CII','NBB','CEO','DIG','NVL',
-            #'NLG','VRE','ACB','VHM','TPB',
-            'DPR','PHR','BCM'
-            #'VIB','CTG','BID','VRE','NVL',
-            #'MSN','VIC','PDR','KDH','HDB'
-            ]
-
-    return lst
-
 def get_bds_symbols_as_command():
-    lst = ['PDR','VHM','DXG','SCR','KDH',
-            'CII','NBB','CEO','DIG','NVL',
-            'NLG','VRE','ACB','VHM','TPB',
-            #'VIB','CTG','BID','VRE','NVL',
-            #'MSN','VIC','PDR','KDH','HDB'
-            ]
-    ouput = ','.join(lst)
-
-    return ouput
+    return ','.join(get_bds_symbols())
 
 def get_danhmuc_symbols():
     lst = ['VND','HAX','PDR','SCR','DXG',
             'HPG','FPT','FRT','VCI','TPB',
             'BID','BSI','MSH','VIB','HBC',
             'IDC','NLG','BSR','ASM','SSI',
-            'PDR'
+            'PDR','HAH','MWG','BSR','FOX',
+            'DGC','SSI','SZC','VGI','CTG',
+            'DPM','GMD'
             #'MSN','VIC','PDR','KDH','HDB'
-            ]
-    ouput = ','.join(lst)
+    ]
 
-    return ouput
+    return list(set(lst))
 
 #print(get_now_price("HPG"))
 # print(get_now_price_2("HPG"))

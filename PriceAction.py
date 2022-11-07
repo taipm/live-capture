@@ -1,5 +1,5 @@
 import numpy as np
-from DateHelper import percent
+from DateHelper import StrTODAY, percent
 from MessageHelper import border_text
 
 class PriceItem:
@@ -11,7 +11,7 @@ class PriceItem:
         self.index = index
 
     def to_string(self):
-        return f'{self.index} : {self.price:,.2f}'
+        return f'{self.index} : {self.close:,.2f}'
 
 class PriceAction:
     def __init__(self, symbol, df_data, days) -> None:
@@ -19,25 +19,33 @@ class PriceAction:
 
         self.df_data = df_data[0:days]
         self.prices = self.df_data['Close']
-
         self.price = self.prices[0]
         self.min_price = np.min(self.prices)
         self.max_price = np.max(self.prices)
         self.last_max_price = np.max(self.prices[1:])
         self.last_min_price = np.min(self.prices[1:])
-        self.avg_price = np.average(self.prices)
-
-        #self.high = self.max_price - self.min_price
-        self.days = len(self.prices)
-        #self.speed = self.high/self.days
+        self.avg_price = np.average(self.prices)        
+        self.days = len(self.prices)        
         self.start = self.prices[len(self.prices)-1]
         self.end = self.prices[0]
-        #self.first = PriceItem(price = self.prices[0], index=0)
     
     def get_indexs_by_price(self, price):
         results_found = self.df_data[self.df_data['Close']==price].index
         return results_found
-
+    
+    @property
+    def suc_bat(self):
+        df_strong = self.df_data[self.df_data['%']>=3]
+        suc_bat = np.sum(df_strong['%'])/self.days
+        return suc_bat
+    @property
+    def suc_bat_am(self):
+        df_strong = self.df_data[self.df_data['%']<=-2.5]
+        suc_bat = np.sum(df_strong['%'])/self.days
+        return suc_bat
+    @property
+    def suc_manh(self):
+        return self.suc_bat+self.suc_bat_am
     @property
     def count_inc(self):
         count = len(self.df_data[self.df_data['%']>0])
@@ -90,18 +98,17 @@ class PriceAction:
     def analysis_last_price(self):
         trail_prices = self.prices[1:]
         output = ''
-        output += f'Giá HT: {self.price} | Giá TB: {self.avg_price:,.2f}'
+        output += f'Giá HT: {self.price} | Giá TB: {self.avg_price:,.2f} : {percent(self.price,self.avg_price):,.2f} (%)'
         if(self.price < self.avg_price):
             output += ' : Dưới giá trung bình'
         else:
             output += ' : Trên giá trung bình'
         if(self.price <= np.min(trail_prices)):
-            output += f'Giá thấp nhất {self.days} ngày'
+            output += f'\n- Giá thấp nhất {self.days} ngày'
         elif(self.price > np.max(trail_prices)):
-            output += f'Vượt đỉnh {self.days} ngày'
+            output += f'\n- Vượt đỉnh {self.days} ngày'
         elif(self.price == np.max(trail_prices)):
-            output += f'Chạm đỉnh {self.days} ngày'
-        
+            output += f'\n- Chạm đỉnh {self.days} ngày'        
         if(self.price_is_max and self.df_data['%'][0] >=3):
             output += border_text(f'=> Lưu ý: [TĂNG] mạnh khỏi nền giá')
         elif(self.price_is_min and self.df_data['%'][0] <=-3):
@@ -146,9 +153,23 @@ class PriceAction:
         else:
             return False
 
-# import Stock
 # s = Stock.Stock(name = 'HAG')
-# s.Prepare()
+# # s.Prepare()
 
-# p = PriceAction(symbol=s.name,df_data=s.df_data,days=10)
-# print(p.summary)
+# # p = PriceAction(symbol=s.name,df_data=s.df_data,days=10)
+# # print(p.summary)
+# #stocks = list(set(db.get_banks_symbols() + db.get_securities_symbols()))
+# stocks = db.get_danhmuc_symbols()
+# print(stocks)
+# rs = []
+# import pandas as pd
+# for symbol in stocks:
+#     print(symbol)
+#     s = Stock.Stock(name = symbol)
+#     p = PriceAction(symbol=s.name,df_data=s.df_data,days=10)
+
+#     rs.append([p.symbol,p.suc_bat,p.suc_bat_am,p.suc_bat+p.suc_bat_am])
+# df = pd.DataFrame(rs,columns=['Symbol','Sức tăng','Sức rơi','TH'])
+# print(df.sort_values(by=['TH'],ascending=False))
+# df.to_excel(f'./danh-muc-{StrTODAY}.xlsx')
+#print(f'{p.symbol} : {p.suc_bat:,.2f}')

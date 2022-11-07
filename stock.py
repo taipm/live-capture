@@ -2,6 +2,7 @@ from Caculator import *
 from DayData import * #DateStick, DayData
 from CandleStick import CandleStick
 from IntradayData import *
+from PriceAction import PriceAction
 import db
 import pandas as pd
 import numpy as np
@@ -89,7 +90,16 @@ class Stock:
         else:
             output += f'- Chưa có gì đặc biệt'
         return output
-
+    @property
+    def price_action(self):
+        p = PriceAction(symbol=self.name,df_data=self.df_data,days=10)
+        return p.suc_manh
+    @property
+    def review_price_action(self):
+        p = PriceAction(symbol=self.name,df_data=self.df_data,days=10)
+        output = f'\nTăng: {p.suc_bat:,.2f} | Giảm: {p.suc_bat_am:,.2f} | TH: {p.suc_manh:,.2f}'
+        output += f'\nHành động giá: \n {p.analysis_last_price}'
+        return output
     @property
     def review_ROE(self):
         output = f'ROE = {self.ROE:,.2f}'
@@ -325,6 +335,7 @@ class Stock:
 
     def Describe(self):
         output = f'{self.name} [{self.last_trans_date}] - {self.price} | {self.df_data["%"][0]:,.2f}'
+        output += f'\nSức mạnh: {self.review_price_action}\n'
         output += f'\nNhận xét (giá):\n{self.review_price}'
         #output += f'\nNhận xét (nến): {self.review_candle_stick}'
         output += f'\nKhối lượng CN/TN: {self.max_vol:,.0f} | {self.min_vol:,.0f}'
@@ -352,3 +363,12 @@ class Stock:
 #     s = Stock(name=s)
 #     #s.check_pivots()
 #     s.check_min_vol()
+
+import heapq
+s = Stock(name = 'HAG')
+p = PriceAction(symbol=s.name,df_data=s.df_data,days=10)
+print(p.analysis_last_price)
+top_10 = heapq.nlargest(n=10,iterable=p.prices)
+print(top_10)
+low_10 = heapq.nsmallest(n=10,iterable=p.prices)
+print(low_10)

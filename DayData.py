@@ -194,7 +194,7 @@ class DayData:
         f'\n03 phiên: {self.df_data["%"][0]:,.2f} | {self.df_data["%"][1]:,.2f} | {self.df_data["%"][2]:,.2f} | Tổng: {np.sum(self.df_data["%"][0:2]):,.2f} (%)'+\
         f'\n- Biến động CN: {np.max(self.df_data["Oscillation"]):,.2f} (%)'+\
         f'\n- Biến động TN {np.min(self.df_data["Oscillation"]):,.2f} (%)'+\
-        f'\n- Biến động TB: {self.avg_oscillation:,.2f} (%)+'\
+        f'\n- Biến động TB: {self.avg_oscillation:,.2f} (%)'+\
         f'\n- Biến động HT: {self.oscillation:,.2f} (%)'+\
         f'\nMax tăng/giảm: {self.max_inc_oscillation_open:,.2f} (%) | {self.max_desc_oscillation_open:,.2f} (%)'+\
         f'\nTB-Tăng: {np.average(self.avg_oscillation_high):,.2f} (%)| TB-Giảm: {self.avg_oscillation_low:,.2f} (%)'+\
@@ -207,7 +207,7 @@ class DayData:
         f'\nKLGD TB : {self.avg_vol:,.2f} - Min vol: {self.is_min_vol()} - Max vol: {self.is_max_vol()}, '+\
         f'\nMin price : {self.is_under_min_price()} , Max price: {self.is_over_max_price()}, '+\
         f'\nNN(Mua-Bán) {self.sum_foriegn:,.2f} ~ {(self.sum_foriegn/self.sum_vol)*100:,.2f} (%) - Min NN : {self.is_min_foriegn()}, - Max NN {self.is_max_foriegn()}'+\
-        f'\n{"-"*30}'
+        f'\n{"-"*30}\n'
         return output
 
     def to_string(self):
