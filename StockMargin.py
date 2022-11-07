@@ -1,6 +1,6 @@
 class StockMargin:
     COMPANY = 'VPS'
-    RATE = 13/100
+    RATE_OF_YEAR = 13/100
 
     def __init__(self, amount) -> None:
         self.amout = amount
