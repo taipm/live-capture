@@ -28,6 +28,8 @@ def get_prev_date(str_date):
 #NUMBER
 billion = 1000000000 #Tỷ
 
+#TIME
+NOW = datetime.now()
 TODAY = date.today()
 fmt_day = '%Y-%-m-%d'
 StrTODAY = TODAY.strftime(fmt_day)

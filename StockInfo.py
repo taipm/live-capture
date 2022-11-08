@@ -44,14 +44,17 @@ class StockInfo:
         rs = []
         for l in self.lines:
             if self.symbol + ":" in l:
-                rs.append(l)
+                index = self.lines.index(l)
+                text_item = l + ':' + f'{self.lines[index+1]}'
+                rs.append(text_item)
+                print(text_item)
         return rs
     
 
-s = StockInfo("MWG")
-#print(s.text)
-print(s.get_stock_info().to_markdown())
-print(s.get_stocks_in_sector().to_markdown())
-print(s.get_news())
+# s = StockInfo("DIG")
+# #print(s.text)
+# print(s.get_stock_info().to_markdown())
+# print(s.get_stocks_in_sector().to_markdown())
+# print(s.get_news())
 
 

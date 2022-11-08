@@ -14,6 +14,7 @@ class VnindexDay:
 class VnIndex:
     def __init__(self) -> None:
         self.url_history = 'https://s.cafef.vn/Lich-su-giao-dich-VNINDEX-1.chn#data'
+        self.url_calendar_market = 'https://www.bsc.com.vn/bao-cao-phan-tich/lich-thi-truong'
         self.df_data = self.to_df_data()
     
     def get_history_data(self):        
