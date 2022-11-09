@@ -1,4 +1,4 @@
-def to_standard(text):
+def toStandard(text):
     text = text.strip()
     while '  ' in text:
         text = text.replace('  ', ' ')
@@ -32,7 +32,7 @@ class Word:
             return f'{self.text} [{self.index}] Number: {self.is_number} Punctuation: {self.is_punctuation}'
 class TextBuilder:
     def __init__(self, text) -> None:
-        self.text = to_standard(text=text)
+        self.text = toStandard(text=text)
         self.len = len(self.words)
         self.start = self.words[0]
         self.end = self.words[self.len-1]

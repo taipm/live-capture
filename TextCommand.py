@@ -1,6 +1,7 @@
+from pprint import pprint
 import Caculator
 from vnstock import *
-from StockOrder import BuyOrder, SellOrder
+from StockOrder import BuyOrder, Order, SellOrder
 from TextHelper import *
 import db
 from DateHelper import *
@@ -26,15 +27,13 @@ class StockCommand:
     Nghĩa là: Mua 100 con VND, giá 11.2
     """
     def __init__(self, command) -> None:
-        self.command = command.lower().strip()        
-        tokens = self.tokens()
-        if tokens is not None:
-            self.type = tokens[0].upper()
-            self.symbol = tokens[1].upper()
-            self.volume = float(tokens[2])
-            self.price = float(tokens[3])
-        else:
-            self.order = self.parse()
+        self.command = command.lower().strip()    
+        order = self.parse()
+        self.type = order.type
+        self.symbol = order.symbol.upper()
+        self.volume = float(order.volume)
+        self.price = float(order.price)
+        self.order = order
 
     def tokens(self):
         try:
@@ -51,27 +50,28 @@ class StockCommand:
         VND(130000,17.2)
         VND(-1000,18.2)
         '''
+        print(self.command)
         tokens = self.command.split('(')
         symbol = tokens[0].upper()
         volume = float(tokens[1].split(',')[0])
-        price = float(tokens[1].split(',')[1])        
-        order = None
+        price = float(tokens[1].split(',')[1][0:len(tokens[1].split(',')[1])-1])
+        order = Order(symbol=symbol)
+
         if(volume >= 0):            
             order = BuyOrder(symbol=symbol,volume=volume,price=price)
         else:            
             order = SellOrder(symbol=symbol,volume=volume,price=price)
+        pprint(order)
         return order
 
     
     def to_string(self):
-        return f'{self.type} | {self.symbol} | {self.volume:,.0f} | {self.price:,.2f}'
+        return f'{self.symbol} | {self.volume:,.0f} | {self.price:,.2f}'
 
-t = StockCommand('VND(100,17.9')
-print(t.order.to_string())
 class BotCommand:
     def __init__(self, text) -> None:
         self.text = text.strip()
-        self.text = to_standard(self.text)
+        self.text = toStandard(self.text)
         self.tokens = self.tokens()
         
     def is_one_number(self):

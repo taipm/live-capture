@@ -10,9 +10,10 @@ class Transaction:
         self.sell_price = sell_price
         self.b_order = BuyOrder(symbol=self.symbol,volume=self.volume, price=self.buy_price)
         self.s_order = SellOrder(symbol=self.symbol,volume=self.volume, price=self.sell_price)
+     
 
     @property
-    def profit(self):
+    def profit(self):       
         print(f'Bán: {self.s_order.total_income:,.0f}')
         print(f'Mua: {self.b_order.total_cost:,.0f}')
         profit = self.s_order.total_income - self.b_order.total_cost
@@ -36,4 +37,4 @@ def test():
     t = Transaction(symbol='BSR',volume=2000,buy_price=17700, sell_price=17800)
     print(t.to_string())
 
-#test()
+test()

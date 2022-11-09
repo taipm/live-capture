@@ -84,6 +84,7 @@ def GetStockData(symbol):
         else:
                 print(f'{symbol} - chưa có trong danh mục')
                 return pd.DataFrame()
+#print(GetStockData(symbol='NVL')[0:100][['Date','Close','%']].to_markdown())
 
 def test_Oscillation():
     symbol = 'VND'

@@ -1,4 +1,5 @@
 import numpy as np
+import math
 from DateHelper import StrTODAY, percent
 from MessageHelper import border_text
 
@@ -12,7 +13,85 @@ class PriceItem:
 
     def to_string(self):
         return f'{self.index} : {self.close:,.2f}'
+class PriceRanges:
+    def __init__(self, min, max, high) -> None:
+        self.min = min
+        self.max = max
+        self.high = high
+        self.ranges = self.get_ranges()
+        #print(f'{self.max} - {self.min}')
 
+    def get_ranges(self):
+        start = self.min
+        end = self.max
+        ranges = []
+
+        low = start
+        top = start + start*self.high
+        while top <= end:
+            ranges.append([low,top])
+            low = top
+            top = top + top*self.high
+        return ranges
+
+    def indexOf(self, number):
+        index = -1
+        for i in range(0, len(self.ranges)-1):
+            r = self.ranges[i]
+            # print(f'{r[0]} - {r[1]}')
+            if r[0] < number and r[1] >= number:
+                index = i
+                #print(f'Đoạn này: {r[0]} - {r[1]}')
+                break
+            # i = i + 1
+                
+        return index
+
+# r = PriceRanges(min=1,max=10,high=10/100)
+# r.get_ranges()
+# print(r.indexOf(6))
+
+class PriceRange:
+    def __init__(self, min, max, length) -> None:
+        self.min_price = min
+        self.max_price = max
+        self.length = length
+        self.high = 5/100 #Default
+
+    def nextRange(self):
+        min = self.min_price + self.min_price*self.high
+        max = self.max_price + self.max_price*self.high
+        r = PriceRange(min= min,max=max,length=self.length)
+        return r
+
+    def isIn(self, number):
+        if (number < self.min_price or number > self.max_price):
+            return False
+        else:
+            return True
+    def isOut(self,number):
+        return not self.isIn(number=number)
+
+    def isHigher(self,number):
+        if (number > self.max_price):
+            return True
+        else:
+            return False
+    def isLower(self,number):
+        if (number < self.max_price):
+            return True
+        else:
+            return False    
+                    
+    def to_string(self):
+        print(f'{self.max_price}')
+
+# r = PriceRange(1,2,10)
+# print(r.isIn(10))
+# print(r.isOut(1.1))
+# print(r.isOut(2.1))
+# print(r.nextRange().to_string())
+    
 class PriceAction:
     def __init__(self, symbol, df_data, days) -> None:
         self.symbol = symbol.upper()
@@ -28,7 +107,14 @@ class PriceAction:
         self.days = len(self.prices)        
         self.start = self.prices[len(self.prices)-1]
         self.end = self.prices[0]
+        self.ranges = PriceRanges(min=self.min_price, max= self.max_price,high=5/100)
+        #self.print_ranges()
+        self.index_price = self.ranges.indexOf(number = self.price)
     
+    def print_ranges(self):
+        for r in self.ranges.ranges:
+            print(f'{r[0]} - {r[1]}')
+
     def get_indexs_by_price(self, price):
         results_found = self.df_data[self.df_data['Close']==price].index
         return results_found
@@ -94,11 +180,13 @@ class PriceAction:
     @property
     def max_index(self):
         return self.get_indexs_by_price(self.max_price).values[0]
+
     @property
     def analysis_last_price(self):
         trail_prices = self.prices[1:]
         output = ''
         output += f'Giá HT: {self.price} | Giá TB: {self.avg_price:,.2f} : {percent(self.price,self.avg_price):,.2f} (%)'
+        output += f'\nVùng giá thứ {self.index_price}'
         if(self.price < self.avg_price):
             output += ' : Dưới giá trung bình'
         else:

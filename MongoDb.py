@@ -1,16 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*- 
 
-from re import search, sub
-from numpy import record
 from pymongo import MongoClient, message
-from urllib.parse import quote  # Python 3+
 from pprint import pprint
-from datetime import datetime, timedelta
-from datetime import date
 import pandas as pd
-from pymongo.periodic_executor import _register_executor
-import pandasql as ps
 import certifi
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
@@ -38,7 +31,7 @@ class OrderDb(MongoDb):
         self.Orders.insert_one(json.loads(order))
 
     def getOrders(self):
-        orders = self.Orders.find()
+        orders = self.Orders.find()        
         df =  pd.DataFrame(list(orders))
         return df
     
@@ -46,13 +39,14 @@ class OrderDb(MongoDb):
         return self.Orders.find({'symbol':symbol})
     
     def getOrder(self, query):
-        return self.Orders.find(query)
+        return self.Orders.find_one(query)
 
     def print_data(self):
         print(self.getOrders())
 
 class StockBook:
-    def __init__(self,symbol) -> None:
+    db_file = './data/TradingBook.xlsx'
+    def __init__(self,symbol) -> None:        
         self.symbol = symbol.upper()
         self.db = OrderDb()
         self.df_data =  pd.DataFrame(list(self.db.getStockOrders(symbol=self.symbol)))
@@ -62,7 +56,7 @@ class StockBook:
         output = f'Length: {len(self.df_data)}'
         return output
         
-    def sum(self):        
+    def sum(self):
         print(f'Tổng lệnh: {self.orders}')
         print(self.df)
     
@@ -71,29 +65,44 @@ class StockBook:
         orders = []
         for i in range(0,len(self.df_data)-1):
             item = self.df_data.iloc[i]
-            query = {'symbol':item['symbol'], 'time':item['time']}
+            query = {'time':item['time']}
             order = self.db.getOrder(query=query)
-            print(order['volume'])
+            if(order['type']=='BUY'):
+                o = BuyOrder(symbol=order['symbol'],volume=order['volume'],price=order['price'])
+                o.time = order['time']
+                orders.append(o)
+            elif(order['type']=='SELL'):
+                o = SellOrder(symbol=order['symbol'],volume=order['volume'],price=order['price'])
+                o.time = order['time']
+                orders.append(o)
 
+        return orders
 
     @property
     def cost(self):
-        pass
+        sum_cost = 0
+        for o in self.Orders:
+            if o.type == 'BUY':
+                sum_cost += o.total_cost
+        return sum_cost
 
-o = StockBook(symbol='VND')
-print(o.summary)
-o.Orders
-# d = MongoDb()
-# d.to_string()
+# o = StockBook(symbol='VND')
+# orders = o.Orders
+# #print(o.summary)
+# for x in o.Orders:
+#     print(x.to_string())
+# print(f'Tổng chi phí: {o.cost:,.2f}')
+# # d = MongoDb()
+# # d.to_string()
 
 # db = OrderDb()
-# db.print_data()
+# # db.print_data()
 
-# _order = BuyOrder(symbol='VND',volume=100,price=117.8)
-# db.addOder(order=_order.to_json())
-# db.to_string()
+# # _order = BuyOrder(symbol='VND',volume=1000,price=117.8)
+# # db.addOder(order=_order.to_json())
+# # db.to_string()
 
-# _order = SellOrder(symbol='VND',volume=-100,price=17.8)
+# _order = SellOrder(symbol='VND',volume=-1000,price=17.8)
 # db.addOder(order=_order.to_json())
 # db.to_string()
 

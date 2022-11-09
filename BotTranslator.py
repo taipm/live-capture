@@ -23,5 +23,5 @@ class BotTranslator:
 
 
 
-t = BotTranslator(inputText="Xin chào")
-print(t.transText)
+# t = BotTranslator(inputText="Xin chào")
+# print(t.transText)

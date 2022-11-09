@@ -5,6 +5,3 @@ class Pivot:
     
     def to_string(self):
         return f'{self.symbol} - {self.index}'
-
-class MinVol:
-    pass

@@ -27,6 +27,7 @@ def get_prev_date(str_date):
 
 #NUMBER
 billion = 1000000000 #Tỷ
+million = 1000000
 
 #TIME
 NOW = datetime.now()
@@ -47,8 +48,14 @@ def Is_Business_Day(date):
     
 
 def percent(x,y):
-    if(y !=0):
-        return ((x-y)/y)*100
+    if(x !=0):
+        return ((x-y)/x)*100
     return None
 
-#print(percent(28000,37136))
+def profit(mua, ban):
+    if(mua != 0):
+        return ((ban-mua)/mua)*100
+    else:
+        return None
+
+#print(profit(1,2))

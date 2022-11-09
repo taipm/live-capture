@@ -6,7 +6,7 @@ class DayData:
     def __init__(self, symbol, index, df_all_data, count_days) -> None:
         self.symbol = symbol.upper()        
         self.df_all_data = df_all_data
-        self.df_all_data['%'] = ((df_all_data['Close']-df_all_data['Open'])/(df_all_data['Open']))*100
+        #self.df_all_data['%'] = ((df_all_data['Close']-df_all_data['Open'])/(df_all_data['Open']))*100
         self.index = index
         self.T_days = count_days
 
@@ -80,7 +80,7 @@ class DayData:
         return len(self.df_data[self.df_data['%']==0])
     @property
     def oscillation(self):
-        return self.df_data['Oscillation'][0]
+        return self.df_data['Oscillation'][self.index]
     @property
     def max_inc_oscillation_open(self):
         return np.max(self.df_data['Oscillation-Open-High'])
@@ -97,12 +97,27 @@ class DayData:
         return price
 
     def get_df_next_data(self):
-        T_next_days = 10
+        #T_next_days = self
         try:
-            df_next_data = self.df_all_data[self.index:self.index-T_next_days]
+            df_next_data = self.df_all_data[self.index-self.T_days:self.index]
             return df_next_data
         except:
             return None
+    @property
+    def isFL(self):
+        if self.margin_price <= -6.67:
+            return True
+        else:
+            return False
+    @property
+    def isCE(self):
+        if self.margin_price >= 6.67:
+            return True
+        else:
+            return False
+    @property
+    def margin_price(self):
+        return self.df_data['%'][self.index]
 
     def is_min_vol(self):
         if(self.volume <= self.last_min_vol):
@@ -131,9 +146,7 @@ class DayData:
             return True
         else:
             return False
-
-    def get_margin_price(self):
-        return self.df_data['%'][0]
+    
 
     def get_distance_price(self):
         min = self.min_price
