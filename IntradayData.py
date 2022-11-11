@@ -8,8 +8,14 @@ class AnalysisIntradayData:
         self.symbol = symbol.upper()
 
         self.df_data = GetIntradayData(symbol=self.symbol)
-        self.las_stick = self.df_data.sort_values(by=['time'],ascending=False).iloc[:1]
-        self.last_price = self.las_stick['price'][0]/1000
+        try:
+            self.las_stick = self.df_data.sort_values(by=['time'],ascending=False).iloc[:1]
+            self.last_price = self.las_stick['price'][0]/1000
+        except:
+            self.las_stick = 0
+            self.last_price = 0
+
+        
 
         self.df_big_sticks = self.Get_Big_Sticks()
         self.df_big_buy_sticks = self.df_big_sticks[self.df_big_sticks['a']=='BU']
@@ -18,13 +24,10 @@ class AnalysisIntradayData:
         self.df_buy = self.df_data[self.df_data['a']=='BU']
         self.df_sell = self.df_data[self.df_data['a']=='SD']
 
-        # self.sum_Volume_Buy = self.df_buy['volume'].sum() 
-        # self.sum_Volume_Sell = self.df_sell['volume'].sum()
         self.sum_Volume = self.df_data['volume'].sum()
 
         self.rateOf_Buy_Volume = self.sum_vol_buy/self.sum_Volume
         self.rateOf_Sell_Volume = self.sum_vol_sell/self.sum_Volume
-        #self.rateOf_Buy_Over_Sell_Volume = self.sum_vol_buy/self.sum_vol_sell
 
         self.countOf_Orders = len(self.df_data.index)
         self.countOf_BuyOrders = len(self.df_buy.index)
@@ -32,7 +35,6 @@ class AnalysisIntradayData:
 
         self.rateOf_Buy_Orders = self.countOf_BuyOrders/self.countOf_Orders
         self.rateOf_Sell_Orders = self.countOf_SellOrders/self.countOf_Orders
-        #self.rateOf_Buy_Over_Sell_Orders = self.countOf_BuyOrders/self.countOf_SellOrders
 
         self.db = IntradayDb(self.symbol)
         self.db.UpdateDb()
@@ -90,6 +92,7 @@ class AnalysisIntradayData:
     def liquidity(self):
         liquidity = np.sum(self.df_data['price']*self.df_data['volume'])/billion #Tỷ
         return liquidity
+
     @property
     def liquidity_of_shark(self):
         liquidity = np.sum(self.df_big_sticks['price']*self.df_big_sticks['volume'])/billion #Tỷ
@@ -140,7 +143,7 @@ class AnalysisIntradayData:
         elif(rateOf_buy_sell <= 1/2):
             analysis_result += ' - BÁN MẠNH'
         else:
-            analysis_result += ' - NA'        
+            analysis_result += ' - NA'
         return analysis_result
 
     

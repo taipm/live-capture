@@ -46,6 +46,11 @@ THIS_DAY = TODAY.day
 def Is_Business_Day(date):
     return bool(len(pd.bdate_range(date, date)))
     
+def inc_percent(x, p):
+    '''
+    p: Phần trăm (nếu 3% thì p = 3)
+    '''
+    return x + (p/100)*x
 
 def percent(x,y):
     if(x !=0):

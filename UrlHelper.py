@@ -6,7 +6,7 @@ from TextHelper import *
 def getTextFromUrl(url):    
     page = requests.get(url=url)
     soup = BeautifulSoup(page.content, "html.parser")        
-    return to_standard(soup.text)
+    return toStandard(soup.text)
 
 def getHtmlFromUrl(url):
     page = requests.get(url=url)    

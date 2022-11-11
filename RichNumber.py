@@ -1,8 +1,5 @@
-def inc_percent(x, p):
-    '''
-    p: Phần trăm (nếu 3% thì p = 3)
-    '''
-    return x + (p/100)*x
+from DateHelper import inc_percent
+
 
 class RichNumber:
     def __init__(self, x) -> None:

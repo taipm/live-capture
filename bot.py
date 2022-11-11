@@ -111,8 +111,8 @@ def unknown_text(update: Update, context: CallbackContext):
 			print('Đang xử lý')
 			textOf_answer = botAnswer.answer()
 			print(textOf_answer)
-			#update.message.reply_text(textOf_answer)
-			update.message.reply_text(TextBuilder(textOf_answer).text_markdown, parse_mode="Markdown")
+			update.message.reply_text(textOf_answer)
+			#update.message.reply_text(TextBuilder(textOf_answer).text_markdown, parse_mode="Markdown")
 		except:
 			rs = parseTextCommand(input_text)
 			
