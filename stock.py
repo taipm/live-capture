@@ -311,13 +311,13 @@ class Stock:
         output += f'\n{self.intraday.GetSummary()}'
         return output
 
-# stocks = ['KBC']
-# for s in stocks:
-#     s = Stock(name=s)
-#     #print(f'{s.name} - {s.rate_of_waze}')
-#     print(f'{s.Describe()}')
-#     d = DayData(symbol=s.name, index=0,df_all_data=s.df_data,count_days=10)
-#     print(d.summary)
+stocks = ['KBC']
+for s in stocks:
+    s = Stock(name=s)
+    #print(f'{s.name} - {s.rate_of_waze}')
+    print(f'{s.Describe()}')
+    d = DayData(symbol=s.name, index = 0,df_all_data=s.df_data,count_days=10)
+    print(d.summary)
 
 # stocks = ['KSB','TPB','VND','KBC','CEO','BID','CTG']
 # for s in stocks:

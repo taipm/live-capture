@@ -6,7 +6,6 @@ from db import *
 class AnalysisIntradayData:
     def __init__(self, symbol) -> None:
         self.symbol = symbol.upper()
-
         self.df_data = GetIntradayData(symbol=self.symbol)
         try:
             self.las_stick = self.df_data.sort_values(by=['time'],ascending=False).iloc[:1]
@@ -173,7 +172,8 @@ class AnalysisIntradayData:
     def GetMaxVolume_Buy(self):
         return self.df_buy['volume'].max()
 
-# x = AnalysisIntradayData(symbol='VND')
+#x = AnalysisIntradayData(symbol='VND')
+#print(x.analysis_shark_action())
 # print(x.GetSummary())
 # print(x.las_stick)
 # sticks = x.get_top_sticks(10)

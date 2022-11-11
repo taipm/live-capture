@@ -105,14 +105,14 @@ def unknown_text(update: Update, context: CallbackContext):
 
 	elif(input_text.lower() == '#ls'):
 		view = ViewOrders()
-		update.message.reply_text(text=view.df_view.to_markdown())
+		update.message.reply_text(text=view.to_tele_view().to_markdown())
 	else:
 		try:
 			print('Đang xử lý')
 			textOf_answer = botAnswer.answer()
 			print(textOf_answer)
-			update.message.reply_text(textOf_answer)
-			#update.message.reply_text(TextBuilder(textOf_answer).text_markdown, parse_mode="Markdown")
+			#update.message.reply_text(textOf_answer)
+			update.message.reply_text(TextBuilder(textOf_answer).text_markdown, parse_mode="Markdown")
 		except:
 			rs = parseTextCommand(input_text)
 			

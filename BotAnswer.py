@@ -29,7 +29,8 @@ class BotAnswer:
         print(self.query)
         if(self.is_number()):            
             return RichNumber(self.query).rich_text
-        elif(len(self.query)==3):            
+        elif(len(self.query)==3):
+            print(f'Đang xử lý mã : {self.query}')
             s = Stock(name= self.query)
             output += s.Describe()
             output += DayData(s.name,index=0,df_all_data= s.df_data,count_days=10).summary

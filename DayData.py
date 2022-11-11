@@ -3,13 +3,13 @@ from CandleStick import CandleStick
 
 class DayData:
     def __init__(self, symbol, index, df_all_data, count_days) -> None:
-        self.symbol = symbol.upper()        
-        self.df_all_data = df_all_data
-        self.df_data = self.df_all_data[self.index:self.index+self.T_days]        
-        self.df_next_data = self.get_df_next_data()
-
+        self.symbol = symbol.upper()
         self.index = index
         self.T_days = count_days
+
+        self.df_all_data = df_all_data
+        self.df_data = self.df_all_data[self.index:self.index+self.T_days]        
+        self.df_next_data = self.get_df_next_data()        
 
         self.data_item = self.df_all_data.iloc[index]
         self.date  = self.data_item['Date']

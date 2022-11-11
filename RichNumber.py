@@ -1,4 +1,5 @@
-from DateHelper import inc_percent
+import math
+from DateHelper import *
 
 
 class RichNumber:
@@ -12,7 +13,31 @@ class RichNumber:
         for i in steps:
             output += f'\n{i} (%) : {inc_percent(self.x,i):,.2f}'
         return output
+    
+    def toText(self):
+        text = ''
+        signal = ''
+        number = 0
+        if self.x < 0:
+            signal = '-'
+            number = math.fabs(self.x)
+        else:
+            number = self.x
+
+        if(number > billion):
+            text = f'{number/billion:,.2f}B'
+        elif(number < billion and number >= million):
+            text = f'{number/million:,.2f}M'
+        elif(number < million and number >= thousand):
+            text = f'{number/thousand:,.2f}K'
+        else:
+            text = f'{number}'
+        return signal + text
+
 
 #print(RichNumber(77.4).rich_text)
+
+# print(RichNumber(8750000).toText())
+# print(RichNumber(-8750000).toText())
 
     
