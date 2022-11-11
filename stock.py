@@ -20,6 +20,7 @@ class Stock:
         self.len = len(self.df_data)
         self.last_price = self.df_data['Close'][0]
         self.last_volume = self.df_data['Volume'][0]
+        self.last_pct_price = self.df_data['%'][0]
         
         self.daily_prices = self.df_data['Close']
         self.daily_volumes = self.df_data['Volume']
@@ -103,7 +104,7 @@ class Stock:
     @property
     def review_price(self):
         output = f''
-        output += f'\n- MA20: {percent(self.price,self.MA20):,.2f}(5)'
+        output += f'\n- MA20: {percent(self.price,self.MA20):,.2f}(%)'
         output += f'\n- MA50: {percent(self.price,self.MA50):,.2f}(%)'
         output += f'\n- MA100: {percent(self.price,self.MA100):,.2f}(%)'
         output += f'\n'
@@ -116,16 +117,18 @@ class Stock:
         else:
             output += f'- Chưa có gì đặc biệt'
         return output
-    @property
-    def price_action(self):
-        p = PriceAction(symbol=self.name,df_data=self.df_data,days=10)
-        return p.suc_manh
-    @property
-    def review_price_action(self):
-        p = PriceAction(symbol=self.name,df_data=self.df_data,days=10)
-        output = f'\nTăng: {p.suc_bat:,.2f} | Giảm: {p.suc_bat_am:,.2f} | TH: {p.suc_manh:,.2f}'
-        output += f'\nHành động giá: \n {p.analysis_last_price}'
-        return output
+
+    # @property
+    # def price_action(self):
+    #     p = PriceAction(symbol=self.name,df_data=self.df_data,days=10)
+    #     return p.suc_manh
+
+    # @property
+    # def review_price_action(self):
+    #     p = PriceAction(symbol=self.name,df_data=self.df_data,days=10)
+    #     output = f'\nTăng: {p.suc_bat:,.2f} | Giảm: {p.suc_bat_am:,.2f} | TH: {p.suc_manh:,.2f}'
+    #     output += f'\nHành động giá: \n {p.analysis_last_price}'
+    #     return output
 
     @property
     def review_ROE(self):
@@ -299,25 +302,25 @@ class Stock:
         return sticks
 
     def Describe(self):
-        output = f'{self.name} [{self.last_trans_date}] - {self.price} | {self.df_data["%"][0]:,.2f}'
-        output += f'\nSức mạnh: {self.review_price_action}\n'
+        output = f'{self.name} - {self.price} | {self.last_pct_price:,.2f}(%)| {self.last_trans_date}'
+        #output += f'\nSức mạnh: {self.review_price_action}\n'
         output += f'\nNhận xét (giá):\n{self.review_price}'        
         output += f'\nKhối lượng CN/TN: {self.max_vol:,.0f} | {self.min_vol:,.0f}'
         output += f'\nThanh khoản: {self.liquidity:,.2f} (tỷ) | CN/TN: {self.liquidity_max:,.2f} | {self.liquidity_min:,.2f}'
         output += f'\n{self.review}'
         output += f'\n{self.signals}'        
         output += f'\n{"-"*30}'        
-        output += f'\n{self.intraday.analysis_shark_action()}'
+        #output += f'\n{self.intraday.analysis_shark_action()}'
         output += f'\n{self.intraday.GetSummary()}'
         return output
 
-stocks = ['KBC']
-for s in stocks:
-    s = Stock(name=s)
-    #print(f'{s.name} - {s.rate_of_waze}')
-    print(f'{s.Describe()}')
-    d = DayData(symbol=s.name, index = 0,df_all_data=s.df_data,count_days=10)
-    print(d.summary)
+# stocks = ['KBC']
+# for s in stocks:
+#     s = Stock(name=s)
+#     #print(f'{s.name} - {s.rate_of_waze}')
+#     print(f'{s.Describe()}')
+#     d = DayData(symbol=s.name, index = 0,df_all_data=s.df_data,count_days=10)
+#     print(d.summary)
 
 # stocks = ['KSB','TPB','VND','KBC','CEO','BID','CTG']
 # for s in stocks:

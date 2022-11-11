@@ -14,8 +14,8 @@ class Transaction:
 
     @property
     def profit(self):       
-        print(f'Bán: {self.s_order.total_income:,.0f}')
-        print(f'Mua: {self.b_order.total_cost:,.0f}')
+        # print(f'Bán: {self.s_order.total_income:,.0f}')
+        # print(f'Mua: {self.b_order.total_cost:,.0f}')
         profit = self.s_order.total_income - self.b_order.total_cost
         return profit
 
@@ -37,4 +37,4 @@ def test():
     t = Transaction(symbol='BSR',volume=2000,buy_price=17700, sell_price=17800)
     print(t.to_string())
 
-test()
+#test()

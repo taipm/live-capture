@@ -55,7 +55,7 @@ def inc_percent(x, p):
 
 def percent(x,y):
     if(x !=0):
-        return ((x-y)/x)*100
+        return ((y-x)/x)*100
     return None
 
 def profit(mua, ban):

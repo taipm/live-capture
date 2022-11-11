@@ -1,6 +1,7 @@
 from PriceAction import PriceAction
 from Stock import *
 from db import *
+import pandas as pd
 
 # def get_all_stocks_to_buy():
 #     lst = []
@@ -82,7 +83,8 @@ from db import *
 # for item in rs:
 #     print(item.to_string())
 #get_all_stocks_to_buy()
-from Stock import *
+
+
 def get_stocks_by_suc_manh(command):
     command = command.upper()
     stocks = []
@@ -99,8 +101,7 @@ def get_stocks_by_suc_manh(command):
     elif(command == 'ALL'):
         stocks = db.get_all_stocks()
     print(stocks)
-    rs = []
-    import pandas as pd
+    rs = []    
     for symbol in stocks:
         print(symbol)
         s = Stock(name = symbol)

@@ -1,11 +1,9 @@
 from FinanceStock import FinanceStock
 from RichNumber import RichNumber
-#from IntradayData import AnalysisIntradayData
 from Stock import Stock
 from BlogManager import *
 from vnstock import *
 from DateHelper import *
-#from pathlib import Path
 from DayData import *
 from TextCommand import BotCommand
 from Buyers import *
@@ -35,9 +33,8 @@ class BotAnswer:
             output += s.Describe()
             output += DayData(s.name,index=0,df_all_data= s.df_data,count_days=10).summary
             f = FinanceStock(symbol=s.name)
-            output += '\nCổ tức: ' + f.get_avg_dividend()
-            output += '\nKHẢ NĂNG THẮNG: \n'
-            output += Buyer(s.name).summary()
+            output += '\nCổ tức: ' + f.get_avg_dividend()           
+            output += Buyer(s.name).summary()            
             output += f'\nhttps://fireant.vn/top-symbols/content/symbols/{s.name}'
             post = BlogPost(title=self.query,content=output,tags=s.name)
             link = post.update_to_blog()            

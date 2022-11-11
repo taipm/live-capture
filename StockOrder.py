@@ -23,7 +23,7 @@ class BuyOrder:
         self.price = price
         self.time = str(NOW)
         self.type = 'BUY'
-        self.market_price = get_now_price(self.symbol)
+        self.market_price = 0
 
     @property
     def cost(self):
@@ -43,6 +43,7 @@ class BuyOrder:
 
     @property
     def current_profit(self):
+        self.market_price = get_now_price(self.symbol)
         sell_income = self.volume*self.market_price
         sell_fee = sell_income*self.BSC_SELL_FEE
         sell_tax = sell_income*self.BSC_SELL_TAX
@@ -82,7 +83,7 @@ class SellOrder:
         self.price = price
         self.time = str(NOW)
         self.type = 'SELL'
-        self.market_price = get_now_price(self.symbol)
+        #self.market_price = 0
                 
     @property
     def income(self):

@@ -1,17 +1,13 @@
 import pandas as pd
 import requests
 from pandas import json_normalize
-
 from datetime import datetime
 from datetime import timedelta
 import time
 from io import BytesIO
 import openpyxl
 
-def Get_BV_Price(symbol):
-    pass
-
-def get_intraday_data (symbol, page_num, page_size):
+def get_intraday_data(symbol, page_num, page_size):
     """
     This function returns the stock realtime intraday data.
     Args:

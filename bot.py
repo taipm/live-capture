@@ -6,8 +6,8 @@ from telegram.ext.callbackcontext import CallbackContext
 from telegram.ext.commandhandler import CommandHandler
 from telegram.ext.messagehandler import MessageHandler
 from telegram.ext.filters import Filters
-from FinanceStock import FinanceStock
-from DateHelper import*
+from Config import *
+from DateHelper import *
 from apscheduler.schedulers.background import BlockingScheduler
 import telegram
 from BotAnswer import BotAnswer
@@ -16,12 +16,7 @@ from TextCommand import *
 from BotTranslator import BotTranslator
 from Viewers import ViewOrders
 
-TELE_TOKEN = '5505330729:AAGxQSLBn-J22Aj9gPD30CT0ah13LPlwhBo'
-CHAT_ID = '1133501778'
-
-#updater = Updater(TELE_TOKEN, use_context=True)
 updater = Updater(TELE_TOKEN, use_context=True)
-
 
 def start(update: Update, context: CallbackContext):
 	update.message.reply_text(
@@ -110,8 +105,7 @@ def unknown_text(update: Update, context: CallbackContext):
 		try:
 			print('Đang xử lý')
 			textOf_answer = botAnswer.answer()
-			print(textOf_answer)
-			#update.message.reply_text(textOf_answer)
+			print(textOf_answer)			
 			update.message.reply_text(TextBuilder(textOf_answer).text_markdown, parse_mode="Markdown")
 		except:
 			rs = parseTextCommand(input_text)
@@ -122,8 +116,7 @@ def unknown_text(update: Update, context: CallbackContext):
 			else:
 				update.message.reply_text(rs)
 
-def notify_ending(message):
-	
+def notify_ending(message):	
 	bot = telegram.Bot(token=TELE_TOKEN)
 	rs = bot.sendMessage(chat_id=CHAT_ID, text=message)
 	print(rs)
@@ -146,11 +139,7 @@ def main():
 	updater.dispatcher.add_handler(CommandHandler('news', news_handler))		
 	updater.dispatcher.add_handler(MessageHandler(Filters.command, unknown)) # Filters out unknown commands
 	# Filters out unknown messages.
-	updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown_text))
-	
-	#updater.start_polling(timeout=600)
-	#updater.dispatcher.add_handler(MessageHandler(Filters.photo, image_handler))
-	#updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown_text))
+	updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown_text))	
 	updater.start_polling(timeout=60)
 
 	#sched = BlockingScheduler()
