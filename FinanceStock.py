@@ -4,15 +4,15 @@ from vnstock import *
 from DateHelper import percent
 
 #Compound: Lãi kép
-def compound_share(beginValue = 100, rate = 0.1, repeatedTime = 1):
-    sum = beginValue
+# def compound_share(beginValue = 100, rate = 0.1, repeatedTime = 1):
+#     sum = beginValue
 
-    for i in range(0,repeatedTime):
-        sum += sum*rate
-        sum = math.floor(sum)
-        print(f'{i} - {sum}')
+#     for i in range(0,repeatedTime):
+#         sum += sum*rate
+#         sum = math.floor(sum)
+#         print(f'{i} - {sum}')
 
-    return sum
+#     return sum
     
 #x = compound_share(beginValue = 100, rate = 0.1, repeatedTime = 5)
 
@@ -56,17 +56,17 @@ class FinanceStock:
         data = price_board(self.symbol)
         return data
 
-    def getBasicInfo(self):
-        query = self.symbol
-        if (self.symbol == "WCS"):
-            query = self.symbol + ", DSN"
-        else:
-            query = self.symbol + ", WCS"
-        #print(query)
-        df = stock_ls_analysis(query)
-        df = df[df['ticker'] == self.symbol]
-        df = df[['ticker','rsi','dividend','priceToBook']]
-        return df
+    # def getBasicInfo(self):
+    #     query = self.symbol
+    #     if (self.symbol == "WCS"):
+    #         query = self.symbol + ", DSN"
+    #     else:
+    #         query = self.symbol + ", WCS"
+    #     #print(query)
+    #     df = stock_ls_analysis(query)
+    #     df = df[df['ticker'] == self.symbol]
+    #     df = df[['ticker','rsi','dividend','priceToBook']]
+    #     return df
 
     def get_dividend_history(self):
         return dividend_history(self.symbol)
@@ -111,8 +111,8 @@ class FinanceStock:
 
         return f'Years: {sum_of_year} -  shares-avg: {share_avg:.2f} - cash-avg: {cash_avg:.2f}'
 
-    def get_ROI(self, price):
-        money = self.default_shares*price
+    # def get_ROI(self, price):
+    #     money = self.default_shares*price
 
 
 # stock = 'HPG'

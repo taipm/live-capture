@@ -1,5 +1,4 @@
 from DateHelper import *
-from CandleStick import CandleStick
 
 class DayData:
     def __init__(self, symbol, index, df_all_data, count_days) -> None:

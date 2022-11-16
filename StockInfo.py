@@ -21,7 +21,7 @@ class StockInfo:
         URL = self.url
         page = requests.get(URL)
         soup = BeautifulSoup(page.content, "html.parser")
-        return to_standard(soup.text)
+        return toStandard(soup.text)
 
     def get_stock_info(self):
         return self.tables[0]

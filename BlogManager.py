@@ -28,9 +28,10 @@ class BlogPost:
         return link
         
 #https://python-wordpress-xmlrpc.readthedocs.io/en/latest/examples/media.html#uploading-a-file
+import Config
 class Blog:
     def __init__(self) -> None:
-        self.wp = Client('https://alphacodeclub.wordpress.com/xmlrpc.php', 'taipm.bidv@gmail.com', 'P@$$w0rdPMT')
+        self.wp = Client('https://alphacodeclub.wordpress.com/xmlrpc.php', Config.blog_user, Config.blog_pwd)
         self.url = self.wp.url
         self.id = self.wp.blog_id
         self.posts = self.get_posts(length_of_post=100)

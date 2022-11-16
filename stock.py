@@ -79,7 +79,7 @@ class Stock:
             self.Du_Ban = 0
             self.Price_At_Max_Vol = 0
 
-        self.STICKS = self.ToCandleSticks()
+        #self.STICKS = self.ToCandleSticks()
         self.intraday = AnalysisIntradayData(self.name)
         #self.df_intraday_data = self.load_intraday_data()
     
@@ -286,18 +286,18 @@ class Stock:
     def liquidity_min(self):
         return np.min(self.daily_money)/billion #Tỷ
 
-    def ToCandleSticks(self):
-        sticks = list()
-        for i in range(0,self.len):
-            stick = CandleStick(high = self.df_data['High'][i],
-                                close = self.df_data['Close'][i],
-                                open = self.df_data['Open'][i],
-                                low = self.df_data['Low'][i],
-                                volume = self.df_data['Volume'][i],
-                                index = i)
-            sticks.append(stick)            
+    # def ToCandleSticks(self):
+    #     sticks = list()
+    #     for i in range(0,self.len):
+    #         stick = CandleStick(high = self.df_data['High'][i],
+    #                             close = self.df_data['Close'][i],
+    #                             open = self.df_data['Open'][i],
+    #                             low = self.df_data['Low'][i],
+    #                             volume = self.df_data['Volume'][i],
+    #                             index = i)
+    #         sticks.append(stick)            
     
-        return sticks
+    #     return sticks
 
     def Describe(self):
         output = f'{self.name} - {self.price} | {self.last_pct_price:,.2f}(%)| {self.last_trans_date}'

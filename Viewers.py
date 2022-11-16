@@ -1,6 +1,6 @@
-from MongoDb import OrderDb
+from BuyOrder import BuyOrder
+from OrderDb import OrderDb
 from RichNumber import RichNumber
-from StockOrder import BuyOrder
 import pandas as pd
 from DateHelper import *
 
@@ -85,6 +85,6 @@ class ViewOrders:
     def save_to_blog(self):
         pass
 
-print('Đang test Viewers')
-v = ViewOrders()
-print(v.to_views(symbol='VGI'))
+# print('Đang test Viewers')
+# v = ViewOrders()
+# print(v.to_views(symbol='VGI'))

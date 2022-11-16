@@ -1,4 +1,4 @@
-from Parameters import *
+from Config import ALPHA_APP_ID
 from wolframalpha import *
 from TextHelper import toStandard
 import ssl

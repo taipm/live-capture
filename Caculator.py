@@ -2,15 +2,6 @@ from math import *
 import numpy as np
 from Parameters import *
 
-# def bsc_avg_price(price, volume):
-#     BSC_BUY_FEE = 0.1/100
-#     BSC_SELL_FEE = 0.1/100
-#     BSC_SELL_TAX = 0.01/100
-
-#     cost = price*volume
-#     fee = cost*BSC_BUY_FEE
-
-
 def EvaluationOrder(old_vol, old_price, market_price, ratio_profit):
     print(f'{old_vol} {old_price} {market_price} {ratio_profit}')
     new_vol = ((market_price*(1-ratio_profit))*old_vol - old_price*old_vol)/(ratio_profit*market_price)

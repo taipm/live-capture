@@ -15,7 +15,7 @@ class StockBook:
         return output
         
     def sum(self):
-        print(f'Tổng lệnh: {self.orders}')
+        print(f'Tổng lệnh: {len(self.df_data)}')
         print(self.df)
     
     @property
