@@ -1,7 +1,8 @@
 from pprint import pprint
 import Caculator
 from vnstock import *
-from SellOrder import BuyOrder, Order, SellOrder
+from BuyOrder import BuyOrder
+from SellOrder import Order, SellOrder
 from TextHelper import *
 import db
 from DateHelper import *

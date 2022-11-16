@@ -7,6 +7,7 @@ class OrderDb(MongoDb):
         super().__init__()
         self.Orders = self.db.get_collection('Orders')
         self.df_data = self.getOrders()
+        self.count_orders = len(self.df_data)
             
     def addOder(self, order):
         self.Orders.insert_one(json.loads(order))
@@ -31,3 +32,17 @@ class OrderDb(MongoDb):
 # o = OrderDb()
 # #o.print_data()
 # print(o.getStockOrders(symbol='VND'))
+
+class TransactionDb(MongoDb):
+    def __init__(self) -> None:
+        super().__init__()
+        self.items = self.db.get_collection('Transactions')
+        self.df_data = self.get_all()
+    
+    def add_item(self, item):
+        self.items.insert_one(json.loads(item))
+
+    def get_all(self):
+        items = self.items.find()        
+        df =  pd.DataFrame(list(items))
+        return df

@@ -48,39 +48,18 @@ class SellOrder:
     def to_json(self):
         return json.dumps(self,default=lambda o: o.__dict__)
 
-    def process(self):
-        select_oder = self.get_buy_orders().iloc[0]
-        sell_vol = self.volume
-        buy_vol = select_oder['volume']
-        
-        total_vol = sell_vol - buy_vol
-        if(total_vol == 0):
-            print('Bán hết, vừa đủ')
-        elif(total_vol > 0):
-            print(f'Số lượng còn lại là: {total_vol}')
-            #Bán chưa hết, vẫn còn, cần lấy thêm lệnh tiếp theo
-        else:
-            print(f'Vẫn còn dư mua, cập nhật lại số lượng')
-            #Vẫn còn, cập nhật lại lệnh select_order hiện tại
 
-        print('Đang xử lý lệnh bán')
-
-    def get_buy_orders(self):
-        _db = OrderDb()
-        orders = _db.getStockOrders(symbol=self.symbol)
-        orders = orders.sort_values(by=['price'])
-        print(orders)
-        return orders
+    
 
 
-s = SellOrder(symbol='BID',volume=100, price=10.55)
-print(s.get_buy_orders())
-s.process()
+# s = SellOrder(symbol='BID',volume=100, price=10.55)
+# print(s.get_buy_orders())
+# s.process()
 
-s = SellOrder(symbol='BID',volume=50, price=10.55)
-print(s.get_buy_orders())
-s.process()
+# s = SellOrder(symbol='BID',volume=50, price=10.55)
+# print(s.get_buy_orders())
+# s.process()
 
-s = SellOrder(symbol='BID',volume=150, price=10.55)
-print(s.get_buy_orders())
-s.process()
+# s = SellOrder(symbol='BID',volume=150, price=10.55)
+# print(s.get_buy_orders())
+# s.process()
