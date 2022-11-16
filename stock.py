@@ -12,17 +12,17 @@ from vnstock import *
 class Stock:
     def __init__(self, name) -> None:
         self.name = name.upper()
-        #self.df_data = pd.DataFrame()
         self.StrSummary = self.name
         self.FileName = ''
  
         self.df_data = self.Load_Daily_Data()
         self.len = len(self.df_data)
+        
         self.last_price = self.df_data['Close'][0]
         self.last_volume = self.df_data['Volume'][0]
         self.last_pct_price = self.df_data['%'][0]
         
-        self.daily_prices = self.df_data['Close']
+        self.prices = self.df_data['Close']
         self.daily_volumes = self.df_data['Volume']
         self.daily_foreign = self.df_data['NN']
         self.daily_money = self.df_data['Money']
@@ -31,14 +31,13 @@ class Stock:
         self.daily_open_prices = self.df_data['Open']
         self.daily_close_prices = self.df_data['Close']
 
-        #self.price = self.daily_prices[0]
-        self.max_price = np.max(self.daily_prices)
-        self.min_price = np.min(self.daily_prices)
+        #self.price = self.prices[0]
+        self.max_price = np.max(self.prices)
+        self.min_price = np.min(self.prices)
         self.vol = self.daily_volumes[0]
         self.max_vol = np.max(self.daily_volumes)
         self.min_vol = np.min(self.daily_volumes)
         self.avg_vol = np.average(self.daily_volumes)
-
         self.TCB_Data = self.load_basic_data()
         #print(self.TCB_Data.transpose())
         try:        
@@ -96,17 +95,17 @@ class Stock:
 
     @property
     def price(self):
-        if(self.intraday_price != self.daily_prices[0]):
+        if(self.intraday_price != self.prices[0]):
             return self.intraday_price
         else:
-            return self.daily_prices[0]
+            return self.prices[0]
 
     @property
     def review_price(self):
-        output = f''
-        output += f'\n- MA20: {percent(self.price,self.MA20):,.2f}(%)'
-        output += f'\n- MA50: {percent(self.price,self.MA50):,.2f}(%)'
-        output += f'\n- MA100: {percent(self.price,self.MA100):,.2f}(%)'
+        output = f'Giá'
+        output += f'\n- MA20 {self.MA20:,.2f} : {percent(self.price,self.MA20):,.2f}(%)'
+        output += f'\n- MA50 {self.MA50:,.2f} : {percent(self.price,self.MA50):,.2f}(%)'
+        output += f'\n- MA100 {self.MA100:,.2f} : {percent(self.price,self.MA100):,.2f}(%)'
         output += f'\n'
         if(self.price >= self.MA100 and self.price >= self.MA50 and self.price >= self.MA20):
             output += f'- Vượt tất cả các mốc MA quan trọng\n'
@@ -118,18 +117,20 @@ class Stock:
             output += f'- Chưa có gì đặc biệt'
         return output
 
-    # @property
-    # def price_action(self):
-    #     p = PriceAction(symbol=self.name,df_data=self.df_data,days=10)
-    #     return p.suc_manh
-
-    # @property
-    # def review_price_action(self):
-    #     p = PriceAction(symbol=self.name,df_data=self.df_data,days=10)
-    #     output = f'\nTăng: {p.suc_bat:,.2f} | Giảm: {p.suc_bat_am:,.2f} | TH: {p.suc_manh:,.2f}'
-    #     output += f'\nHành động giá: \n {p.analysis_last_price}'
-    #     return output
-
+    @property
+    def review_volume(self):
+        output = f'Khối lượng'
+        output += f'\n- CN/TN: {self.max_vol:,.0f} | {self.min_vol:,.0f} | {self.avg_vol:,.0f}'
+        output += f'\n- HT: {self.daily_volumes[0]:,.0f} : {percent(self.daily_volumes[0],self.avg_vol):,.2f}(%)'
+        # if(self.price >= self.MA100 and self.price >= self.MA50 and self.price >= self.MA20):
+        #     output += f'- Vượt tất cả các mốc MA quan trọng\n'
+        # if(self.price >= self.max_price_year):
+        #     output += f'- Vượt đỉnh năm: {percent(self.price,self.max_price_year):,.2f} (%)'
+        # elif(self.price <= self.min_price_year):
+        #     output += f'- Thủng dáy năm: {percent(self.price,self.min_price_year):,.2f} (%)'
+        # else:
+        #     output += f'- Chưa có gì đặc biệt'
+        return output
     @property
     def review_ROE(self):
         output = f'ROE = {self.ROE:,.2f}'
@@ -285,9 +286,6 @@ class Stock:
     def liquidity_min(self):
         return np.min(self.daily_money)/billion #Tỷ
 
-    def GetLastPrice(self):
-        return self.df_data['Close'][0]
-
     def ToCandleSticks(self):
         sticks = list()
         for i in range(0,self.len):
@@ -303,24 +301,27 @@ class Stock:
 
     def Describe(self):
         output = f'{self.name} - {self.price} | {self.last_pct_price:,.2f}(%)| {self.last_trans_date}'
-        #output += f'\nSức mạnh: {self.review_price_action}\n'
-        output += f'\nNhận xét (giá):\n{self.review_price}'        
-        output += f'\nKhối lượng CN/TN: {self.max_vol:,.0f} | {self.min_vol:,.0f}'
+        #output += f'\nBiên độ CN/TN {self.df_data["Margin-Up"][0]:,.2f} (%) | {self.df_data["Margin-Down"][0]:,.2f} | {self.df_data["Margin-Up"][0]-self.df_data["Margin-Down"][0]:,.2f} (%)'
+        #output += f'\nBiên độ tăng/giảm TB: {self.avg_margin_up:,.2f} (%) | {self.avg_margin_down:,.2f} (%)'
+        output += f'\n{self.review_price}'
+        output += f'\n{self.review_volume}'       
+        #output += f'\nKhối lượng CN/TN/TB: {self.max_vol:,.0f} | {self.min_vol:,.0f} | {self.avg_vol:,.0f}'
         output += f'\nThanh khoản: {self.liquidity:,.2f} (tỷ) | CN/TN: {self.liquidity_max:,.2f} | {self.liquidity_min:,.2f}'
         output += f'\n{self.review}'
         output += f'\n{self.signals}'        
-        output += f'\n{"-"*30}'        
-        #output += f'\n{self.intraday.analysis_shark_action()}'
+        output += f'\n{"-"*30}'
         output += f'\n{self.intraday.GetSummary()}'
+        d = DayData(symbol=s.name, index = 0,df_all_data=s.df_data,count_days=10)
+        output += f'\n{d.summary}'
         return output
 
-# stocks = ['KBC']
-# for s in stocks:
-#     s = Stock(name=s)
-#     #print(f'{s.name} - {s.rate_of_waze}')
-#     print(f'{s.Describe()}')
-#     d = DayData(symbol=s.name, index = 0,df_all_data=s.df_data,count_days=10)
-#     print(d.summary)
+stocks = ['VND']
+for s in stocks:
+    s = Stock(name=s)
+    #print(f'{s.name} - {s.rate_of_waze}')
+    
+    #d = DayData(symbol=s.name, index = 0,df_all_data=s.df_data,count_days=10)
+    print(f'{s.Describe()}')
 
 # stocks = ['KSB','TPB','VND','KBC','CEO','BID','CTG']
 # for s in stocks:

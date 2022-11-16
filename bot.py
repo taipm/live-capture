@@ -90,9 +90,13 @@ def unknown_text(update: Update, context: CallbackContext):
 			print(command.command)
 		update.message.reply_text(command.order.to_string(),parse_mode='Markdown')
 
-	elif('!' in input_text):		
-		answer = BotTranslator(inputText = input_text[1:].strip()).transText
-		update.message.reply_text(answer)
+	elif('!' in input_text):
+		if(len(input_text)==4):
+			answer = botAnswer.answer()
+			update.message.reply_text(answer)
+		else:
+			answer = BotTranslator(inputText = input_text[1:].strip()).transText
+			update.message.reply_text(answer)
 
 	elif((len(input_text) > 3) and (',' in input_text) and ('(') not in input_text):
 		file_path = botAnswer.answer_stocks()
@@ -100,7 +104,7 @@ def unknown_text(update: Update, context: CallbackContext):
 
 	elif(input_text.lower() == '#ls'):
 		view = ViewOrders()
-		update.message.reply_text(text=view.to_tele_view().to_markdown())
+		update.message.reply_text(text=view.to_tele_view())
 	else:
 		try:
 			print('Đang xử lý')

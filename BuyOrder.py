@@ -1,15 +1,10 @@
-from DateHelper import NOW, percent
-import pandas as pd
-import json
 from dataclasses import dataclass
-from datetime import datetime
+import json
+from DateHelper import NOW
+from MongoDb import MongoDb
 from RichNumber import RichNumber
 from db import get_now_price
-import MongoDb as MongoDb
 
-class Order:
-    def __init__(self, symbol) -> None:
-        self.symbol = symbol.upper()
 
 @dataclass
 class BuyOrder:
@@ -23,7 +18,12 @@ class BuyOrder:
         self.price = price
         self.time = str(NOW)
         self.type = 'BUY'
-        self.market_price = 0
+        self.market_price = get_now_price(self.symbol)
+
+    def update(self):
+        print(self.symbol)
+        self.market_price = get_now_price(self.symbol)
+        print(f'{self.symbol} : {self.market_price}')
 
     @property
     def cost(self):
@@ -43,7 +43,6 @@ class BuyOrder:
 
     @property
     def current_profit(self):
-        self.market_price = get_now_price(self.symbol)
         sell_income = self.volume*self.market_price
         sell_fee = sell_income*self.BSC_SELL_FEE
         sell_tax = sell_income*self.BSC_SELL_TAX
@@ -56,7 +55,7 @@ class BuyOrder:
 
     def save_to_db(self):
         db = MongoDb.OrderDb()
-        order = self        
+        order = self  
         db.addOder(order=order.to_json())
 
     def to_string(self):
@@ -66,45 +65,12 @@ class BuyOrder:
     def to_json(self):
         return json.dumps(self,default=lambda o: o.__dict__)
 
-# b = BuyOrder(symbol='HAX',volume=700,price=16510)
-# #print(b.avg_price)
-# print(b.market_price)
-# # print(f'{b.current_profit:,.2f}')
-# # print(f'{b.current_rate_profit:,.2f} (%)')
-# print(b.to_string())
+    def process(self):
+        print('Đang xử lý lệnh mua')
 
-class SellOrder:
-    BSC_SELL_FEE = 0.1/100
-    BSC_SELL_TAX = 0.01/100
-
-    def __init__(self, symbol,volume, price) -> None:
-        self.symbol = symbol.upper()
-        self.volume = volume
-        self.price = price
-        self.time = str(NOW)
-        self.type = 'SELL'
-        #self.market_price = 0
-                
-    @property
-    def income(self):
-        return self.volume*self.price
-
-    @property
-    def fee(self):        
-        return self.income*self.BSC_SELL_FEE
-    
-    @property
-    def tax(self):        
-        return self.income*self.BSC_SELL_TAX
-    
-    @property
-    def total_income(self):        
-        return self.income - self.tax - self.fee
-        
-    def to_string(self):        
-        return f'{self.symbol} | Bán: {self.volume:,.0f} Giá: {self.price:,.0f} Thành tiền {self.income:,.0f}' +\
-            f'Phí (bán): {self.fee:,.0f} Thuế (bán): {self.fee:,.0f} Tổng thu: {self.total_income:,.0f}'
-
-    def to_json(self):
-        return json.dumps(self,default=lambda o: o.__dict__)
-
+b = BuyOrder(symbol='HAX',volume=700,price=16510)
+#print(b.avg_price)
+print(b.market_price)
+# print(f'{b.current_profit:,.2f}')
+# print(f'{b.current_rate_profit:,.2f} (%)')
+print(b.to_string())

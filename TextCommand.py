@@ -1,7 +1,7 @@
 from pprint import pprint
 import Caculator
 from vnstock import *
-from StockOrder import BuyOrder, Order, SellOrder
+from SellOrder import BuyOrder, Order, SellOrder
 from TextHelper import *
 import db
 from DateHelper import *
@@ -158,3 +158,60 @@ def parseTextCommand(text):
         return output_text
     else:
         return ""
+
+
+def is_sell_stock_command(text):
+    '''
+    VND(-2000,10.55) - Bán 2k VND giá 10.55
+    '''
+    result = True
+    if('(' in text and ')' in text and ',' in text):
+        items = text.split('(')
+        symbol = items[0]
+        if(len(symbol) == 3):
+            try:
+                volume = float(items[1].split(',')[0])
+                if(volume < 0):
+                    price = float(items[1].split(',')[1].split(')')[0])
+                    print(f'{symbol} - {volume} - {price}')
+                else:
+                    result = False
+            except:
+                print('Không phải lệnh bán')
+                result = False
+        else:
+            result = False
+    else:
+        result = False
+    return result
+
+def is_buy_stock_command(text):
+    '''
+    VND(2000,10.55) - Mua 2k VND giá 10.55
+    '''
+    result = True
+    if('(' in text and ')' in text and ',' in text):
+        items = text.split('(')
+        symbol = items[0]
+        if(len(symbol) == 3):
+            try:
+                volume = float(items[1].split(',')[0])
+                if(volume > 0):
+                    price = float(items[1].split(',')[1].split(')')[0])
+                    print(f'{symbol} - {volume} - {price}')
+                else:
+                    result = False
+            except:
+                print('Không phải lệnh bán')
+                result = False
+        else:
+            result = False
+    else:
+        result = False
+    return result
+print(is_sell_stock_command('VND(-2000,10.55)'))
+print(is_sell_stock_command('VNDX(-2000,10.55)'))
+print(is_buy_stock_command('VND(-2000,10.55)'))
+print(is_buy_stock_command('VND(2000,10.55)'))
+        
+    

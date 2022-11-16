@@ -28,13 +28,15 @@ class T0:
         self.count_transaction = 0
 
     def volume_to_transaction(self):
-        return self.total_volume/2
+        return self.total_volume/10
 
     def transaction(self):
         t = Transaction(symbol=self.symbol,volume=self.transaction_volume,sell_price=self.sell_price,buy_price=self.buy_price)
         self.profit += t.profit
-        self.total_income += t.s_order.total_income
+        self.total_income += t.profit
         self.count_transaction += 1
+        self.total_profit += self.profit
+        self.total_rate_profit = profit(self.total_income,self.total_cost)
 
     def excute(self, n_transaction):
         for i in range(0,n_transaction):
@@ -46,10 +48,11 @@ class T0:
         output += f'\nCount: {self.count_transaction}: {self.transaction_volume:,.0f} | Profit: {self.profit:,.2f} | TL: {(self.profit/self.cost)*100:,.2f} (%)| Money: {self.total_income:,.2f}'
         return output
 
-t = T0(symbol='VGI',total_volume=2000,origin_price=24120)
-print(t.summary)
-while t.profit + t.total_profit <= 0:
-    t.excute(1)
-print(t.summary)
+# t = T0(symbol='VGI',total_volume=2000,origin_price=24120)
+# print(t.summary)
+# while t.profit + t.total_profit <= 0:
+#     t.excute(1)
+#     print(t.summary)
+#     print(f'{"-"*20}')
 
     

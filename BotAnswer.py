@@ -7,6 +7,7 @@ from DateHelper import *
 from DayData import *
 from TextCommand import BotCommand
 from Buyers import *
+from Viewers import ViewOrders
 
 class BotAnswer:
     def __init__(self, query) -> None:
@@ -40,6 +41,9 @@ class BotAnswer:
             link = post.update_to_blog()            
             output += f'\nBlog: {link}'
             return f'{output}'
+        elif(len(self.query)==4):            
+            v = ViewOrders()            
+            return v.to_views(symbol=self.query[1:].upper())
 
     def answer_stocks(self):
         stocks = self.query.split(',')

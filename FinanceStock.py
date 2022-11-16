@@ -1,8 +1,6 @@
-from cmath import cos
 import math
 from unicodedata import name
 from vnstock import *
-
 from DateHelper import percent
 
 #Compound: Lãi kép

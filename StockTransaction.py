@@ -1,7 +1,6 @@
-from StockOrder import BuyOrder, SellOrder
+from BuyOrder import BuyOrder
+from SellOrder import SellOrder
 from DateHelper import percent
-
-
 class Transaction:
     def __init__(self, symbol, volume, buy_price, sell_price) -> None:
         self.symbol = symbol.upper()
@@ -11,11 +10,8 @@ class Transaction:
         self.b_order = BuyOrder(symbol=self.symbol,volume=self.volume, price=self.buy_price)
         self.s_order = SellOrder(symbol=self.symbol,volume=self.volume, price=self.sell_price)
      
-
     @property
-    def profit(self):       
-        # print(f'Bán: {self.s_order.total_income:,.0f}')
-        # print(f'Mua: {self.b_order.total_cost:,.0f}')
+    def profit(self):
         profit = self.s_order.total_income - self.b_order.total_cost
         return profit
 
@@ -37,4 +33,4 @@ def test():
     t = Transaction(symbol='BSR',volume=2000,buy_price=17700, sell_price=17800)
     print(t.to_string())
 
-#test()
+test()

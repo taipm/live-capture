@@ -58,6 +58,6 @@ class VnIndex:
     def sum_pct(self):
         return np.sum(self.df_data['%'])
 
-vni = VnIndex()
-print(vni.df_data.to_markdown())
-print(vni.sum_pct)
+# vni = VnIndex()
+# print(vni.df_data.to_markdown())
+# print(vni.sum_pct)

@@ -1,1 +1,0 @@
-docker build -t live-capture/chatbot_mini .

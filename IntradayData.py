@@ -169,9 +169,6 @@ class AnalysisIntradayData:
         else:
             return 'NA'
 
-    def GetMaxVolume_Buy(self):
-        return self.df_buy['volume'].max()
-
 #x = AnalysisIntradayData(symbol='VND')
 #print(x.analysis_shark_action())
 # print(x.GetSummary())

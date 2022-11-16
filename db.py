@@ -7,7 +7,6 @@ from urllib.request import urlopen
 import requests
 from pandas import json_normalize
 from datetime import datetime
-
 from vnstock import *
 import numpy as np
 import ssl
@@ -65,10 +64,10 @@ def get_stock_data_from_api(symbol):
                 df['NN'] = df['NN Mua'] - df['NN Ban']
                 df['M(NN)'] = df['NN']*df['Volume']*1000*100 #Giá trị giao dịch của khối ngoại (tỷ)
                 df['Oscillation'] = np.abs(((df['Low']-df['High'])/df['Low'])*100)
-                df['Oscillation-Low-Open'] = ((df['Low']-df['Open'])/df['Open'])*100
-                df['Oscillation-Open-High'] = ((df['High']-df['Open'])/df['Open'])*100
-
-                df = df.drop_duplicates(subset=['Date'])                
+                df['Oscillation-Down'] = ((df['Low']-df['Open'])/df['Open'])*100
+                df['Oscillation-Up'] = ((df['High']-df['Open'])/df['Open'])*100
+                #df['Margin-Up'] = ((df['High']-df['Open'])/df['Open'])*100
+                #df['Margin-Down'] = ((df['Low']-df['Open'])/df['Open'])*100              
                 return df
         except: #Cổ phiếu chưa có trong danh mục
                 return pd.DataFrame()
@@ -77,7 +76,10 @@ def GetStockData(symbol):
         data = get_stock_data_from_api(symbol=symbol)
         if not data.empty:
                 df = pd.DataFrame(data=data)
-                df['Close'] = df['Close']
+                df = df.drop_duplicates(subset=['Date'])
+                df = df[df['Open'] > 0]
+                df = df[df['Volume']>0]
+
                 df = df.reset_index(drop=True)
                 df.set_index('Date')
                 return df
@@ -160,8 +162,8 @@ def get_bds_symbols():
             'CII','NBB','CEO','DIG','NVL',
             #'NLG','VRE','ACB','VHM','TPB',
             'DPR','PHR','BCM','KBC','VHM',
-            'CRE','SZC','PHR','DPR','GVR'
-            #'VIB','CTG','BID','VRE','NVL',
+            'CRE','SZC','PHR','DPR','GVR',
+            'KSB','HBC','DXS','DPG','NTL'
             #'MSN','VIC','PDR','KDH','HDB'
             ]
     return list(set(lst))
@@ -174,9 +176,11 @@ def get_banks_symbols_command():
     return output
 
 def get_securities_symbols():
-    lst = ['VCI','SSI','VND','BSI','CTS','TVS','HCM',
-        'FTS','SHS','VIX']
-    return lst
+    lst = [
+        'VCI','SSI','VND','BSI','CTS',
+        'TVS','HCM','FTS','SHS','VIX'
+        ]
+    return list(set(lst))
 
 def get_securities_symbols_command():
     lst = ['VCI','SSI','VND','BSI','CTS','TVS',
@@ -208,15 +212,23 @@ def get_bds_symbols_as_command():
     return ','.join(get_bds_symbols())
 
 def get_danhmuc_symbols():
+    
     lst = ['VND','HAX','PDR','SCR','DXG',
             'HPG','FPT','FRT','VCI','TPB',
             'BID','BSI','MSH','VIB','HBC',
             'IDC','NLG','BSR','ASM','SSI',
             'PDR','HAH','MWG','BSR','FOX',
             'DGC','SSI','SZC','VGI','CTG',
-            'DPM','GMD'
+            'DPM','GMD','BCM','DPM','DCM',
+            'KDH',''
+            'VJC','HVN','AST','ACV',
+            'HAX','CTF','VEA',
             #'MSN','VIC','PDR','KDH','HDB'
     ]
+    lst += get_vn30_symbols()
+    lst += get_bds_symbols()
+    lst += get_banks_symbols()
+    lst += get_securities_symbols()
 
     return list(set(lst))
 

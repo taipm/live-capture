@@ -40,17 +40,26 @@ class DayData:
         self.last_min_vol = np.min(self.df_data['Volume'][1:])
 
         self.avg_oscillation = np.average(self.df_data['Oscillation'])
-        self.avg_oscillation_low = np.average(self.df_data['Oscillation-Low-Open'])
-        self.avg_oscillation_high = np.average(self.df_data['Oscillation-Open-High'])
+        self.avg_oscillation_down = np.average(self.df_data['Oscillation-Down'])
+        self.avg_oscillation_up = np.average(self.df_data['Oscillation-Up'])
 
-        self.CandleStick = CandleStick(open=self.open,close=self.close,high=self.high,low=self.low,volume=self.volume, index=0)
+        #self.CandleStick = CandleStick(open=self.open,close=self.close,high=self.high,low=self.low,volume=self.volume, index=0)
 
         self.singal = ''
 
     @property
     def today_money(self):
         return self.volume*self.price/billion #tỷ
-
+    @property
+    def t0_profit(self):
+        return profit(mua=self.low, ban=self.high)
+    @property
+    def max_profit(self):
+        '''
+        Lợi nhuận cao nhất trong T_days
+        '''
+        max_price = np.max(self.df_next_data['High'])
+        return profit(mua=self.low,ban=max_price)
     @property
     def price(self):
         if self.close > 0:
@@ -76,20 +85,21 @@ class DayData:
     
     @property
     def max_inc_oscillation_open(self):
-        return np.max(self.df_data['Oscillation-Open-High'])
+        return np.max(self.df_data['Oscillation-Up'])
     
     @property
     def max_desc_oscillation_open(self):
-        return np.min(self.df_data['Oscillation-Low-Open'])
+        return np.min(self.df_data['Oscillation-Down'])
     
-    @property
-    def target_buy_price(self):
-        price = (self.avg_oscillation_low/100)*self.price + self.price
+    def target_buy_price(self, desc_rate):
+        '''
+        Chỉ mua khi giảm quá -6% và nên bán trong phiên
+        '''
+        price = price = inc_percent(self.price,desc_rate)
         return price
 
-    @property
-    def target_sell_price(self):        
-        price = (self.avg_oscillation_high/100)*self.price + self.price
+    def target_sell_price(self, inc_rate):      
+        price = inc_percent(self.target_buy_price(desc_rate=-6),inc_rate+0.67)
         return price
     
     @property
@@ -103,6 +113,23 @@ class DayData:
     def isCE(self):
         if self.margin_price >= 6.67:
             return True
+        else:
+            return False
+
+    '''
+    VOLUME ANALYSIS
+    '''
+    def is_supper_volume(self,level):
+        if self.volume >= level*self.last_max_vol and self.margin_price >=1:
+            return True
+        else:
+            return False
+
+    def is_break_volume(self,level):
+        if self.volume >= level*self.avg_vol and self.margin_price >=2:
+            if self.volume >= self.last_max_vol:
+                if self.close > self.open:
+                    return True
         else:
             return False
 
@@ -123,7 +150,6 @@ class DayData:
             return True
         else:
             return False
-
     @property
     def margin_price(self):
         return self.df_data['%'][self.index]
@@ -139,13 +165,16 @@ class DayData:
             output += f'{self.volume} - MaxVol {self.T_days} ngày'
         elif(self.is_min_vol):
             output += f'{self.volume} - MinVol {self.T_days} ngày'
+        return output
     @property
     def review_price(self):
-        output = ''
+        output = f'Giá:\n'
         if(self.is_max_price):
-            output += f'{self.volume} - MaxVol {self.T_days} ngày'
-        elif(self.is_min_vol):
-            output += f'{self.volume} - MinVol {self.T_days} ngày'
+            output += f'{self.max_price} - max: {self.T_days} ngày'
+        elif(self.is_min_price):
+            output += f'{self.min_price} - min {self.T_days} ngày'
+        output += f'- Giá CN/TN: {self.max_price} | {self.min_price} [{self.get_index_of_min_price()}] [d = {self.get_distance_price():,.2f} (%)]'
+        return output
     @property
     def is_max_price(self):
         if(self.price >= self.last_max_price):
@@ -158,7 +187,20 @@ class DayData:
             return True
         else:
             return False
-    
+            
+    @property
+    def is_highest_price(self):
+        if self.close == self.high:
+            return True
+        else:
+            return False
+    @property
+    def is_lowest_price(self):
+        if self.close == self.low:
+            return True
+        else:
+            return False
+
     def get_df_next_data(self) -> pd.DataFrame:
         try:
             df_next_data = self.df_all_data[self.index-self.T_days:self.index+1]
@@ -166,7 +208,7 @@ class DayData:
             return df_next_data.reset_index(drop=True)
         except:
             return pd.DataFrame().empty
-    #def max_price(df)
+   
     def isUpPrice(self,x:float): #Up x%
         if x > 0:
             if self.margin_price >= x:
@@ -239,6 +281,12 @@ class DayData:
         return self.singal + '\n' + text
     
     @property
+    def review_foriegn(self):
+        output = ''
+        output += f'NN(Mua-Bán) {self.sum_foriegn:,.2f} ~ {(self.sum_foriegn/self.sum_vol)*100:,.2f} (%) - Min NN : {self.is_min_foriegn()}, - Max NN {self.is_max_foriegn()}'
+        return output
+
+    @property
     def summary(self):
         output = f'{self.symbol} - Phiên [{self.index}] - {self.close} [{self.margin_price:,.2f} (%)] - GTGD: {self.today_money:,.2f} (tỷ)'+\
         f'\nTrong {self.T_days} phiên : {self.sum_margin_price:,.2f}(%)'+\
@@ -248,14 +296,13 @@ class DayData:
         f'\n- Biến động TB: {self.avg_oscillation:,.2f} (%)'+\
         f'\n- Biến động HT: {self.oscillation:,.2f} (%)'+\
         f'\nMax tăng/giảm: {self.max_inc_oscillation_open:,.2f} (%) | {self.max_desc_oscillation_open:,.2f} (%)'+\
-        f'\nTB-Tăng: {np.average(self.avg_oscillation_high):,.2f} (%)| TB-Giảm: {self.avg_oscillation_low:,.2f} (%)'+\
-        f'\nMục tiêu: \n- Mua {self.target_buy_price:,.2f} ({self.avg_oscillation_low:,.2f} (%))'+\
-        f'\n- Bán: {self.target_sell_price:,.2f} ({self.avg_oscillation_high:,.2f}) (%)'+\
-        f'\n=> Lợi nhuận: {percent(self.target_sell_price,self.target_buy_price):,.2f} (%)'+\
-        f'\nGiá CN/TN: {self.max_price} | {self.min_price} [{self.get_index_of_min_price()}] [d = {self.get_distance_price():,.2f} (%)]'+\
-        f'\nGiá: {self.review_price}'+\
+        f'\nTB-Tăng: {np.average(self.avg_oscillation_up):,.2f} (%)| TB-Giảm: {self.avg_oscillation_down:,.2f} (%)'+\
+        f'\nMục tiêu: \n- Mua {self.target_buy_price(desc_rate=-6):,.2f} -6(%)'+\
+        f'\n- Bán:'+\
+        f'\n- 3%: {self.target_sell_price(3):,.2f} | 4%: {self.target_sell_price(4):,.2f} | 5%: {self.target_sell_price(5):,.2f}'+\
+        f'\n{self.review_price}'+\
         f'\nKLGD TB: {self.avg_vol:,.2f}: {self.pct_avg_volume:,.2f} (%) - {self.review_volume}'+\
-        f'\nNN(Mua-Bán) {self.sum_foriegn:,.2f} ~ {(self.sum_foriegn/self.sum_vol)*100:,.2f} (%) - Min NN : {self.is_min_foriegn()}, - Max NN {self.is_max_foriegn()}'+\
+        f'\nKhối ngoại:\n {self.review_foriegn}'+\
         f'\n{"-"*30}\n'
         return output
 
