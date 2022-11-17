@@ -28,6 +28,8 @@ def help(update: Update, context: CallbackContext):
 	/VND - Trả về thông tin cổ phiếu VND (phục vụ giao dịch)
 	/#BDS (#CK, #BANKS, ...) - Trả về thông tin các nhóm ngành
 	/! - Dịch
+	/!VND(100,10)
+	/!VND(-100,10)
 	/? - Wolframe Alpha
 	/geeks - To get the GeeksforGeeks URL""")
 
@@ -67,44 +69,38 @@ def unknown_text(update: Update, context: CallbackContext):
 		text_command = db.get_banks_symbols()
 		botAnswer = BotAnswer(text_command)
 		file_path = botAnswer.answer_stocks()
-		update.message.reply_text(file_path)
-
-	elif('?' in input_text):
-		answer = Alpha(input_text[1:].strip()).answerText
-		update.message.reply_text(answer)
-
-	elif('#today' in input_text):
+		update.message.reply_text(file_path)	
+	
+	elif(input_text.upper() == '#LS'):
+		view = ViewOrders()
+		update.message.reply_text(text=view.to_tele_view())
+		
+	elif input_text.upper() == '#TODAY':
 		print('Đang tìm cổ phiếu theo sức mạnh')
 		df = get_stocks_by_suc_manh(input_text[1:].strip())
 		update.message.reply_text(df.to_markdown(),parse_mode='Markdown')
-
-	elif('(' in input_text and ')' in input_text):
-		#Is Buy/Sell stock
-		print('Đang kiểm tra và xử lý lệnh mua/bán')
-		command = None
-		if(input_text.startswith('!')):		
-			command = StockCommand(input_text[1:])
-			command.order.save_to_db()			
-		else:
-			command = StockCommand(input_text)
-			print(command.command)
-		update.message.reply_text(command.order.to_string(),parse_mode='Markdown')
-
-	elif('!' in input_text):
+	
+	elif input_text.startswith('!'):
+		print('start with !')
 		if(len(input_text)==4):
 			answer = botAnswer.answer()
 			update.message.reply_text(answer)
+		elif('(' in input_text and ')' in input_text):
+			command = StockCommand(input_text[1:])
+			print(command.to_string())
+			command.order.save_to_db()
+			update.message.reply_text(command.order.to_string(),parse_mode='Markdown')
 		else:
 			answer = BotTranslator(inputText = input_text[1:].strip()).transText
 			update.message.reply_text(answer)
-
+	
+	elif input_text.startswith('?'):
+		answer = Alpha(input_text[1:].strip()).answerText
+		update.message.reply_text(answer)
+	
 	elif((len(input_text) > 3) and (',' in input_text) and ('(') not in input_text):
 		file_path = botAnswer.answer_stocks()
-		update.message.reply_text(file_path)
-
-	elif(input_text.lower() == '#ls'):
-		view = ViewOrders()
-		update.message.reply_text(text=view.to_tele_view())
+		update.message.reply_text(file_path)	
 	else:
 		try:
 			print('Đang xử lý')
@@ -112,8 +108,7 @@ def unknown_text(update: Update, context: CallbackContext):
 			print(textOf_answer)			
 			update.message.reply_text(TextBuilder(textOf_answer).text_markdown, parse_mode="Markdown")
 		except:
-			rs = parseTextCommand(input_text)
-			
+			rs = parseTextCommand(input_text)			
 			if rs == "":
 				update.message.reply_text(
 					"Sorry I can't recognize you , you said '%s'" % update.message.text)

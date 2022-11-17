@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import json
 from DateHelper import NOW
-from MongoDb import MongoDb
+from OrderDb import OrderDb
 from RichNumber import RichNumber
 from db import get_now_price
 
@@ -54,7 +54,7 @@ class BuyOrder:
         return (self.current_profit/self.total_cost)*100
 
     def save_to_db(self):
-        db = MongoDb.OrderDb()
+        db = OrderDb()
         order = self  
         db.addOder(order=order.to_json())
 
@@ -68,9 +68,9 @@ class BuyOrder:
     def process(self):
         print('Đang xử lý lệnh mua')
 
-b = BuyOrder(symbol='HAX',volume=700,price=16510)
-#print(b.avg_price)
-print(b.market_price)
-# print(f'{b.current_profit:,.2f}')
-# print(f'{b.current_rate_profit:,.2f} (%)')
-print(b.to_string())
+# b = BuyOrder(symbol='HAX',volume=700,price=16510)
+# #print(b.avg_price)
+# print(b.market_price)
+# # print(f'{b.current_profit:,.2f}')
+# # print(f'{b.current_rate_profit:,.2f} (%)')
+# print(b.to_string())

@@ -42,13 +42,12 @@ class DayData:
         self.avg_oscillation_down = np.average(self.df_data['Oscillation-Down'])
         self.avg_oscillation_up = np.average(self.df_data['Oscillation-Up'])
 
-        #self.CandleStick = CandleStick(open=self.open,close=self.close,high=self.high,low=self.low,volume=self.volume, index=0)
-
         self.singal = ''
 
     @property
     def today_money(self):
         return self.volume*self.price/billion #tỷ
+
     @property
     def t0_profit(self):
         return profit(mua=self.low, ban=self.high)
@@ -59,6 +58,7 @@ class DayData:
         '''
         max_price = np.max(self.df_next_data['High'])
         return profit(mua=self.low,ban=max_price)
+        
     @property
     def price(self):
         if self.close > 0:
@@ -94,7 +94,7 @@ class DayData:
         '''
         Chỉ mua khi giảm quá -6% và nên bán trong phiên
         '''
-        price = price = inc_percent(self.price,desc_rate)
+        price = inc_percent(self.price,desc_rate)
         return price
 
     def target_sell_price(self, inc_rate):      

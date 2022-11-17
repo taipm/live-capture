@@ -210,9 +210,9 @@ def is_buy_stock_command(text):
     else:
         result = False
     return result
-print(is_sell_stock_command('VND(-2000,10.55)'))
-print(is_sell_stock_command('VNDX(-2000,10.55)'))
-print(is_buy_stock_command('VND(-2000,10.55)'))
-print(is_buy_stock_command('VND(2000,10.55)'))
+# print(is_sell_stock_command('VND(-2000,10.55)'))
+# print(is_sell_stock_command('VNDX(-2000,10.55)'))
+# print(is_buy_stock_command('VND(-2000,10.55)'))
+# print(is_buy_stock_command('VND(2000,10.55)'))
         
     

@@ -1,6 +1,5 @@
 from Caculator import *
 from DayData import * #DateStick, DayData
-from CandleStick import CandleStick
 from IntradayData import *
 from PriceAction import PriceAction
 import db
@@ -31,7 +30,6 @@ class Stock:
         self.daily_open_prices = self.df_data['Open']
         self.daily_close_prices = self.df_data['Close']
 
-        #self.price = self.prices[0]
         self.max_price = np.max(self.prices)
         self.min_price = np.min(self.prices)
         self.vol = self.daily_volumes[0]
@@ -78,10 +76,7 @@ class Stock:
             self.Du_Mua = 0
             self.Du_Ban = 0
             self.Price_At_Max_Vol = 0
-
-        #self.STICKS = self.ToCandleSticks()
         self.intraday = AnalysisIntradayData(self.name)
-        #self.df_intraday_data = self.load_intraday_data()
     
     def Load_Daily_Data(self) -> pd.DataFrame:
         return db.GetStockData(self.name)
@@ -121,15 +116,7 @@ class Stock:
     def review_volume(self):
         output = f'Khối lượng'
         output += f'\n- CN/TN: {self.max_vol:,.0f} | {self.min_vol:,.0f} | {self.avg_vol:,.0f}'
-        output += f'\n- HT: {self.daily_volumes[0]:,.0f} : {percent(self.daily_volumes[0],self.avg_vol):,.2f}(%)'
-        # if(self.price >= self.MA100 and self.price >= self.MA50 and self.price >= self.MA20):
-        #     output += f'- Vượt tất cả các mốc MA quan trọng\n'
-        # if(self.price >= self.max_price_year):
-        #     output += f'- Vượt đỉnh năm: {percent(self.price,self.max_price_year):,.2f} (%)'
-        # elif(self.price <= self.min_price_year):
-        #     output += f'- Thủng dáy năm: {percent(self.price,self.min_price_year):,.2f} (%)'
-        # else:
-        #     output += f'- Chưa có gì đặc biệt'
+        output += f'\n- HT: {self.daily_volumes[0]:,.0f} : {percent(self.daily_volumes[0],self.avg_vol):,.2f}(%)'        
         return output
     @property
     def review_ROE(self):
@@ -286,26 +273,10 @@ class Stock:
     def liquidity_min(self):
         return np.min(self.daily_money)/billion #Tỷ
 
-    # def ToCandleSticks(self):
-    #     sticks = list()
-    #     for i in range(0,self.len):
-    #         stick = CandleStick(high = self.df_data['High'][i],
-    #                             close = self.df_data['Close'][i],
-    #                             open = self.df_data['Open'][i],
-    #                             low = self.df_data['Low'][i],
-    #                             volume = self.df_data['Volume'][i],
-    #                             index = i)
-    #         sticks.append(stick)            
-    
-    #     return sticks
-
     def Describe(self):
-        output = f'{self.name} - {self.price} | {self.last_pct_price:,.2f}(%)| {self.last_trans_date}'
-        #output += f'\nBiên độ CN/TN {self.df_data["Margin-Up"][0]:,.2f} (%) | {self.df_data["Margin-Down"][0]:,.2f} | {self.df_data["Margin-Up"][0]-self.df_data["Margin-Down"][0]:,.2f} (%)'
-        #output += f'\nBiên độ tăng/giảm TB: {self.avg_margin_up:,.2f} (%) | {self.avg_margin_down:,.2f} (%)'
+        output = f'{self.name} - {self.price} | {self.last_pct_price:,.2f}(%)| {self.last_trans_date}'       
         output += f'\n{self.review_price}'
-        output += f'\n{self.review_volume}'       
-        #output += f'\nKhối lượng CN/TN/TB: {self.max_vol:,.0f} | {self.min_vol:,.0f} | {self.avg_vol:,.0f}'
+        output += f'\n{self.review_volume}'               
         output += f'\nThanh khoản: {self.liquidity:,.2f} (tỷ) | CN/TN: {self.liquidity_max:,.2f} | {self.liquidity_min:,.2f}'
         output += f'\n{self.review}'
         output += f'\n{self.signals}'        
@@ -315,13 +286,13 @@ class Stock:
         output += f'\n{d.summary}'
         return output
 
-stocks = ['VND']
-for s in stocks:
-    s = Stock(name=s)
-    #print(f'{s.name} - {s.rate_of_waze}')
+# stocks = ['VND']
+# for s in stocks:
+#     s = Stock(name=s)
+#     #print(f'{s.name} - {s.rate_of_waze}')
     
-    #d = DayData(symbol=s.name, index = 0,df_all_data=s.df_data,count_days=10)
-    print(f'{s.Describe()}')
+#     #d = DayData(symbol=s.name, index = 0,df_all_data=s.df_data,count_days=10)
+#     print(f'{s.Describe()}')
 
 # stocks = ['KSB','TPB','VND','KBC','CEO','BID','CTG']
 # for s in stocks:

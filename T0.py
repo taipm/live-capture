@@ -1,5 +1,3 @@
-#from db import *
-import math
 from DateHelper import *
 from StockTransaction import *
 from db import get_now_price

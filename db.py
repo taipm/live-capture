@@ -72,7 +72,7 @@ def get_stock_data_from_api(symbol):
         except: #Cổ phiếu chưa có trong danh mục
                 return pd.DataFrame()
 
-def GetStockData(symbol):    
+def GetStockData(symbol) -> pd.DataFrame:
         data = get_stock_data_from_api(symbol=symbol)
         if not data.empty:
                 df = pd.DataFrame(data=data)
@@ -86,19 +86,6 @@ def GetStockData(symbol):
         else:
                 print(f'{symbol} - chưa có trong danh mục')
                 return pd.DataFrame()
-#print(GetStockData(symbol='NVL')[0:100][['Date','Close','%']].to_markdown())
-
-def test_Oscillation():
-    symbol = 'VND'
-    data = GetStockData(symbol=symbol).iloc[0]
-    high = data['High']
-    low = data['Low']
-    open = data['Open']
-    osci_open = data['Oscillation-Low-Open']
-
-    print(f'L {low} : O {open} -> {open-low:,.2f} : {osci_open:,.2f}')
-
-#test_Oscillation()
 
 
 def get_intraday_data(symbol, page_num, page_size):
@@ -149,6 +136,27 @@ def get_now_price(symbol):
         price = df_data.sort_values(by=['time'],ascending=False).iloc[:1]['price'].values[0]
     
     return price
+
+def get_now_full_price(symbol):
+    df_data = GetIntradayData(symbol = symbol)
+    last_price = None
+    max_price = None
+    min_price = None
+
+    if (df_data.empty):
+        data = get_stock_data_from_api(symbol=symbol).iloc[0]
+        last_price = data['Close']*1000
+        max_price = data['High']*1000
+        min_price = data['Low']*1000
+    else:
+        data = df_data.sort_values(by=['time'],ascending=False).iloc[:1]     
+        last_price = data['price'].values[0]
+        max_price = np.max(df_data['price'])
+        min_price = np.min(df_data['price'])
+    
+    return [last_price, max_price, min_price]
+
+#print(get_now_full_price(symbol='VIB'))
 
 def get_banks_symbols():
     bank_list = ['VPB', 'BID','CTG','VCB','TCB',

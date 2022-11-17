@@ -1,6 +1,5 @@
 from math import *
 import numpy as np
-from Parameters import *
 
 def EvaluationOrder(old_vol, old_price, market_price, ratio_profit):
     print(f'{old_vol} {old_price} {market_price} {ratio_profit}')

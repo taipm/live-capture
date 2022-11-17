@@ -42,7 +42,7 @@ class BotAnswer:
             output += f'\nBlog: {link}'
             return f'{output}'
         elif(len(self.query)==4):            
-            v = ViewOrders()            
+            v = ViewOrders()
             return v.to_views(symbol=self.query[1:].upper())
 
     def answer_stocks(self):

@@ -22,7 +22,7 @@ class OrderDb(MongoDb):
         df =  pd.DataFrame(list(orders))
         df = df.sort_values(by=['time'])
         return df
-    
+
     def getOrder(self, query):
         return self.Orders.find_one(query)
 
