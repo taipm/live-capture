@@ -10,7 +10,7 @@ from db import get_now_price
 class BuyOrder:
     BSC_BUY_FEE = 0.1/100
     BSC_SELL_FEE = 0.1/100
-    BSC_SELL_TAX = 0.01/100
+    BSC_SELL_TAX = 0.1/100
 
     def __init__(self, symbol, volume, price) -> None:
         self.symbol = symbol.upper()

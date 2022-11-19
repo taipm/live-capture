@@ -7,8 +7,8 @@ from db import *
 class ViewOrders:
     def __init__(self) -> None:
         self.df_data = OrderDb().getOrders()
-        self.df_buy_oders = self.get_df_buy_orders()
-        self.count_of_oders = len(self.df_buy_oders)
+        self.df_buy_oders = pd.DataFrame()#self.get_df_buy_orders()
+        self.count_of_oders = 0# len(self.df_buy_oders)
         #print(self.df_data)
     
     def get_df_buy_orders(self):
@@ -26,6 +26,7 @@ class ViewOrders:
 
     def get_df_buy_orders_by_stock(self, symbol):
         df = self.df_data[self.df_data['symbol'] == symbol.upper()]
+        print(df)
         orders = []
         for i in range(0, len(df)):
             item = df.iloc[i]
@@ -97,7 +98,7 @@ class ViewOrders:
         df = pd.DataFrame(list(rs),columns=['symbol','volume','price', 'm_price','profit','%','max_price','max_%','min_price','min_%'])
         df = df.sort_values(by=['%'])
 
-        summary = f'\n{symbol} | {np.sum(df["volume"]):,.0f} : Tổng lợi nhuận: {RichNumber(np.sum(df["profit"])):,.2f}'
+        summary = f'\n{symbol} | {np.sum(df["volume"]):,.0f} : Tổng lợi nhuận: {np.sum(df["profit"]):,.2f}'
         
         df['max_price'] = (df['max_price']/1000).map('{:,.2f}'.format)
         df['min_price'] = (df['min_price']/1000).map('{:,.2f}'.format)
