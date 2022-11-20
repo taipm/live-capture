@@ -32,7 +32,7 @@ class BotAnswer:
             print(f'Đang xử lý mã : {self.query}')
             s = Stock(name= self.query)
             output += s.Describe()
-            output += DayData(s.name,index=0,df_all_data= s.df_data,count_days=10).summary
+            #output += DayData(s.name,index=0,df_all_data= s.df_data,count_days=10).summary
             f = FinanceStock(symbol=s.name)
             output += '\nCổ tức: ' + f.get_avg_dividend()           
             output += Buyer(s.name).summary()            
@@ -45,16 +45,19 @@ class BotAnswer:
             v = ViewOrders()
             return v.to_views(symbol=self.query[1:].upper())
 
-    def answer_stocks(self):
-        stocks = self.query.split(',')
+    def answer_stocks(self, stocks):
+        #stocks = self.query.split(',')
+        print(f'Đang tìm kết quả: {stocks}')
         lst = []
         for stock in stocks:
             lst.append(stock.strip().upper())
         stocks = ','.join(lst)
+        print(stocks)
         if(len(stocks)>1):
             print('Đang query nhiều cổ phiếu')
             print(stocks)
             board = price_board(stocks)
+            print(board)
             rs = board.transpose()
             file_path = './data/' + 'your-file-' + 'Intraday-' +str(datetime.now()) + ".xlsx"
             rs.to_excel(file_path)
@@ -63,13 +66,13 @@ class BotAnswer:
             return file_url            
 
 
-    def answer_with_chart(self):
-        if(len(self.query)==3):
-            print('Đang vẽ đồ thị')
-            s = Stock(name = self.query)
-            s.Prepare()
-            file_path = s.draw()
-            return file_path
+    # def answer_with_chart(self):
+    #     if(len(self.query)==3):
+    #         print('Đang vẽ đồ thị')
+    #         s = Stock(name = self.query)
+    #         s.Prepare()
+    #         file_path = s.draw()
+    #         return file_path
     
     def answer_two_numbers(self):
         command = BotCommand(self.query)

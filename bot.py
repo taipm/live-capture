@@ -52,25 +52,14 @@ def unknown(update: Update, context: CallbackContext):
 def unknown_text(update: Update, context: CallbackContext):
 	input_text = toStandard(update.message.text)
 	botAnswer = BotAnswer(input_text)
-
-	if(input_text.upper() == 'BANKS'):
-		text_command = db.get_banks_symbols_command()
-		botAnswer = BotAnswer(text_command)
-		file_path = botAnswer.answer_stocks()
-		update.message.reply_text(file_path)
-	
-	elif(input_text.upper() == 'CK'):
-		text_command = db.get_securities_symbols()
-		botAnswer = BotAnswer(text_command)
-		file_path = botAnswer.answer_stocks()
+	validCommands = ['BANKS','CK','VN30','BDS','ALL']
+	if (input_text.upper() in validCommands):
+		command = input_text.upper()
+		stocks = db.getStocksByCommand(command=command)
+		
+		file_path =botAnswer.answer_stocks(stocks=stocks)
 		update.message.reply_text(file_path)
 
-	elif(input_text.upper() == 'VN30'):
-		text_command = db.get_banks_symbols()
-		botAnswer = BotAnswer(text_command)
-		file_path = botAnswer.answer_stocks()
-		update.message.reply_text(file_path)	
-	
 	elif(input_text.upper() == '#LS'):
 		view = ViewOrders()
 		update.message.reply_text(text=view.to_tele_view())
@@ -100,7 +89,7 @@ def unknown_text(update: Update, context: CallbackContext):
 	
 	elif((len(input_text) > 3) and (',' in input_text) and ('(') not in input_text):
 		file_path = botAnswer.answer_stocks()
-		update.message.reply_text(file_path)	
+		update.message.reply_text(file_path)
 	else:
 		try:
 			print('Đang xử lý')
@@ -114,22 +103,6 @@ def unknown_text(update: Update, context: CallbackContext):
 					"Sorry I can't recognize you , you said '%s'" % update.message.text)
 			else:
 				update.message.reply_text(rs)
-
-def notify_ending(message):	
-	bot = telegram.Bot(token=TELE_TOKEN)
-	rs = bot.sendMessage(chat_id=CHAT_ID, text=message)
-	print(rs)
-
-# notify_ending(message="Hello, teo")
-# # Creates a default Background Scheduler
-
-
-# def prompt():
-# 	notify_ending(message="Tự động đây")
- 
-# prompt()
-
-
 
 def main():
 	updater.dispatcher.add_handler(CommandHandler('start', start))

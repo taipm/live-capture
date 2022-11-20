@@ -46,7 +46,7 @@ class DayData:
 
     @property
     def today_money(self):
-        return self.volume*self.price/billion #tỷ
+        return self.volume*self.price/billion
 
     @property
     def t0_profit(self):
@@ -107,7 +107,12 @@ class DayData:
             return True
         else:
             return False
-    
+    @property
+    def isGreen(self):
+        if self.close >= self.open and self.margin_price>=1:
+            return True
+        else:
+            return False
     @property
     def isCE(self):
         if self.margin_price >= 6.67:
@@ -129,6 +134,21 @@ class DayData:
             if self.volume >= self.last_max_vol:
                 if self.close > self.open:
                     return True
+        else:
+            return False
+    
+    def is_big_trend_up(self):
+        level = 3
+        result = False
+        if self.volume >= level*self.avg_vol and self.margin_price >=3:
+            if self.isGreen:
+                result = True
+        return result
+
+    def is_big_trend_down(self):
+        level = 5
+        if self.volume >= level*self.last_max_vol and self.margin_price < 0:
+            return True
         else:
             return False
 

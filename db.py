@@ -126,7 +126,7 @@ def GetIntradayData(symbol):
         else:
             df = df.append(df_next)
     return df
-
+#print(GetIntradayData(symbol='VND'))
 def get_now_price(symbol):
     df_data = GetIntradayData(symbol = symbol)
     price = None
@@ -136,7 +136,7 @@ def get_now_price(symbol):
         price = df_data.sort_values(by=['time'],ascending=False).iloc[:1]['price'].values[0]
     
     return price
-
+#print(get_now_price(symbol='VND'))
 def get_now_full_price(symbol):
     df_data = GetIntradayData(symbol = symbol)
     last_price = None
@@ -240,5 +240,23 @@ def get_danhmuc_symbols():
 
     return list(set(lst))
 
+def getStocksByCommand(command):
+    print(f'Đang xử lý lệnh: {command}')
+    command = command.upper()
+    stocks = []
+    if(command == 'BANKS'):
+        stocks = get_banks_symbols()
+    elif(command == 'CK'):
+        stocks = get_securities_symbols()
+    elif(command == 'DM'):
+        stocks = get_danhmuc_symbols()    
+    elif(command == 'VN30'):
+        stocks = get_vn30_symbols()
+    elif(command == 'BDS'):
+        stocks = get_bds_symbols()
+    elif(command == 'ALL'):
+        stocks = get_all_stocks()
+    print(stocks)
+    return stocks
 #print(get_now_price("HPG"))
 # print(get_now_price_2("HPG"))

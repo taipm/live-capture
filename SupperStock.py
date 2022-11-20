@@ -1,58 +1,89 @@
+from BlogManager import Blog
 from DateHelper import StrTODAY
 from DayData import DayData
 from Stock import Stock
+from db import *
 class SupperStock(Stock):
     def __init__(self, name) -> None:
         super().__init__(name)
-        self.dayObjs = self.scan()
+        self.days = self.scan()
     
     def scan(self):
         items = []
         for i in range(0,self.len-1):
-            dayObj = DayData(symbol=self.name,index=i,df_all_data=self.df_data,count_days=10)
-            items.append(dayObj)
+            day = DayData(symbol=self.name,index=i,df_all_data=self.df_data,count_days=10)
+            items.append(day)
         return items
 
-    def get_supper_volumes(self):
+    @property
+    def big_trends_up(self):
         days = []
-        for i in range(0, len(self.dayObjs)-1):
-            if self.dayObjs[i].is_supper_volume(3):
-                days.append(self.dayObjs[i])
-            if self.dayObjs[i].is_supper_volume(2):
-                days.append(self.dayObjs[i])
-        return sorted(list(set(days)),key = lambda x : x.index)
-
-    def get_break_volumes(self): #compare with avg_vol
-        days = []
-        for i in range(0, len(self.dayObjs)-1):
-            if self.dayObjs[i].is_break_volume(2):
-                days.append(self.dayObjs[i])
-            # if self.dayObjs[i].is_supper_volume(2):
-            #     days.append(self.dayObjs[i])
+        for i in range(0, len(self.days)-1):
+            if self.days[i].is_big_trend_up():
+                days.append(self.days[i])
         return sorted(list(set(days)),key = lambda x : x.index)
 
     @property
     def has_supper_volume(self):
-        if len(self.get_supper_volumes())>0:
-            return True
-        else:
-            return False
-    @property
-    def has_break_volume(self):
-        if len(self.get_break_volumes())>0:
+        if len(self.big_trends_up)>0:
             return True
         else:
             return False
 
     def to_string(self):
-        df_data = self.df_data
         ouput = f'{self.name} - {self.len} - {self.price} - {self.vol}'
-        ouput += f'DayData: {len(self.dayObjs)} - First: {self.dayObjs[0]}'
+        ouput += f'DayData: {len(self.days)} - First: {self.days[0]}'
         return ouput
 
+    def summary(self):
+        output = ''
+        if self.has_supper_volume:
+            output += f'\n{self.name}'
+            for d in self.big_trends_up:
+                output += f'\n{d.index} - {d.price} - {d.date}'
+        return output
 
-# from db import *
-# #stocks = list(set(['HAX','DGW', 'FRT','DIG','CEO','PVT']))
+
+class DailyReport:
+    def __init__(self) -> None:
+        self.title = f'{StrTODAY} - [Dấu hiệu] - Big trend UP'
+        self.content = self.get_daily_report()
+
+    def get_daily_report(self):
+        output = ''
+        stocks = get_danhmuc_symbols()
+        stocks = ['DGC']
+        for symbol in stocks:
+            s = SupperStock(name=symbol)
+            if (s.has_supper_volume):
+                output += f'{s.summary()}'
+        return output
+
+    def updateBlog(self):
+        title = self.title
+        content = self.content
+        blog = Blog()
+        url = blog.post(title=title,content=content,tags='daily report')
+        return url
+        # post = BlogPost()
+        # post.update_to_blog()
+    
+    def __str__(self) -> str:
+        return f'{self.title}\n{self.content}'
+
+d = DailyReport()
+print(d)
+#print(d.updateBlog())
+# print(d.title)
+# print(d.content)
+
+# 
+# stocks = list(set(['HAX','DGW', 'FRT']))
+
+# for s in stocks:
+#     s = SupperStock(name=s)
+#     if (s.has_supper_volume):
+#         print(f'{s} - {s.summary()}')
 
 # stocks = get_danhmuc_symbols()
 # rs = []

@@ -36,9 +36,10 @@ class Stock:
         self.max_vol = np.max(self.daily_volumes)
         self.min_vol = np.min(self.daily_volumes)
         self.avg_vol = np.average(self.daily_volumes)
-        self.TCB_Data = self.load_basic_data()
         #print(self.TCB_Data.transpose())
-        try:        
+        self.TCB_Data = self.load_basic_data()
+        try:
+            self.intraday_price = self.TCB_Data['Giá Khớp Lệnh'].values[0]/1000
             self.TCB_valuation = self.TCB_Data['TCBS định giá'].values[0]/1000
             self.max_price_year = self.TCB_Data['Đỉnh 1Y'].values[0]/1000
             self.min_price_year = self.TCB_Data['Đáy 1Y'].values[0]/1000
@@ -76,21 +77,16 @@ class Stock:
             self.Du_Mua = 0
             self.Du_Ban = 0
             self.Price_At_Max_Vol = 0
+            self.intraday_price = 0
+
         self.intraday = AnalysisIntradayData(self.name)
     
     def Load_Daily_Data(self) -> pd.DataFrame:
         return db.GetStockData(self.name)
 
     @property
-    def intraday_price(self):
-        try:
-            return self.TCB_Data['Giá Khớp Lệnh'].values[0]/1000
-        except:
-            return 0
-
-    @property
     def price(self):
-        if(self.intraday_price != self.prices[0]):
+        if(self.intraday_price != self.prices[0] and self.intraday_price != 0):
             return self.intraday_price
         else:
             return self.prices[0]
@@ -281,18 +277,19 @@ class Stock:
         output += f'\n{self.review}'
         output += f'\n{self.signals}'        
         output += f'\n{"-"*30}'
-        output += f'\n{self.intraday.GetSummary()}'
-        d = DayData(symbol=s.name, index = 0,df_all_data=s.df_data,count_days=10)
+        if not self.intraday.hasError:
+            output += f'\n{self.intraday.GetSummary()}'
+        d = DayData(symbol=self.name, index = 0,df_all_data=self.df_data,count_days=10)
         output += f'\n{d.summary}'
         return output
 
-# stocks = ['VND']
-# for s in stocks:
-#     s = Stock(name=s)
-#     #print(f'{s.name} - {s.rate_of_waze}')
+stocks = ['VND']
+for s in stocks:
+    s = Stock(name=s)
+    #print(f'{s.name} - {s.rate_of_waze}')
     
-#     #d = DayData(symbol=s.name, index = 0,df_all_data=s.df_data,count_days=10)
-#     print(f'{s.Describe()}')
+    #d = DayData(symbol=s.name, index = 0,df_all_data=s.df_data,count_days=10)
+    print(f'{s.Describe()}')
 
 # stocks = ['KSB','TPB','VND','KBC','CEO','BID','CTG']
 # for s in stocks:
