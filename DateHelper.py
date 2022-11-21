@@ -1,8 +1,8 @@
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
-import numpy as np
 import pandas as pd
+import datetime
 
 def parse_text_to_date(str_date):
     if('-' in str_date):
@@ -25,43 +25,30 @@ def get_prev_date(str_date):
     next_date = date - timedelta(days=1)
     return next_date
 
-#NUMBER
-billion = 1000000000 #Tỷ
-million = 1000000
-thousand = 1000
+def isToday(text):
+    '''
+    fomart: '2022-11-17 06:48:05.904288'
+    '''
+    date_time_obj = datetime.datetime.strptime(text, '%Y-%m-%d %H:%M:%S.%f')
+    _date = date_time_obj.date()
+    today= datetime.datetime.now().date()
+
+    if(_date == today):
+        return True
+    else:
+        return False
 
 #TIME
-NOW = datetime.now()
+NOW = datetime.datetime.now()
 TODAY = date.today()
 fmt_day = '%Y-%-m-%d'
 StrTODAY = TODAY.strftime(fmt_day)
 
 YESTERDAY = TODAY - timedelta(days=1)
 StrYESTERDAY = YESTERDAY.strftime(fmt_day)
-NOW = datetime.now()
 
-THIS_YEAR = datetime.now().year
-THIS_MONTH = datetime.now().month
-THIS_DAY = TODAY.day
-
-def Is_Business_Day(date):
+def Is_Business_Day(Adate):
     return bool(len(pd.bdate_range(date, date)))
-    
-def inc_percent(x, p):
-    '''
-    p: Phần trăm (nếu 3% thì p = 3)
-    '''
-    return x + (p/100)*x
 
-def percent(x,y):
-    if(x !=0):
-        return ((y-x)/x)*100
-    return None
-
-def profit(mua, ban):
-    if(mua != 0):
-        return ((ban-mua)/mua)*100
-    else:
-        return None
 
 #print(profit(1,2))

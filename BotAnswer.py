@@ -65,15 +65,6 @@ class BotAnswer:
             file_url = blog.upload(file_path=file_path)
             return file_url            
 
-
-    # def answer_with_chart(self):
-    #     if(len(self.query)==3):
-    #         print('Đang vẽ đồ thị')
-    #         s = Stock(name = self.query)
-    #         s.Prepare()
-    #         file_path = s.draw()
-    #         return file_path
-    
     def answer_two_numbers(self):
         command = BotCommand(self.query)
         a,b = command.is_two_numbers()

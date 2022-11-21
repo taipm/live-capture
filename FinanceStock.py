@@ -1,7 +1,6 @@
 
 from unicodedata import name
 from vnstock import *
-from DateHelper import percent
 
 class FinanceStock:
     def __init__(self, symbol) -> None:
@@ -80,24 +79,3 @@ class FinanceStock:
         self.avg_share = share_avg
 
         return f'Years: {sum_of_year} -  shares-avg: {share_avg:.2f} - cash-avg: {cash_avg:.2f}'
-
-    # def get_ROI(self, price):
-    #     money = self.default_shares*price
-
-
-# stock = 'HPG'
-# f = FinanceStock(symbol=stock)
-# print(f.basic_review)
-# print(f.get_signals())
-# print(f.RSI)
-# print(f.Price)
-#print(f.get_basic_analysis())
-# print(f.getBasicInfo())
-# print(f.get_avg_dividend())
-
-# x = valuation_rating(stock)
-# print(x)
-
-
-# print(price_board("PVT").to_markdown())
-# print(price_board('PVT').transpose())

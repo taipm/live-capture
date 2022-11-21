@@ -1,7 +1,6 @@
 from Caculator import *
 from DayData import * #DateStick, DayData
 from IntradayData import *
-from PriceAction import PriceAction
 import db
 import pandas as pd
 import numpy as np
@@ -283,13 +282,13 @@ class Stock:
         output += f'\n{d.summary}'
         return output
 
-stocks = ['VND']
-for s in stocks:
-    s = Stock(name=s)
-    #print(f'{s.name} - {s.rate_of_waze}')
+# stocks = ['VND']
+# for s in stocks:
+#     s = Stock(name=s)
+#     #print(f'{s.name} - {s.rate_of_waze}')
     
-    #d = DayData(symbol=s.name, index = 0,df_all_data=s.df_data,count_days=10)
-    print(f'{s.Describe()}')
+#     #d = DayData(symbol=s.name, index = 0,df_all_data=s.df_data,count_days=10)
+#     print(f'{s.Describe()}')
 
 # stocks = ['KSB','TPB','VND','KBC','CEO','BID','CTG']
 # for s in stocks:

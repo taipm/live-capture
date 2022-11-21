@@ -1,89 +1,9 @@
+from BlogManager import Blog
 from PriceAction import PriceAction
 from Stock import *
+from SupperStock import SupperStock
 from db import *
 import pandas as pd
-
-# def get_all_stocks_to_buy():
-#     lst = []
-#     stocks = db.get_all_stocks()
-#     #stocks = stocks[30:60]
-#     for stock in stocks:
-#         try:
-#             s = Stock(name=stock)
-#             s.Prepare()
-#             pivots = s.get_pivots_as_string()
-#             if(len(pivots)>0):
-#                 lst.append([stock,pivots])
-#                 #print(s.get_pivots_as_string())
-#         except:
-#             x=1
-
-#     print(lst)
-#     df = pd.DataFrame(lst, columns=['symbokl','pivots'])
-#     df.to_excel('Pivots.xlsx')
-
-# def get_all_stocks_to_buy_2(fileName):
-#     lst = []
-#     stocks = db.get_all_stocks()
-#     #stocks = stocks[30:60]
-#     for stock in stocks:
-#         try:
-#             s = Stock(name=stock)            
-#             pivots = s.get_pivots()
-
-#             if(len(pivots)>0):
-                
-#                 indexs = []
-#                 for pivot in pivots:
-#                     print(f'{pivot.to_string()}')
-#                     indexs.append(pivot.index)
-#                 lst.append([stock,indexs])
-#                 #print(s.get_pivots_as_string())
-#             #print(f'{stock} - {pivots}')
-#         except:
-#             x=1
-
-#     print(lst)
-#     df = pd.DataFrame(lst, columns=['Symbol','Pivots'])
-#     df.to_excel(fileName)
-
-# def get_all_stocks_min_vol(fileName):
-#     lst = []
-#     #stocks = db.get_all_stocks()[10:30]
-#     stocks = ['BID']
-#     #stocks = stocks[30:60]
-#     for stock in stocks:
-#         try:
-#             s = Stock(name=stock)
-#             s.Prepare()
-#             rs = s.get_min_vols()
-#             print(rs)
-#             if(len(rs)>0):
-#                 indexs = []
-#                 for pivot in rs:
-#                     print(f'{pivot.to_string()}')
-#                     indexs.append(pivot.index)
-#                 lst.append([stock,indexs])
-#                 #print(s.get_pivots_as_string())
-#             #print(f'{stock} - {pivots}')
-#         except:
-#             x=1
-
-#     print(lst)
-#     df = pd.DataFrame(lst, columns=['Symbol','Pivots'])
-#     df.to_excel(fileName)
-
-# file_name = StrTODAY + '-Pivots.xlsx'
-# get_all_stocks_to_buy_2(fileName=file_name)
-# file_name = StrTODAY + '-min-vols.xlsx'
-# get_all_stocks_min_vol(fileName=file_name)
-
-# s = Stock(name='BID')
-# rs = s.get_min_vols()
-# for item in rs:
-#     print(item.to_string())
-#get_all_stocks_to_buy()
-
 
 def get_stocks_by_suc_manh(command):
     command = command.upper()
@@ -111,15 +31,37 @@ def get_stocks_by_suc_manh(command):
     df = df.sort_values(by=['TH'],ascending=False)
     df.to_excel(f'./data/{command}-{StrTODAY}.xlsx')
     return df
-    
-    # banks = db.get_banks_symbols()
-    # rs = []
-    # for bank in banks:
-    #     print(f'Đang xử lý {bank}')
-    #     s = Stock(name = bank)
-    #     p = PriceAction(symbol=s.name,df_data=s.df_data,days=10)
 
-    #     rs.append([p.symbol,p.suc_bat])
-    # df = pd.DataFrame(rs,columns=['Symbol','Sức mạnh'])
-    # df = df.sort_values(by=['Sức mạnh'],ascending=False)
-    # return df
+class DailyReport:
+    def __init__(self) -> None:
+        self.title = f'{StrTODAY} - [Dấu hiệu] - Big trend UP'
+        self.content = self.get_daily_report()
+
+    def get_daily_report(self):
+        output = ''
+        stocks = db.get_all_stocks_db()
+        errors = []
+        for symbol in stocks:
+            try:
+                s = SupperStock(name=symbol)
+                if (s.has_supper_volume):
+                    output += f'{s.summary()}'
+            except:
+                errors.append(symbol)
+        print(errors)
+        return output
+
+    def updateBlog(self):
+        title = self.title
+        content = self.content
+        blog = Blog()
+        url = blog.post(title=title,content=content,tags='daily report')
+        return url
+    
+    def __str__(self) -> str:
+        return f'{self.title}\n{self.content}'
+
+# d = DailyReport()
+# print(d)
+# d.updateBlog()
+#print(d.updateBlog())

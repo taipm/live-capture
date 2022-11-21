@@ -12,6 +12,20 @@ import numpy as np
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
+def get_all_stocks_db():
+    url = "https://stock.kdtv4.vn/api/app/company/?MaxResultCount=500"
+    try:
+        response = urlopen(url)                
+        data_json = json.loads(response.read())                  
+        df = pd.json_normalize(data_json['items'])
+        #print(df)
+        df = df[['name','stockCode','isActive']]
+        return df['stockCode'].to_list()
+    except:
+        print('Error')
+        return None
+#print(get_all_stocks())
+
 def get_stock_data_from_api(symbol):
         url = "https://stock.kdtv4.vn/api/app/company/by-stock-code?stockCode=" + symbol.upper()        
         try:
@@ -65,9 +79,7 @@ def get_stock_data_from_api(symbol):
                 df['M(NN)'] = df['NN']*df['Volume']*1000*100 #Giá trị giao dịch của khối ngoại (tỷ)
                 df['Oscillation'] = np.abs(((df['Low']-df['High'])/df['Low'])*100)
                 df['Oscillation-Down'] = ((df['Low']-df['Open'])/df['Open'])*100
-                df['Oscillation-Up'] = ((df['High']-df['Open'])/df['Open'])*100
-                #df['Margin-Up'] = ((df['High']-df['Open'])/df['Open'])*100
-                #df['Margin-Down'] = ((df['Low']-df['Open'])/df['Open'])*100              
+                df['Oscillation-Up'] = ((df['High']-df['Open'])/df['Open'])*100       
                 return df
         except: #Cổ phiếu chưa có trong danh mục
                 return pd.DataFrame()
@@ -114,7 +126,6 @@ def get_intraday_data(symbol, page_num, page_size):
 def GetIntradayData(symbol):
     _page_num = 0
     _page_size = 5000
-    
     df =  get_intraday_data(symbol=symbol, page_num=_page_num, page_size=_page_size)    
     while True:
         _page_num += 1

@@ -1,7 +1,9 @@
-import pandas as pd
+
 from DateHelper import *
+from Caculator import *
 from IntradayDb import IntradayDb
 from db import *
+from Constant import *
 
 class AnalysisIntradayData:
     def __init__(self, symbol) -> None:
@@ -201,21 +203,3 @@ class AnalysisIntradayData:
             return 'SELL'
         else:
             return 'NA'
-
-x = AnalysisIntradayData(symbol='VND')
-print(x.analysis_shark_action())
-# print(x.GetSummary())
-# print(x.las_stick)
-# sticks = x.get_top_sticks(10)
-# print(sticks)
-
-
-# top_sticks = x.analysis_top_sticks(10)
-# print(top_sticks)
-# print(x.GetSummary())
-# df = x.Get_Big_OrderStick()
-# print('Big_OrderSticks')
-# print(df)
-# a = IntradayDb(symbol='HAX')
-# a.UpdateDb()
-# print(a.GetSummary())

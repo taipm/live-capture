@@ -1,9 +1,8 @@
 import json
 from BuyOrder import BuyOrder
-from MongoDb import MongoDb
 from OrderDb import OrderDb, TransactionDb
 from SellOrder import SellOrder
-from DateHelper import percent
+from Caculator import percent
 
 class Transaction:
     def __init__(self, symbol, volume, buy_price, sell_price) -> None:

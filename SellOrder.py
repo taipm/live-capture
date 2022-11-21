@@ -1,8 +1,7 @@
-from DateHelper import NOW, percent
-import pandas as pd
+from DateHelper import NOW
+from Constant import *
 import json
 from dataclasses import dataclass
-from db import get_now_price
 from MongoDb import *
 
 class Order:
@@ -38,25 +37,9 @@ class SellOrder:
     def total_income(self):        
         return self.income - self.tax - self.fee
         
-    def to_string(self):        
+    def _str_(self):        
         return f'{self.symbol} | Bán: {self.volume:,.0f} Giá: {self.price:,.0f} Thành tiền {self.income:,.0f}' +\
             f' Phí (bán): {self.fee:,.0f} Thuế (bán): {self.fee:,.0f} Tổng thu: {self.total_income:,.0f}'
 
     def to_json(self):
         return json.dumps(self,default=lambda o: o.__dict__)
-
-
-    
-
-
-# s = SellOrder(symbol='BID',volume=100, price=10.55)
-# print(s.get_buy_orders())
-# s.process()
-
-# s = SellOrder(symbol='BID',volume=50, price=10.55)
-# print(s.get_buy_orders())
-# s.process()
-
-# s = SellOrder(symbol='BID',volume=150, price=10.55)
-# print(s.get_buy_orders())
-# s.process()

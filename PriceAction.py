@@ -1,6 +1,5 @@
 import numpy as np
-import math
-from DateHelper import StrTODAY, percent
+from Caculator import percent
 from MessageHelper import border_text
 
 class PriceItem:
@@ -240,24 +239,3 @@ class PriceAction:
             return True
         else:
             return False
-
-# s = Stock.Stock(name = 'HAG')
-# # s.Prepare()
-
-# # p = PriceAction(symbol=s.name,df_data=s.df_data,days=10)
-# # print(p.summary)
-# #stocks = list(set(db.get_banks_symbols() + db.get_securities_symbols()))
-# stocks = db.get_danhmuc_symbols()
-# print(stocks)
-# rs = []
-# import pandas as pd
-# for symbol in stocks:
-#     print(symbol)
-#     s = Stock.Stock(name = symbol)
-#     p = PriceAction(symbol=s.name,df_data=s.df_data,days=10)
-
-#     rs.append([p.symbol,p.suc_bat,p.suc_bat_am,p.suc_bat+p.suc_bat_am])
-# df = pd.DataFrame(rs,columns=['Symbol','Sức tăng','Sức rơi','TH'])
-# print(df.sort_values(by=['TH'],ascending=False))
-# df.to_excel(f'./danh-muc-{StrTODAY}.xlsx')
-#print(f'{p.symbol} : {p.suc_bat:,.2f}')

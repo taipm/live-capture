@@ -1,4 +1,5 @@
 import json
+from DateHelper import isToday
 from MongoDb import MongoDb
 import pandas as pd
 
@@ -23,6 +24,12 @@ class OrderDb(MongoDb):
         df = df.sort_values(by=['time'])
         return df
 
+    def getStockOrdersByToday(self):
+        df = self.df_data
+        df = df[df['time'].map(lambda x: isToday(x)==True)]
+        df = df.sort_values(by=['time'])
+        return df
+
     def getOrder(self, query):
         return self.Orders.find_one(query)
 
@@ -30,6 +37,7 @@ class OrderDb(MongoDb):
         print(self.getOrders())
 
 # o = OrderDb()
+# print(o.getStockOrdersByToday())
 # #o.print_data()
 # print(o.getStockOrders(symbol='VND'))
 
