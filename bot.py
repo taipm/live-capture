@@ -8,8 +8,8 @@ from telegram.ext.messagehandler import MessageHandler
 from telegram.ext.filters import Filters
 from Config import *
 from DateHelper import *
-from apscheduler.schedulers.background import BlockingScheduler
-import telegram
+#from apscheduler.schedulers.background import BlockingScheduler
+#import telegram
 from BotAnswer import BotAnswer
 from Reports import get_stocks_by_suc_manh
 from TextCommand import *
@@ -113,10 +113,6 @@ def main():
 	# Filters out unknown messages.
 	updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown_text))	
 	updater.start_polling(timeout=60)
-
-	#sched = BlockingScheduler()
-	#sched.add_job(prompt,'interval', seconds=15) 
-	#sched.start()
 
 main()
 
