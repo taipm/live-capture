@@ -11,6 +11,7 @@ from DateHelper import *
 #from apscheduler.schedulers.background import BlockingScheduler
 #import telegram
 from BotAnswer import BotAnswer
+from Messages import *
 from Reports import get_stocks_by_suc_manh
 from TextCommand import *
 from BotTranslator import BotTranslator
@@ -52,6 +53,18 @@ def unknown(update: Update, context: CallbackContext):
 def unknown_text(update: Update, context: CallbackContext):
 	input_text = toStandard(update.message.text)
 	botAnswer = BotAnswer(input_text)
+	
+	
+	msg_historyOrders = HistoryOrderMessage(input_text=input_text)
+	if msg_historyOrders.isValid:
+		answer = botAnswer.answer()
+		update.message.reply_text(answer)
+	
+	msg_Alpha = AlphaMessage(input_text=input_text)
+	if msg_Alpha.isValid:
+		answer = Alpha(input_text[1:].strip()).answerText
+		update.message.reply_text(answer)
+
 	validCommands = ['BANKS','CK','VN30','BDS','ALL']
 	if (input_text.upper() in validCommands):
 		command = input_text.upper()
@@ -70,11 +83,7 @@ def unknown_text(update: Update, context: CallbackContext):
 		update.message.reply_text(df.to_markdown(),parse_mode='Markdown')
 	
 	elif input_text.startswith('!'):
-		print('start with !')
-		if(len(input_text)==4):
-			answer = botAnswer.answer()
-			update.message.reply_text(answer)
-		elif('(' in input_text and ')' in input_text):
+		if('(' in input_text and ')' in input_text):
 			command = StockCommand(input_text[1:])
 			print(command.to_string())
 			command.order.save_to_db()
@@ -82,10 +91,6 @@ def unknown_text(update: Update, context: CallbackContext):
 		else:
 			answer = BotTranslator(inputText = input_text[1:].strip()).transText
 			update.message.reply_text(answer)
-	
-	elif input_text.startswith('?'):
-		answer = Alpha(input_text[1:].strip()).answerText
-		update.message.reply_text(answer)
 	
 	elif((len(input_text) > 3) and (',' in input_text) and ('(') not in input_text):
 		file_path = botAnswer.answer_stocks()

@@ -37,7 +37,7 @@ class SellOrder:
     def total_income(self):        
         return self.income - self.tax - self.fee
         
-    def _str_(self):        
+    def __str__(self):        
         return f'{self.symbol} | Bán: {self.volume:,.0f} Giá: {self.price:,.0f} Thành tiền {self.income:,.0f}' +\
             f' Phí (bán): {self.fee:,.0f} Thuế (bán): {self.fee:,.0f} Tổng thu: {self.total_income:,.0f}'
 

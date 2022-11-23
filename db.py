@@ -18,13 +18,12 @@ def get_all_stocks_db():
         response = urlopen(url)                
         data_json = json.loads(response.read())                  
         df = pd.json_normalize(data_json['items'])
-        #print(df)
         df = df[['name','stockCode','isActive']]
-        return df['stockCode'].to_list()
+        return list(set(df['stockCode'].map(lambda x:x.upper())))
     except:
         print('Error')
         return None
-#print(get_all_stocks())
+#print(get_all_stocks_db())
 
 def get_stock_data_from_api(symbol):
         url = "https://stock.kdtv4.vn/api/app/company/by-stock-code?stockCode=" + symbol.upper()        
