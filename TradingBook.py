@@ -5,6 +5,7 @@ from DayData import DayData
 from SellOrder import *
 from Stock import Stock
 from StockTransaction import Transaction
+from db import get_now_price
 class TradingBook:
     def __init__(self,symbol) -> None:
         self.stock = Stock(symbol)

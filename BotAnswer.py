@@ -41,7 +41,7 @@ class BotAnswer:
         elif(len(self.query)==3):
             print(f'Đang xử lý mã : {self.query}')
             s = Stock(name= self.query)
-            output += s.Describe()
+            output += s.summary()
             #output += DayData(s.name,index=0,df_all_data= s.df_data,count_days=10).summary
             f = FinanceStock(symbol=s.name)
             output += '\nCổ tức: ' + f.get_avg_dividend()           

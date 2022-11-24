@@ -2,16 +2,6 @@ import numpy as np
 from Caculator import percent
 from MessageHelper import border_text
 
-class PriceItem:
-    def __init__(self, high,low,open, close, index) -> None:
-        self.high = high
-        self.low = low
-        self.open = open
-        self.close = close
-        self.index = index
-
-    def to_string(self):
-        return f'{self.index} : {self.close:,.2f}'
 class PriceRanges:
     def __init__(self, min, max, high) -> None:
         self.min = min

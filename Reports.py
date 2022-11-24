@@ -62,7 +62,7 @@ class DailyReport:
     def __str__(self) -> str:
         return f'{self.title}\n{self.content}'
 
-d = DailyReport()
-print(d)
-d.updateBlog()
-print(d.updateBlog())
+# d = DailyReport()
+# print(d)
+# d.updateBlog()
+# print(d.updateBlog())

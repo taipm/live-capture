@@ -25,4 +25,4 @@ def Test():
     print(db.getAll())
     print(db.getItemsOfToday())
 
-Test()
+#Test()

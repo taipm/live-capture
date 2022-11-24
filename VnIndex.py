@@ -1,4 +1,5 @@
 from UrlHelper import getHtmlFromUrl, getTextFromUrl
+from Constant import *
 import pandas as pd
 import numpy as np
 import html5lib
@@ -7,15 +8,35 @@ from bs4 import BeautifulSoup
 from DateHelper import *
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
-
+from vnstock import *
 class VnindexDay:
     def __init__(self, date, close, change,volume, liquidity, volume_agree, liquidity_agree, open, high,low) -> None:
         pass
+
 class VnIndex:
     def __init__(self) -> None:
         self.url_history = 'https://s.cafef.vn/Lich-su-giao-dich-VNINDEX-1.chn#data'
         self.url_calendar_market = 'https://www.bsc.com.vn/bao-cao-phan-tich/lich-thi-truong'
         self.df_data = self.to_df_data()
+    
+    def get_current(self, command:str)->pd.DataFrame:
+        
+        commands = ['Value', 'Losers', 'Gainers', 'Volume', 'ForeignTrading', 'NewLow', 'Breakout', 'NewHigh']
+        #commands = []
+        if command in commands:
+            df = market_top_mover(command)
+            return df
+        else:
+            print('Lỗi câu lệnh')
+            return pd.DataFrame.empty
+
+        ##Value, Losers, Gainers, Volume, ForeignTrading, NewLow, Breakout, NewHigh
+        
+
+    def getTopGainers(self):
+        df = market_top_mover("Gainers")
+        ##Value, Losers, Gainers, Volume, ForeignTrading, NewLow, Breakout, NewHigh
+        return df
     
     def get_history_data(self):        
         df_data = pd.read_html(self.url_history)[2].iloc[2:]
@@ -58,6 +79,8 @@ class VnIndex:
     def sum_pct(self):
         return np.sum(self.df_data['%'])
 
-# vni = VnIndex()
-# print(vni.df_data.to_markdown())
-# print(vni.sum_pct)
+vni = VnIndex()
+#print(vni.df_data.to_markdown())
+#print(vni.sum_pct)
+print(vni.get_current('Breakout'))
+#print(vni.getTopGainers())

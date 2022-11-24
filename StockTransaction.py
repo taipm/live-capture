@@ -66,7 +66,7 @@ def test():
     print(order.to_string())
 
     s_order = SellOrder(symbol="KSB",volume=500,price=17350)
-    print(s_order.to_string())
+    print(s_order)
 
     t = Transaction(symbol='BSR',volume=2000,buy_price=17700, sell_price=17800)
     t.excute()

@@ -1,9 +1,16 @@
 from datetime import date, timedelta
 
 class VnDate:
-    def __init__(self, date:date) -> None:
-        self.currentDate = date
-    
+    def __init__(self, _date:date) -> None:
+        self.currentDate = _date
+        self.today = date.today()
+    @property
+    def isWeekend(self):
+        index = self.currentDate.weekday()
+        if index in [5,6]:
+            return True
+        return False
+            
     @property
     def next(self):
         value = self.currentDate
@@ -17,13 +24,14 @@ class VnDate:
         return value
     
     def __str__(self) -> str:
-        return self.currentDate.strftime("%Y-%m-%d")
+        return f'{self.currentDate.strftime("%Y-%m-%d")} - {self.today}'
 
 def Test_VnDate():
-    v = VnDate(date=date(2002,10,1))
+    v = VnDate(_date=date(2002,10,1))
     print(v)
     print(v.next)
     print(v.previous)
+    print(f'Weekend: {v.isWeekend}')
 
 class DateRange:
     def __init__(self, start_date, end_date):

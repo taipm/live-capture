@@ -1,27 +1,41 @@
+from AnalysisList import AnalysisList
 from Caculator import *
-from DayData import * #DateStick, DayData
+from DayData import *
 from IntradayData import *
+from PriceAction import PriceAction
+from StockChart import StockChart
 import db
 import pandas as pd
 import numpy as np
-import datetime as dt
-from vnstock import *
 
+# class AnalysisVolumes:
+#     pass
+
+# class AnalysisPrice(AnalysisList):
+#     def __init__(self, lst: list) -> None:
+#         super().__init__(lst)
+    
+#     def distance(self, from_index):
+#         value_of_index = self.items[from_index]
+#         print(value_of_index)
+#         return self.pct(value_of_index, self.items[0])
+    
 class Stock:
     def __init__(self, name) -> None:
         self.name = name.upper()
-        self.StrSummary = self.name
-        self.FileName = ''
- 
+        self.chartUrl = StockChart(symbol=self.name).imageUrl
         self.df_data = self.Load_Daily_Data()
-        self.len = len(self.df_data)
+        self.priceAction = PriceAction(symbol=self.name,df_data=self.df_data,days=10)
+        
+        self.len = len(self.df_data.index)
         
         self.last_price = self.df_data['Close'][0]
         self.last_volume = self.df_data['Volume'][0]
         self.last_pct_price = self.df_data['%'][0]
         
         self.prices = self.df_data['Close']
-        self.daily_volumes = self.df_data['Volume']
+        self.volumes = self.df_data['Volume']
+        # self.daily_volumes = self.df_data['Volume']
         self.daily_foreign = self.df_data['NN']
         self.daily_money = self.df_data['Money']
         self.daily_low_prices = self.df_data['Low']
@@ -31,11 +45,10 @@ class Stock:
 
         self.max_price = np.max(self.prices)
         self.min_price = np.min(self.prices)
-        self.vol = self.daily_volumes[0]
-        self.max_vol = np.max(self.daily_volumes)
-        self.min_vol = np.min(self.daily_volumes)
-        self.avg_vol = np.average(self.daily_volumes)
-        #print(self.TCB_Data.transpose())
+        self.vol = self.volumes[0]
+        self.max_vol = np.max(self.volumes)
+        self.min_vol = np.min(self.volumes)
+        self.avg_vol = np.average(self.volumes)
         self.TCB_Data = self.load_basic_data()
         try:
             self.intraday_price = self.TCB_Data['Giá Khớp Lệnh'].values[0]/1000
@@ -82,6 +95,9 @@ class Stock:
     
     def Load_Daily_Data(self) -> pd.DataFrame:
         return db.GetStockData(self.name)
+    
+    def load_basic_data(self):
+        return price_board(self.name)
 
     @property
     def price(self):
@@ -89,6 +105,20 @@ class Stock:
             return self.intraday_price
         else:
             return self.prices[0]
+
+    @property
+    def last_trans_date(self):
+        return self.df_data['Date'][0]
+
+    @property
+    def liquidity(self):
+        return self.daily_money[0]/billion #Tỷ
+    @property
+    def liquidity_max(self):
+        return np.max(self.daily_money)/billion #Tỷ
+    @property
+    def liquidity_min(self):
+        return np.min(self.daily_money)/billion #Tỷ
 
     @property
     def review_price(self):
@@ -105,14 +135,15 @@ class Stock:
             output += f'- Thủng dáy năm: {percent(self.price,self.min_price_year):,.2f} (%)'
         else:
             output += f'- Chưa có gì đặc biệt'
-        return output
-
+        return output 
+    
     @property
     def review_volume(self):
         output = f'Khối lượng'
         output += f'\n- CN/TN: {self.max_vol:,.0f} | {self.min_vol:,.0f} | {self.avg_vol:,.0f}'
-        output += f'\n- HT: {self.daily_volumes[0]:,.0f} : {percent(self.daily_volumes[0],self.avg_vol):,.2f}(%)'        
+        output += f'\n- HT: {self.volumes[0]:,.0f} : {percent(self.volumes[0],self.avg_vol):,.2f}(%)'        
         return output
+
     @property
     def review_ROE(self):
         output = f'ROE = {self.ROE:,.2f}'
@@ -151,7 +182,7 @@ class Stock:
     @property
     def review_TCB_valuation(self):
         valuation = self.TCB_valuation
-        output = f'- Định giá: {valuation:,.2f} | {percent(self.price,valuation):,.2f} (%)'
+        output = f'Định giá: {valuation:,.2f} | {percent(self.price,valuation):,.2f} (%)'
         if(self.price <= valuation):
             output += ' => Hấp dẫn'
         else:
@@ -159,7 +190,7 @@ class Stock:
         return output
         
     @property
-    def signals(self):
+    def review_TA(self):
         output = f'Tín hiệu (TA):'
         output + f'\n- Kỹ thuật: {self.signal_KT}'
         output += f'\n- Trung bình động: {self.signal_TBD}'
@@ -175,29 +206,6 @@ class Stock:
             f'\n- {self.review_PB}' +\
             f'\n- {self.review_TCB_valuation}'
         return output
-
-    def load_basic_data(self):
-        return price_board(self.name)
-
-    def get_percent_price(self, index):
-        if(index < 0):
-            return None
-        return self.df_data['%'][index]
-
-    def get_percent_vol_day(self):
-        return percent(self.daily_volumes[0], self.daily_volumes[1])
-    
-    def get_percent_vol_avg_week(self, index):
-        start = index
-        end = index + 5
-        vol_avg_week = np.average(self.df_data['Volume'][start:end])
-        return percent(self.df_data['Volume'][0], vol_avg_week)
-
-    def get_percent_vol_avg_month(self, index):
-        start = index
-        end = index + 20
-        vol_avg_week = np.average(self.df_data['Volume'][start:end])
-        return percent(self.df_data['Volume'][0], vol_avg_week)
 
     def is_min_vol(self,index):
         vol = self.df_data.iloc[index]['Volume']
@@ -216,71 +224,30 @@ class Stock:
                 results.append(i)
         return results
 
-    def get_data_by_index(self,index):
-        data = self.df_data.iloc[index]
-        return data
-
     def get_profit_by_index(self,index, pre_count_of_days):
         price = self.df_data.iloc[index]['Close']
         n_price = self.df_data.iloc[index-pre_count_of_days]['Close']
         return percent(price,n_price)
-    
-    def check_profit(self,index):
-        values = []
-        price = self.df_data.iloc[index]['Close']
-        pre_count_of_days = 10
-        for i in range(0,pre_count_of_days):
-            n_price = self.df_data.iloc[index-i]['Close']
-            profit = percent(price,n_price)
-            values.append(profit)
-        return np.max(values),np.min(values)
-        
-    def Get_Price(self, d_str):
-        item = self.df_data[self.df_data['Date'] == dt.datetime.strptime(d_str, '%Y-%m-%d').date()]
-        return item['Close'].values
-    
-    def Get_Volume(self, d_str):
-        item = self.df_data[self.df_data['Date'] == dt.datetime.strptime(d_str, '%Y-%m-%d').date()]
-        return item['Volume'].values
-    
-    def GetDataItem(self, d_str):        
-        item = self.df_data[self.df_data['Date'] == dt.datetime.strptime(d_str, '%Y-%m-%d').date()]
-        return item
-    
-    def GetDataItemAtPrev(self,countOfPrevDays):
-        item = self.df_data.iloc[countOfPrevDays]
-        return item
-    
-    def GetPriceAtPrev(self,countOfPrevDays):
-        return self.GetDataItemAtPrev(countOfPrevDays=countOfPrevDays)['Close']
-    
-    @property
-    def last_trans_date(self):
-        return self.df_data['Date'][0]
 
-    @property
-    def liquidity(self):
-        return self.daily_money[0]/billion #Tỷ
-    @property
-    def liquidity_max(self):
-        return np.max(self.daily_money)/billion #Tỷ
-    @property
-    def liquidity_min(self):
-        return np.min(self.daily_money)/billion #Tỷ
-
-    def Describe(self):
+    
+    def summary(self):
         output = f'{self.name} - {self.price} | {self.last_pct_price:,.2f}(%)| {self.last_trans_date}'       
         output += f'\n{self.review_price}'
         output += f'\n{self.review_volume}'               
         output += f'\nThanh khoản: {self.liquidity:,.2f} (tỷ) | CN/TN: {self.liquidity_max:,.2f} | {self.liquidity_min:,.2f}'
         output += f'\n{self.review}'
-        output += f'\n{self.signals}'        
+        output += f'\n{self.review_TA}'        
         output += f'\n{"-"*30}'
         if not self.intraday.hasError:
-            output += f'\n{self.intraday.GetSummary()}'
+            output += f'\n{self.intraday.summary()}'
         d = DayData(symbol=self.name, index = 0,df_all_data=self.df_data,count_days=10)
-        output += f'\n{d.summary}'
+        output += f'\n{d.summary}\n{self.chartUrl}'
         return output
+
+# stock = Stock(name='HAH')
+# p = AnalysisPrice(stock.prices.tolist())
+# print(p)
+# print(stock.summary())
 
 # stocks = ['VND']
 # for s in stocks:

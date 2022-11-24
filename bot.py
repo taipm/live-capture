@@ -54,7 +54,6 @@ def unknown_text(update: Update, context: CallbackContext):
 	input_text = toStandard(update.message.text)
 	botAnswer = BotAnswer(input_text)
 	
-	
 	msg_historyOrders = HistoryOrderMessage(input_text=input_text)
 	if msg_historyOrders.isValid:
 		answer = botAnswer.answer()

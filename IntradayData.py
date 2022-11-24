@@ -1,4 +1,3 @@
-
 from DateHelper import *
 from Caculator import *
 from IntradayDb import IntradayDb
@@ -36,30 +35,30 @@ class AnalysisIntradayData:
             self.db = IntradayDb(self.symbol)
             self.db.UpdateDb()
         else:
-            self.las_stick = None # self.df_data.sort_values(by=['time'],ascending=False).iloc[:1]
-            self.last_price = None# self.las_stick['price'][0]/1000
-            self.df_big_sticks = None# self.Get_Big_Sticks()
-            self.df_big_buy_sticks = None# self.df_big_sticks[self.df_big_sticks['a']=='BU']
-            self.df_big_sell_sticks = None #self.df_big_sticks[self.df_big_sticks['a']=='SD']
+            self.las_stick = None 
+            self.last_price = None
+            self.df_big_sticks = None
+            self.df_big_buy_sticks = None
+            self.df_big_sell_sticks = None 
 
-            self.df_buy = None #self.df_data[self.df_data['a']=='BU']
-            self.df_sell = None# self.df_data[self.df_data['a']=='SD']
+            self.df_buy = None 
+            self.df_sell = None
 
-            self.sum_Volume = 0# self.df_data['volume'].sum()
+            self.sum_Volume = 0
 
-            self.rateOf_Buy_Volume = 0# self.sum_vol_buy/self.sum_Volume
-            self.rateOf_Sell_Volume =0# self.sum_vol_sell/self.sum_Volume
+            self.rateOf_Buy_Volume = 0
+            self.rateOf_Sell_Volume =0
 
-            self.countOf_Orders = 0# len(self.df_data.index)
-            self.countOf_BuyOrders = 0# len(self.df_buy.index)
-            self.countOf_SellOrders = 0# len(self.df_sell.index)
+            self.countOf_Orders = 0
+            self.countOf_BuyOrders = 0
+            self.countOf_SellOrders = 0
 
-            self.rateOf_Buy_Orders = 0# self.countOf_BuyOrders/self.countOf_Orders
-            self.rateOf_Sell_Orders = 0#self.countOf_SellOrders/self.countOf_Orders
-
+            self.rateOf_Buy_Orders = 0
+            self.rateOf_Sell_Orders = 0
+    
     def loadData(self):
         df = GetIntradayData(symbol=self.symbol)
-        if(not df.empty):
+        if(df.empty or df is None):
             print('KHÔNG LẤY ĐƯỢC DỮ LIỆU TRONG NGÀY')
             self.hasError = False
         return df
@@ -177,8 +176,7 @@ class AnalysisIntradayData:
                 analysis_result += ' - NA'
             return analysis_result
 
-    
-    def GetSummary(self):
+    def summary(self):
         if self.hasError:
             return 'LỖI. KHÔNG LẤY ĐƯỢC DỮ LIỆU TRONG NGÀY'
         else:
@@ -203,3 +201,9 @@ class AnalysisIntradayData:
             return 'SELL'
         else:
             return 'NA'
+
+# t = AnalysisIntradayData(symbol='MWG')
+# a = AnalysisList(t.df_data['price'])
+# print(a)
+# v = AnalysisList(t.df_data['volume'])
+# print(v)

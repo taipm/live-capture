@@ -1,6 +1,5 @@
 from DayData import DayData
 from Stock import Stock
-#from db import *
 
 class SupperStock(Stock):
     def __init__(self, name) -> None:

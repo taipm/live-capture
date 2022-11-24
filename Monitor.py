@@ -1,11 +1,11 @@
 from pathlib import Path
 from time import sleep
 from telegram.ext.updater import Updater
-from telegram.update import Update
-from telegram.ext.callbackcontext import CallbackContext
-from telegram.ext.commandhandler import CommandHandler
-from telegram.ext.messagehandler import MessageHandler
-from telegram.ext.filters import Filters
+# from telegram.update import Update
+# from telegram.ext.callbackcontext import CallbackContext
+# from telegram.ext.commandhandler import CommandHandler
+# from telegram.ext.messagehandler import MessageHandler
+# from telegram.ext.filters import Filters
 from Config import *
 from DateHelper import *
 from apscheduler.schedulers.background import BlockingScheduler
@@ -71,6 +71,21 @@ class StockTime:
 
     def __str__(self) -> str:
         return f'Start: {self.startTime} - End: {self.endTime} : Now: {self.currentTime} : {self.isTradingTime()}'
+
+class Subject:
+    def __init__(self) -> None:
+        pass
+    def update(self):
+        pass
+
+class TeleViewers:
+    def __init__(self) -> None:
+        pass
+    def register(self):
+        pass
+    def unRegister(self):
+        pass
+
 class Monitor:
     def __init__(self) -> None:        
         self.updater = Updater(TELE_TOKEN, use_context=True)
