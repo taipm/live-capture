@@ -1,4 +1,4 @@
-from UrlHelper import getHtmlFromUrl, getTextFromUrl
+from UrlCrawler import getHtmlFromUrl, getTextFromUrl
 from Constant import *
 import pandas as pd
 import numpy as np
@@ -79,8 +79,8 @@ class VnIndex:
     def sum_pct(self):
         return np.sum(self.df_data['%'])
 
-vni = VnIndex()
+#vni = VnIndex()
 #print(vni.df_data.to_markdown())
 #print(vni.sum_pct)
-print(vni.get_current('Breakout'))
+#print(vni.get_current('Breakout'))
 #print(vni.getTopGainers())

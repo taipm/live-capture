@@ -1,29 +1,7 @@
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
-import pandas as pd
 import datetime
-
-def parse_text_to_date(str_date):
-    if('-' in str_date):
-        return datetime.strptime(str_date, '%Y-%m-%d').date()
-    else:
-        return None
-
-def get_next_date(str_date, days):
-    date = parse_text_to_date(str_date=str_date)
-    next_date = date + timedelta(days=days)
-    return next_date
-
-def get_after_date(str_date):
-    date = parse_text_to_date(str_date=str_date)
-    next_date = date + timedelta(days=1)
-    return next_date
-
-def get_prev_date(str_date):
-    date = parse_text_to_date(str_date=str_date)
-    next_date = date - timedelta(days=1)
-    return next_date
 
 def isToday(text):
     '''
@@ -46,9 +24,3 @@ StrTODAY = TODAY.strftime(fmt_day)
 
 YESTERDAY = TODAY - timedelta(days=1)
 StrYESTERDAY = YESTERDAY.strftime(fmt_day)
-
-def Is_Business_Day(Adate):
-    return bool(len(pd.bdate_range(date, date)))
-
-
-#print(profit(1,2))

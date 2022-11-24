@@ -5,52 +5,51 @@ from vnstock import *
 class FinanceStock:
     def __init__(self, symbol) -> None:
         self.symbol = symbol.upper()
-        self.df_basic_data = self.GetTCB()
+        # self.df_basic_data = self.GetTCB()
         
-        self.Price = self.df_basic_data['Giá Khớp Lệnh'][0]
-        self.RSI = self.df_basic_data['RSI'][0]
-        self.ROE = self.df_basic_data['ROE'][0]*100
-        self.PE = self.df_basic_data['P/E'][0]
-        self.PB = self.df_basic_data['P/B'][0]
-        self.MA20 = self.df_basic_data['MA20'][0]
-        self.MA50 = self.df_basic_data['MA50'][0]
-        self.MA100 = self.df_basic_data['MA100'][0]
-        self.signal_KT = self.df_basic_data['Tín hiệu KT'][0]
-        self.signal_TBD = self.df_basic_data['Tín hiệu TB động'][0]
-        self.MACD_Signal = self.df_basic_data['MACD Signal'][0]
-        self.MACD_Volume = self.df_basic_data['MACD Volume'][0]
-        self.Du_Mua = self.df_basic_data['Khối lượng Dư mua'][0]
-        self.Du_Ban = self.df_basic_data['Khối lượng Dư bán'][0]
-        self.Price_At_Max_Vol = self.df_basic_data['Khớp nhiều nhất'][0]
-        self.Evalue_Price = self.df_basic_data['TCBS định giá'][0]
+        # self.Price = self.df_basic_data['Giá Khớp Lệnh'][0]
+        # self.RSI = self.df_basic_data['RSI'][0]
+        # self.ROE = self.df_basic_data['ROE'][0]*100
+        # self.PE = self.df_basic_data['P/E'][0]
+        # self.PB = self.df_basic_data['P/B'][0]
+        # self.MA20 = self.df_basic_data['MA20'][0]
+        # self.MA50 = self.df_basic_data['MA50'][0]
+        # self.MA100 = self.df_basic_data['MA100'][0]
+        # self.signal_KT = self.df_basic_data['Tín hiệu KT'][0]
+        # self.signal_TBD = self.df_basic_data['Tín hiệu TB động'][0]
+        # self.MACD_Signal = self.df_basic_data['MACD Signal'][0]
+        # self.MACD_Volume = self.df_basic_data['MACD Volume'][0]
+        # self.Du_Mua = self.df_basic_data['Khối lượng Dư mua'][0]
+        # self.Du_Ban = self.df_basic_data['Khối lượng Dư bán'][0]
+        # self.Price_At_Max_Vol = self.df_basic_data['Khớp nhiều nhất'][0]
+        # self.Evalue_Price = self.df_basic_data['TCBS định giá'][0]
         
-    def get_basic_analysis(self):
-        return self.df_basic_data
+    # def get_basic_analysis(self):
+    #     return self.df_basic_data
 
-    @property
-    def rsi_review(self):
-        if self.RSI <= 30:
-            return f'RSI: {self.RSI:,.2f} : Quá bán'
-        elif self.RSI >= 90:
-            return f'RSI: {self.RSI:,.2f} : Quá mua'
-        elif self.RSI >= 75:
-            return f'RSI: {self.RSI:,.2f} : Đang mạnh (Mark Minervini) - Xem xét'
-        else:
-            return f'RSI: {self.RSI:,.2f} : Chưa xác định'
+    # @property
+    # def rsi_review(self):
+    #     if self.RSI <= 30:
+    #         return f'RSI: {self.RSI:,.2f} : Quá bán'
+    #     elif self.RSI >= 90:
+    #         return f'RSI: {self.RSI:,.2f} : Quá mua'
+    #     elif self.RSI >= 75:
+    #         return f'RSI: {self.RSI:,.2f} : Đang mạnh (Mark Minervini) - Xem xét'
+    #     else:
+    #         return f'RSI: {self.RSI:,.2f} : Chưa xác định'
 
-    def GetTCB(self):
-        data = price_board(self.symbol)
-        return data
+    # def GetTCB(self):
+    #     data = price_board(self.symbol)
+    #     return data
 
-    def get_dividend_history(self):
+    def __get_dividend_history(self):
         return dividend_history(self.symbol)
     
     def get_avg_dividend(self):
+        df = self.__get_dividend_history()
 
-        df = self.get_dividend_history()
-
-        df_cash = df[df['issueMethod']=='cash']#['cashDividendPercentage']
-        df_share = df[df['issueMethod']=='share']#['cashDividendPercentage']
+        df_cash = df[df['issueMethod']=='cash']
+        df_share = df[df['issueMethod']=='share']
 
         start_year = df['cashYear'].min()
         end_year = df['cashYear'].max()+1

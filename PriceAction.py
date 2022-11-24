@@ -7,8 +7,7 @@ class PriceRanges:
         self.min = min
         self.max = max
         self.high = high
-        self.ranges = self.get_ranges()
-        #print(f'{self.max} - {self.min}')
+        self.ranges = self.get_ranges()        
 
     def get_ranges(self):
         start = self.min

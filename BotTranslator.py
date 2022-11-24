@@ -17,11 +17,3 @@ class BotTranslator:
                 translator = Translator(to_lang="vi",from_lang='en')
                 text = translator.translate(self.inputText)
             return text
-    
-    def detectLang(self):
-        pass
-
-
-
-# t = BotTranslator(inputText="Xin chào")
-# print(t.transText)

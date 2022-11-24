@@ -1,4 +1,3 @@
-from AnalysisList import AnalysisList
 from Caculator import *
 from DayData import *
 from IntradayData import *
@@ -7,18 +6,6 @@ from StockChart import StockChart
 import db
 import pandas as pd
 import numpy as np
-
-# class AnalysisVolumes:
-#     pass
-
-# class AnalysisPrice(AnalysisList):
-#     def __init__(self, lst: list) -> None:
-#         super().__init__(lst)
-    
-#     def distance(self, from_index):
-#         value_of_index = self.items[from_index]
-#         print(value_of_index)
-#         return self.pct(value_of_index, self.items[0])
     
 class Stock:
     def __init__(self, name) -> None:
@@ -34,8 +21,7 @@ class Stock:
         self.last_pct_price = self.df_data['%'][0]
         
         self.prices = self.df_data['Close']
-        self.volumes = self.df_data['Volume']
-        # self.daily_volumes = self.df_data['Volume']
+        self.volumes = self.df_data['Volume']        
         self.daily_foreign = self.df_data['NN']
         self.daily_money = self.df_data['Money']
         self.daily_low_prices = self.df_data['Low']
@@ -243,33 +229,3 @@ class Stock:
         d = DayData(symbol=self.name, index = 0,df_all_data=self.df_data,count_days=10)
         output += f'\n{d.summary}\n{self.chartUrl}'
         return output
-
-# stock = Stock(name='HAH')
-# p = AnalysisPrice(stock.prices.tolist())
-# print(p)
-# print(stock.summary())
-
-# stocks = ['VND']
-# for s in stocks:
-#     s = Stock(name=s)
-#     #print(f'{s.name} - {s.rate_of_waze}')
-    
-#     #d = DayData(symbol=s.name, index = 0,df_all_data=s.df_data,count_days=10)
-#     print(f'{s.Describe()}')
-
-# stocks = ['KSB','TPB','VND','KBC','CEO','BID','CTG']
-# for s in stocks:
-#     s = Stock(name=s)
-#     #s.check_pivots()
-#     s.check_min_vol()
-
-# import heapq
-# stocks = ['CTG', 'BID','HAX','VND']
-# for symbol in stocks:
-#     s = Stock(name = symbol)
-#     p = PriceAction(symbol=s.name,df_data=s.df_data,days=100)
-#     print(f'{symbol} - {p.analysis_last_price}')
-# top_10 = heapq.nlargest(n=10,iterable=p.prices)
-# print(top_10)
-# low_10 = heapq.nsmallest(n=10,iterable=p.prices)
-# print(low_10)
