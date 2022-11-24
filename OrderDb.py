@@ -33,13 +33,9 @@ class OrderDb(MongoDb):
     def getOrder(self, query):
         return self.Orders.find_one(query)
 
-    def print_data(self):
-        print(self.getOrders())
+    def __str__(self):
+        return self.getOrders()
 
-# o = OrderDb()
-# print(o.getStockOrdersByToday())
-# #o.print_data()
-# print(o.getStockOrders(symbol='VND'))
 
 class TransactionDb(MongoDb):
     def __init__(self) -> None:

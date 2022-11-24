@@ -1,6 +1,5 @@
 from datetime import date, timedelta
 
-
 class VnDate:
     def __init__(self, _date:date) -> None:
         self.currentDate = _date
@@ -26,11 +25,3 @@ class VnDate:
     
     def __str__(self) -> str:
         return f'{self.currentDate.strftime("%Y-%m-%d")} - {self.today}'
-
-def Test_VnDate():
-    v = VnDate(_date=date(2002,10,1))
-    print(v)
-    print(v.next)
-    print(v.previous)
-    print(f'Weekend: {v.isWeekend}')
-#Test_VnDate()

@@ -1,7 +1,5 @@
-from BlogManager import Blog
 from PriceAction import PriceAction
 from Stock import *
-from SupperStock import SupperStock
 from db import *
 import pandas as pd
 

@@ -103,8 +103,7 @@ class DayData:
 
     def mapperToDateData(self):
         dates_data = []
-        for i in range(0,len(self.df_all_data)-1):
-            #dataItem = self.df_all_data.iloc[i]
+        for i in range(0,len(self.df_all_data)-1):            
             dateData = StockDateData(symbol=self.symbol,index=i, df_all_data=self.df_all_data)
             dates_data.append(dateData)
         return dates_data
@@ -287,8 +286,7 @@ class DayData:
 
     def get_df_next_data(self) -> pd.DataFrame:
         try:
-            df_next_data = self.df_all_data[self.index-self.T_days:self.index+1]
-            #return df_next_data
+            df_next_data = self.df_all_data[self.index-self.T_days:self.index+1]            
             return df_next_data.reset_index(drop=True)
         except:
             return pd.DataFrame().empty
@@ -333,9 +331,9 @@ class DayData:
         distance = ((max-min)/min)*100
         return distance
 
-    def get_index_of_min_price(self): #MinP = Min Price
+    def get_index_of_min_price(self):
         min_price = np.min(self.df_data['Close'])
-        index_of_min = self.df_data.index[self.df_data['Close']==min_price][0]#.tolist()
+        index_of_min = self.df_data.index[self.df_data['Close']==min_price][0]
         return index_of_min
     
     def get_max_profit(self):
@@ -389,6 +387,3 @@ class DayData:
         f'\nKhối ngoại:\n {self.review_foriegn}'+\
         f'\n{"-"*30}\n'
         return output
-
-    # def to_string(self):
-    #     pass

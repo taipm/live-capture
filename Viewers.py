@@ -9,7 +9,7 @@ from db import *
 class ViewOrders:
     def __init__(self) -> None:
         self.df_data = OrderDb().getOrders()
-        self.df_buy_oders = pd.DataFrame()#self.get_df_buy_orders()
+        self.df_buy_oders = pd.DataFrame()
         self.count_of_oders = 0
         
     
