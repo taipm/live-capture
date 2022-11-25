@@ -33,18 +33,10 @@ class MongoDb:
 
     def getItemsOfToday(self):
         df = self.getAll()
-        df = df[df['time'].map(lambda x: isToday(x)==True)]
-        df = df.sort_values(by=['time'])
+        if not df.empty:
+            df = df[df['time'].map(lambda x: isToday(x)==True)]
+            df = df.sort_values(by=['time'])
         return df
 
     def __str__(self):
         return f'TradingBook\n - {self.name}'
-
-
-def Test():
-    db = MongoDb(name='Notes')
-    print(db)
-    print(db.getAll())
-    print(db.getItemsOfToday())
-
-#Test()

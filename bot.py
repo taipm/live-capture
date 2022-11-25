@@ -8,11 +8,10 @@ from telegram.ext.messagehandler import MessageHandler
 from telegram.ext.filters import Filters
 from Config import *
 from DateHelper import *
-#from apscheduler.schedulers.background import BlockingScheduler
-#import telegram
 from BotAnswer import BotAnswer
 from Messages import *
 from Reports import get_stocks_by_suc_manh
+from TextBuilder import TextBuilder
 from TextCommand import *
 from BotTranslator import BotTranslator
 from Viewers import ViewOrders

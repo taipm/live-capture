@@ -4,6 +4,7 @@ from Stock import Stock
 class SupperStock(Stock):
     def __init__(self, name) -> None:
         super().__init__(name)
+        print(f'SupperStock: {self.name}')
         self.days = self.scan()
     
     def scan(self):
@@ -18,7 +19,7 @@ class SupperStock(Stock):
         days = []
         for i in range(0, len(self.days)-1):
             if self.days[i].is_big_trend_up():
-                if (i <= 20):
+                if (i <= 10):
                     days.append(self.days[i])
         return sorted(list(set(days)),key = lambda x : x.index)
 
@@ -40,4 +41,6 @@ class SupperStock(Stock):
             output += f'\n{self.name}'
             for d in self.big_trends_up:
                 output += f'\n{d.index} - {d.price} - {d.date}'
+                output += f'\n{super().summary()}'
+                output += f'\n{"-"*30}'
         return output

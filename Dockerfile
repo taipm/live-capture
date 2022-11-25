@@ -48,6 +48,7 @@ RUN pip3 install html5lib
 RUN pip3 install translate
 RUN pip3 install langdetect
 RUN pip3 install pymongo
+#RUN pip3 install htmldocx
 #RUN pip3 install json-normalize
 
 #RUN sudo apt-get install tesseract-ocr-vie

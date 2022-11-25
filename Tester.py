@@ -3,15 +3,18 @@ from datetime import date
 from Alpha import Alpha
 from AnalysisList import AnalysisList
 from AnalysisPrices import AnalysisPrice
+from BotAnswer import BotAnswer
 from BotTranslator import BotTranslator
 from DailyReport import DailyReport
 from DateRange import DateRange
 from FinanceStock import FinanceStock
 from IntradayData import AnalysisIntradayData
+from MongoDb import MongoDb
 from OrderDb import OrderDb
 from Stock import Stock
+from StockInfo import StockInfo
+from TextBuilder import TextBuilder
 from VnDate import VnDate
-
 
 def Test_DateRange():
     r = DateRange(start_date=date(2022,10,1), end_date= date(2022,10,20))
@@ -47,7 +50,7 @@ def Test_Alpha():
 
 def Test_OrderDb():
     o = OrderDb()
-    print(o.getStockOrdersByToday())    
+    print(o.getStockOrdersByToday())
     print(o.getStockOrders(symbol='VND'))
 
 def Test_VnDate():
@@ -59,9 +62,10 @@ def Test_VnDate():
 
 def Test_AnalysisIntradayData():
     t = AnalysisIntradayData(symbol='MWG')
-    a = AnalysisList(t.df_data['price'])
+    print(t.df_data)
+    a = AnalysisList(t.df_data['price'].to_list())
     print(a)
-    v = AnalysisList(t.df_data['volume'])
+    v = AnalysisList(t.df_data['volume'].to_list())
     print(v)
 
 def Test_DailyReport():
@@ -70,16 +74,49 @@ def Test_DailyReport():
     d.updateBlog()
     print(d.updateBlog())
 
+def Test_MongoDb():
+    db = MongoDb(name='Notes')
+    print(db)
+    print(db.getAll())
+    print(db.getItemsOfToday())
+
+def Test_TextBuilder():
+    b = TextBuilder('Hello, how are you ?. Thanks. I"m 20 years old')
+    print(b.text_markdown)
+    b.to_string()
+
+def Test_StockInfo():
+    s = StockInfo("DIG")
+    print(s.text)
+    print(s.get_stock_info().to_markdown())
+    print(s.get_stocks_in_sector().to_markdown())
+    print(s.get_news())
+
+def Test_BotAnswer():
+    bot = BotAnswer('HPG, VND, FRT')
+    stocks = ['HPG, VND, FRT']
+    bot.answer_stocks(stocks=stocks)
+
+def Test_BotAnswerObj(symbol):
+    return BotAnswer(symbol).answer()
+
 def runTest():
-    Test_DateRange()
-    Test_FinanceStock()
-    Test_Stock()
-    Test_AnalysisPrice()
-    Test_Translator()
-    Test_Alpha()
-    Test_OrderDb()
-    Test_VnDate()
-    Test_AnalysisIntradayData()
-    Test_DailyReport()
+    # Test_DateRange()
+    # Test_FinanceStock()
+    #Test_Stock()
+    # Test_AnalysisPrice()
+    # Test_Translator()
+    # Test_Alpha()
+    
+    # Test_VnDate()
+    # Test_AnalysisIntradayData()
+    # #Test_DailyReport()
+    
+    # Test_MongoDb()
+    # Test_OrderDb()
+    # Test_StockInfo()
+    # Test_TextBuilder()
+    Test_BotAnswerObj(symbol='DHC')
+    Test_BotAnswer()
 
 runTest()

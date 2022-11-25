@@ -97,16 +97,16 @@ class DayData:
         self.avg_oscillation_down = np.average(self.df_data['Oscillation-Down'])
         self.avg_oscillation_up = np.average(self.df_data['Oscillation-Up'])
 
-        self.dates_data = self.mapperToDateData()
+        #self.dates_data = self.mapperToDateData()
 
         self.singal = ''
 
-    def mapperToDateData(self):
-        dates_data = []
-        for i in range(0,len(self.df_all_data)-1):            
-            dateData = StockDateData(symbol=self.symbol,index=i, df_all_data=self.df_all_data)
-            dates_data.append(dateData)
-        return dates_data
+    # def mapperToDateData(self):
+    #     dates_data = []
+    #     for i in range(0,len(self.df_all_data)-1):            
+    #         dateData = StockDateData(symbol=self.symbol,index=i, df_all_data=self.df_all_data)
+    #         dates_data.append(dateData)
+    #     return dates_data
 
     @property
     def today_money(self):

@@ -10,6 +10,7 @@ import numpy as np
 class Stock:
     def __init__(self, name) -> None:
         self.name = name.upper()
+        print(f'Stock: {self.name}')
         self.chartUrl = StockChart(symbol=self.name).imageUrl
         self.df_data = self.Load_Daily_Data()
         self.priceAction = PriceAction(symbol=self.name,df_data=self.df_data,days=10)
@@ -35,56 +36,57 @@ class Stock:
         self.max_vol = np.max(self.volumes)
         self.min_vol = np.min(self.volumes)
         self.avg_vol = np.average(self.volumes)
-        self.TCB_Data = self.load_basic_data()
-        try:
-            self.intraday_price = self.TCB_Data['Giá Khớp Lệnh'].values[0]/1000
-            self.TCB_valuation = self.TCB_Data['TCBS định giá'].values[0]/1000
-            self.max_price_year = self.TCB_Data['Đỉnh 1Y'].values[0]/1000
-            self.min_price_year = self.TCB_Data['Đáy 1Y'].values[0]/1000
-            self.MA20 = self.TCB_Data['MA20'].values[0]/1000
-            self.MA50 = self.TCB_Data['MA50'].values[0]/1000
-            self.MA100 = self.TCB_Data['MA100'].values[0]/1000
-            self.RSI = self.TCB_Data['RSI'].values[0]
-            self.PB = self.TCB_Data['P/B'].values[0]
-            self.PE = self.TCB_Data['P/E'].values[0]
-            self.ROE = self.TCB_Data['ROE'].values[0]*100
+        
+        self.TCB_valuation = 0
+        self.max_price_year = 0
+        self.min_price_year = 0
+        self.MA20 = 0
+        self.MA50 = 0
+        self.MA100 = 0
+        self.RSI = 0
+        self.PB = 0
+        self.PE = 0
+        self.ROE = 0
 
-            self.signal_KT = self.TCB_Data['Tín hiệu KT'].values[0]
-            self.signal_TBD = self.TCB_Data['Tín hiệu TB động'].values[0]
-            self.MACD_Signal = self.TCB_Data['MACD Signal'].values[0]
-            self.MACD_Volume = self.TCB_Data['MACD Volume'].values[0]
-            self.Du_Mua = self.TCB_Data['Khối lượng Dư mua'].values[0]
-            self.Du_Ban = self.TCB_Data['Khối lượng Dư bán'].values[0]
-            self.Price_At_Max_Vol = self.TCB_Data['Khớp nhiều nhất'].values[0]
-        except:
-            self.TCB_valuation = 0
-            self.max_price_year = 0
-            self.min_price_year = 0
-            self.MA20 = 0
-            self.MA50 = 0
-            self.MA100 = 0
-            self.RSI = 0
-            self.PB = 0
-            self.PE = 0
-            self.ROE = 0
-
-            self.signal_KT = 0
-            self.signal_TBD = 0
-            self.MACD_Signal = 0
-            self.MACD_Volume = 0
-            self.Du_Mua = 0
-            self.Du_Ban = 0
-            self.Price_At_Max_Vol = 0
-            self.intraday_price = 0
+        self.signal_KT = 0
+        self.signal_TBD = 0
+        self.MACD_Signal = 0
+        self.MACD_Volume = 0
+        self.Du_Mua = 0
+        self.Du_Ban = 0
+        self.Price_At_Max_Vol = 0
+        self.intraday_price = 0
+            
 
         self.intraday = AnalysisIntradayData(self.name)
+        self.load_TCB_data()
     
     def Load_Daily_Data(self) -> pd.DataFrame:
         return db.GetStockData(self.name)
     
-    def load_basic_data(self):
-        return price_board(self.name)
+    def load_TCB_data(self):
+        data = price_board(self.name)
+        if not data.empty:
+            self.intraday_price = data['Giá Khớp Lệnh'].values[0]/1000
+            self.TCB_valuation = data['TCBS định giá'].values[0]/1000
+            self.max_price_year = data['Đỉnh 1Y'].values[0]/1000
+            self.min_price_year = data['Đáy 1Y'].values[0]/1000
+            self.MA20 = data['MA20'].values[0]/1000
+            self.MA50 = data['MA50'].values[0]/1000
+            self.MA100 = data['MA100'].values[0]/1000
+            self.RSI = data['RSI'].values[0]
+            self.PB = data['P/B'].values[0]
+            self.PE = data['P/E'].values[0]
+            self.ROE = data['ROE'].values[0]*100
 
+            self.signal_KT = data['Tín hiệu KT'].values[0]
+            self.signal_TBD = data['Tín hiệu TB động'].values[0]
+            self.MACD_Signal = data['MACD Signal'].values[0]
+            self.MACD_Volume = data['MACD Volume'].values[0]
+            self.Du_Mua = data['Khối lượng Dư mua'].values[0]
+            self.Du_Ban = data['Khối lượng Dư bán'].values[0]
+            self.Price_At_Max_Vol = data['Khớp nhiều nhất'].values[0] 
+    
     @property
     def price(self):
         if(self.intraday_price != self.prices[0] and self.intraday_price != 0):
@@ -105,7 +107,6 @@ class Stock:
     @property
     def liquidity_min(self):
         return np.min(self.daily_money)/billion #Tỷ
-
     @property
     def review_price(self):
         output = f'Giá'
@@ -122,14 +123,12 @@ class Stock:
         else:
             output += f'- Chưa có gì đặc biệt'
         return output 
-    
     @property
     def review_volume(self):
         output = f'Khối lượng'
         output += f'\n- CN/TN: {self.max_vol:,.0f} | {self.min_vol:,.0f} | {self.avg_vol:,.0f}'
         output += f'\n- HT: {self.volumes[0]:,.0f} : {percent(self.volumes[0],self.avg_vol):,.2f}(%)'        
         return output
-
     @property
     def review_ROE(self):
         output = f'ROE = {self.ROE:,.2f}'
@@ -140,7 +139,6 @@ class Stock:
         elif self.ROE >= 20:
             output += f': Hấp dẫn'
         return output
-
     @property
     def review_PB(self):
         output = f'PB = {self.PB:,.2f}'
@@ -151,7 +149,6 @@ class Stock:
         elif self.PB >= 3:
             output += f': Quá cao'
         return output
-    
     @property
     def review_RSI(self):
         output = f'RSI = {self.RSI:,.2f}'
@@ -164,7 +161,6 @@ class Stock:
         elif self.RSI >= 70 and self.RSI <= 85:
             output += f': Đang năng động'
         return output
-
     @property
     def review_TCB_valuation(self):
         valuation = self.TCB_valuation
@@ -174,7 +170,6 @@ class Stock:
         else:
             output += ' => Cao, xem lại'
         return output
-        
     @property
     def review_TA(self):
         output = f'Tín hiệu (TA):'
@@ -183,7 +178,6 @@ class Stock:
         output += f'\n- MACD: {self.MACD_Signal}'
         output += f'\n- MACD (Volume): {self.MACD_Volume}'
         return output
-
     @property
     def review(self):
         output = f'Nhận xét (cơ bản) :'+\
@@ -216,7 +210,7 @@ class Stock:
         return percent(price,n_price)
 
     
-    def summary(self):
+    def summary(self):        
         output = f'{self.name} - {self.price} | {self.last_pct_price:,.2f}(%)| {self.last_trans_date}'       
         output += f'\n{self.review_price}'
         output += f'\n{self.review_volume}'               

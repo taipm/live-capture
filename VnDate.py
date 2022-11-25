@@ -4,6 +4,7 @@ class VnDate:
     def __init__(self, _date:date) -> None:
         self.currentDate = _date
         self.today = date.today()
+        
     @property
     def isWeekend(self):
         index = self.currentDate.weekday()

@@ -48,12 +48,5 @@ class StockInfo:
                 rs.append(text_item)
                 print(text_item)
         return rs
-    
-
-# s = StockInfo("DIG")
-# #print(s.text)
-# print(s.get_stock_info().to_markdown())
-# print(s.get_stocks_in_sector().to_markdown())
-# print(s.get_news())
 
 

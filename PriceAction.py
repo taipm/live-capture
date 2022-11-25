@@ -1,6 +1,5 @@
 import numpy as np
 from Caculator import percent
-from MessageHelper import border_text
 
 class PriceRanges:
     def __init__(self, min, max, high) -> None:
@@ -95,8 +94,7 @@ class PriceAction:
         self.days = len(self.prices)        
         self.start = self.prices[len(self.prices)-1]
         self.end = self.prices[0]
-        self.ranges = PriceRanges(min=self.min_price, max= self.max_price,high=5/100)
-        #self.print_ranges()
+        self.ranges = PriceRanges(min=self.min_price, max= self.max_price,high=5/100)        
         self.index_price = self.ranges.indexOf(number = self.price)
     
     def print_ranges(self):
@@ -186,9 +184,9 @@ class PriceAction:
         elif(self.price == np.max(trail_prices)):
             output += f'\n- Chạm đỉnh {self.days} ngày'        
         if(self.price_is_max and self.df_data['%'][0] >=3):
-            output += border_text(f'=> Lưu ý: [TĂNG] mạnh khỏi nền giá')
+            output += f'\n=> Lưu ý: [TĂNG] mạnh khỏi nền giá'
         elif(self.price_is_min and self.df_data['%'][0] <=-3):
-            output += border_text(f'=> Lưu ý: [RỚT] mạnh khỏi nền giá')
+            output += f'\n=> Lưu ý: [RỚT] mạnh khỏi nền giá'
         return output
     
     def actions(self, days):

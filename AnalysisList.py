@@ -23,7 +23,7 @@ class AnalysisList:
         min = self.min
         if from_index >=0:
             min = np.min(self.items[0:from_index])
-        return np.fabs(self.pct(min=min,max=self.max))
+        return self.pct(min=min,max=self.max)
 
     def __len__(self):
         return len(self.items)
@@ -33,3 +33,6 @@ class AnalysisList:
             f'\nFirst: {self.first:,.2f} - Last: {self.last:,.2f}'+\
             f'\nSum: {self.sum:,.2f} - Max: {self.max:,.2f} - Min: {self.min:,.2f} - Avg: {self.avg:,.2f}'+\
                 f'\nd({self.__len__()}): {self.distance(from_index=-1):,.2f} - ({self.distance(from_index= 10):,.2f})'
+
+a = AnalysisList([1,2,3,4,5])
+print(a)

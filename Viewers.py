@@ -6,6 +6,7 @@ from DateHelper import *
 from Constant import *
 from Caculator import *
 from db import *
+
 class ViewOrders:
     def __init__(self) -> None:
         self.df_data = OrderDb().getOrders()

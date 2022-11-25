@@ -59,7 +59,7 @@ class AnalysisIntradayData:
     def loadData(self):
         df = GetIntradayData(symbol=self.symbol)
         if(df.empty or df is None):
-            print('KHÔNG LẤY ĐƯỢC DỮ LIỆU TRONG NGÀY')
+            print(f'{self.symbol} - KHÔNG LẤY ĐƯỢC DỮ LIỆU TRONG NGÀY')
             self.hasError = False
         return df
 
@@ -202,8 +202,3 @@ class AnalysisIntradayData:
         else:
             return 'NA'
 
-# t = AnalysisIntradayData(symbol='MWG')
-# a = AnalysisList(t.df_data['price'])
-# print(a)
-# v = AnalysisList(t.df_data['volume'])
-# print(v)
