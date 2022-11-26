@@ -15,6 +15,7 @@ class User(ObjectDb):
     @property
     def email(self):
         return self._email
+        
     @email.setter
     def email(self, new_email):
         if not is_valid_email(new_email):

@@ -1,6 +1,6 @@
 from datetime import date, timedelta
-
 class VnDate:
+    format_date = "%Y-%m-%d"
     def __init__(self, _date:date) -> None:
         self.currentDate = _date
         self.today = date.today()
@@ -25,4 +25,4 @@ class VnDate:
         return value
     
     def __str__(self) -> str:
-        return f'{self.currentDate.strftime("%Y-%m-%d")} - {self.today}'
+        return f'{self.currentDate.strftime(self.format_date)} - {self.today}'

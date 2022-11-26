@@ -37,7 +37,7 @@ class StockDateData:
             return False
     @property
     def isGreen(self):
-        if self.close >= self.open and self.margin>=1:
+        if self.close >= self.open and self.margin >= 1:
             return True
         else:
             return False

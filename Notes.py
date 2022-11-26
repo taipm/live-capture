@@ -18,11 +18,4 @@ class Note(ObjectDb):
     def to_json(self):
         return json.dumps(self,default=lambda o: o.__dict__)
 
-def Test():
-    db = NoteDb()
-    note = Note(text='Đây là note thứ 2')
-    db.addItem(note.to_json())
-    print(db.getAll())
-    print(db.getItemsOfToday())
-
 #Test()

@@ -1,7 +1,6 @@
 
 from unicodedata import name
 from vnstock import *
-
 class FinanceStock:
     def __init__(self, symbol) -> None:
         self.symbol = symbol.upper()        

@@ -1,6 +1,6 @@
 import telegram
 from Config import CHAT_ID, TELE_TOKEN
-from StockChart import StockChart
+from vnstocklib.StockChart import StockChart
 
 '''
 https://www.geeksforgeeks.org/send-message-to-telegram-user-using-python/
@@ -26,5 +26,5 @@ t = TelegramBot()
 #t.sendImageFromUrl(userId=CHAT_ID, symbol='VND')
 
 chart = StockChart(symbol='VND')
-url = chart.getEmbedChart()
+url = chart.imageUrl
 t.sendImageFromUrl(userId=CHAT_ID,img_url=url)

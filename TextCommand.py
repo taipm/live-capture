@@ -1,6 +1,5 @@
 from pprint import pprint
 from Caculator import*
-from vnstock import *
 from BuyOrder import BuyOrder
 from SellOrder import Order, SellOrder
 from TextHelper import *
@@ -126,7 +125,7 @@ def parseTextCommand(text):
         market_price = db.get_stock_data_from_api(symbol=symbol).iloc[0]['Close']*1000
         m_price = market_price
 
-        new_vol = Caculator.EvaluationOrder(old_vol=vol,old_price=price,ratio_profit=ratio, market_price=m_price)
+        new_vol = EvaluationOrder(old_vol=vol,old_price=price,ratio_profit=ratio, market_price=m_price)
         sum_vol = vol + new_vol
         sum_money = vol*price + new_vol*m_price
         avg_price = sum_money/sum_vol
@@ -146,7 +145,7 @@ def parseTextCommand(text):
         print(f'{symbol} {vol} {price} m_price: {target_price}')
         ratio = -3/100              
 
-        new_vol = Caculator.EvaluationOrder(old_vol=vol,old_price=price,ratio_profit=ratio, market_price=target_price)
+        new_vol = EvaluationOrder(old_vol=vol,old_price=price,ratio_profit=ratio, market_price=target_price)
         sum_vol = vol + new_vol
         sum_money = vol*price + new_vol*target_price
         avg_price = sum_money/sum_vol

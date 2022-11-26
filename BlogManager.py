@@ -47,16 +47,6 @@ class Blog:
         return rs
 
     def get_post(self,id):
-        # if(type(id) != str):
-        #     #print(type(id))
-        #     id = str(id)
-        #     #xprint(type(id))
-        print(id)
-        print(type(id))
-        
-        print(self.posts[0].id)
-        print(type(self.posts[0].id))
-
         for post in self.posts:
             if(post.id == id):
                 pprint(post)
@@ -73,10 +63,6 @@ class Blog:
         }
         post.post_status = 'publish'
         self.wp.call(NewPost(post))
-        #print(f'Id: {id} - Type: {type(id)}')
-        # uploaded_post = self.last_post
-        # print(f'Bài mới {uploaded_post}')
-        # #print(f'Bài mới {uploaded_post.link}')
         blog = Blog()
         return blog.last_post.link
             

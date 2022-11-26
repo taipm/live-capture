@@ -1,15 +1,14 @@
 from datetime import date
-from DateHelper import StrTODAY
+#from DateHelper import StrTODAY
 import db
 from SupperStock import SupperStock
 from BlogManager import Blog
 from VnDate import VnDate
-# from htmldocx import HtmlToDocx
-# from docx import Document
 class DailyReport:
+    format_date = "%Y-%m-%d"
     def __init__(self) -> None:
         self.date = VnDate(date.today()).today
-        self.title = f'{StrTODAY} - Dấu hiệu cổ phiếu mạnh nổi bật thị trường'
+        self.title = f'{self.date.strftime(self.format_date)} - Dấu hiệu cổ phiếu mạnh nổi bật thị trường'
         self.content = self.get_daily_report()
 
     def get_daily_report(self):
@@ -17,17 +16,20 @@ class DailyReport:
         stocks = db.get_all_stocks_db()
         print(stocks)
         errors = []
-        stocks = ['DGC','ASM']
+        short_desc = ''
+        select_stocks = []
         for symbol in stocks:
             try:
                 s = SupperStock(name=symbol)
                 if (s.has_supper_volume):
-                    #output += "<hr>"
+                    select_stocks.append(s.name)
+                    short_desc += s.name
                     output += f'{s.summary()}'
-                    #output += "<br/>"
             except:
                 errors.append(symbol)
         print(errors)
+        html_report = f'Danh sách cổ phiếu mạnh : {len(select_stocks)} \n{select_stocks}'
+        output = f'{html_report}\n{output}'
         return output
 
     def updateBlog(self):

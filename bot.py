@@ -10,6 +10,7 @@ from Config import *
 from DateHelper import *
 from BotAnswer import BotAnswer
 from Messages import *
+from Notes import NoteDb
 from Reports import get_stocks_by_suc_manh
 from TextBuilder import TextBuilder
 from TextCommand import *
@@ -54,14 +55,18 @@ def unknown_text(update: Update, context: CallbackContext):
 	botAnswer = BotAnswer(input_text)
 	
 	msg_historyOrders = HistoryOrderMessage(input_text=input_text)
-	if msg_historyOrders.isValid:
-		answer = botAnswer.answer()
+	if msg_historyOrders.isValid:		
+		answer = msg_historyOrders.process()
 		update.message.reply_text(answer)
+		return
 	
 	msg_Alpha = AlphaMessage(input_text=input_text)
 	if msg_Alpha.isValid:
-		answer = Alpha(input_text[1:].strip()).answerText
+		alpha = Alpha(input_text[1:].strip())
+		answer = alpha.answerText
 		update.message.reply_text(answer)
+		alpha.addToNotes()
+		return
 
 	validCommands = ['BANKS','CK','VN30','BDS','ALL']
 	if (input_text.upper() in validCommands):
@@ -70,7 +75,7 @@ def unknown_text(update: Update, context: CallbackContext):
 		
 		file_path =botAnswer.answer_stocks(stocks=stocks)
 		update.message.reply_text(file_path)
-
+		
 	elif(input_text.upper() == '#LS'):
 		view = ViewOrders()
 		update.message.reply_text(text=view.to_tele_view())
@@ -79,7 +84,10 @@ def unknown_text(update: Update, context: CallbackContext):
 		print('Đang tìm cổ phiếu theo sức mạnh')
 		df = get_stocks_by_suc_manh(input_text[1:].strip())
 		update.message.reply_text(df.to_markdown(),parse_mode='Markdown')
-	
+	elif input_text.upper() == '#NOTES':
+		print('Đang tìm cổ phiếu theo sức mạnh')
+		db = NoteDb()
+		update.message.reply_text(db.getAll().to_markdown())
 	elif input_text.startswith('!'):
 		if('(' in input_text and ')' in input_text):
 			command = StockCommand(input_text[1:])

@@ -3,7 +3,6 @@ from Constant import *
 from Caculator import *
 from DateHelper import *
 
-
 class RichNumber:
     def __init__(self, x) -> None:
         self.x = float(x)
@@ -35,11 +34,4 @@ class RichNumber:
         else:
             text = f'{number}'
         return signal + text
-
-
-#print(RichNumber(77.4).rich_text)
-
-# print(RichNumber(8750000).toText())
-# print(RichNumber(-8750000).toText())
-
     

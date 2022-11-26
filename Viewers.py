@@ -121,6 +121,4 @@ class ViewOrders:
     def save_to_blog(self):
         pass
 
-# print('Đang test Viewers')
-# v = ViewOrders()
-# print(v.to_views(symbol='VGI'))
+

@@ -4,7 +4,6 @@ from MongoDb import MongoDb
 import pandas as pd
 
 class OrderDb(MongoDb):
-
     def __init__(self) -> None:
         super().__init__(name="Orders")
         self.Orders = self.db.get_collection('Orders')

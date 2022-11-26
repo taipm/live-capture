@@ -10,10 +10,13 @@ from DateRange import DateRange
 from FinanceStock import FinanceStock
 from IntradayData import AnalysisIntradayData
 from MongoDb import MongoDb
+from Notes import Note, NoteDb
 from OrderDb import OrderDb
+from RichNumber import RichNumber
 from Stock import Stock
-from StockInfo import StockInfo
+from vnstocklib.StockInfo import StockInfo
 from TextBuilder import TextBuilder
+from Viewers import ViewOrders
 from VnDate import VnDate
 
 def Test_DateRange():
@@ -42,11 +45,16 @@ def Test_Translator():
     print(t.transText)
 
 def Test_Alpha():
+
+    a = Alpha(query='Có bao nhiêu quốc gia trên thế giới')
+    print(a.answerText)
+
     a = Alpha(query="How far from earth to moon")
     print(a.answerText)
 
     a = Alpha(query="Khoảng cách từ trái đất đến mặt trăng")
     print(a.answerText)
+    a.addToNotes()
 
 def Test_OrderDb():
     o = OrderDb()
@@ -100,23 +108,43 @@ def Test_BotAnswer():
 def Test_BotAnswerObj(symbol):
     return BotAnswer(symbol).answer()
 
+def Test_RichNumber():
+    print(RichNumber(77.4).rich_text)
+    print(RichNumber(8750000).toText())
+    print(RichNumber(-8750000).toText())
+
+def Test_Viewers():
+    print('Đang test Viewers')
+    v = ViewOrders()
+    print(v.to_views(symbol='DGC'))
+
+def Test_Notes():
+    db = NoteDb()
+    note = Note(text='Đây là note thứ 2')
+    db.addItem(note.to_json())
+    print(db.getAll())
+    print(db.getItemsOfToday())
+    
 def runTest():
     # Test_DateRange()
     # Test_FinanceStock()
-    #Test_Stock()
+    # Test_Stock()
     # Test_AnalysisPrice()
     # Test_Translator()
-    # Test_Alpha()
+    Test_Alpha()
     
     # Test_VnDate()
     # Test_AnalysisIntradayData()
-    # #Test_DailyReport()
+    #Test_DailyReport()
     
     # Test_MongoDb()
     # Test_OrderDb()
     # Test_StockInfo()
     # Test_TextBuilder()
-    Test_BotAnswerObj(symbol='DHC')
-    Test_BotAnswer()
+    # Test_BotAnswerObj(symbol='DHC')
+    # Test_BotAnswer()
+    # Test_RichNumber()
+    # Test_Viewers()
+    Test_Notes()
 
 runTest()

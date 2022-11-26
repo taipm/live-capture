@@ -2,16 +2,17 @@ from Caculator import *
 from DayData import *
 from IntradayData import *
 from PriceAction import PriceAction
-from StockChart import StockChart
+from vnstocklib.StockChart import StockChart
 import db
 import pandas as pd
 import numpy as np
+from vnstock import *
     
 class Stock:
     def __init__(self, name) -> None:
         self.name = name.upper()
         print(f'Stock: {self.name}')
-        self.chartUrl = StockChart(symbol=self.name).imageUrl
+        self.chartUrl = StockChart(symbol=self.name)
         self.df_data = self.Load_Daily_Data()
         self.priceAction = PriceAction(symbol=self.name,df_data=self.df_data,days=10)
         
@@ -107,6 +108,9 @@ class Stock:
     @property
     def liquidity_min(self):
         return np.min(self.daily_money)/billion #Tỷ
+    @property
+    def liquidity_avg(self):
+        return np.average(self.daily_money)/billion #Tỷ
     @property
     def review_price(self):
         output = f'Giá'
@@ -221,5 +225,7 @@ class Stock:
         if not self.intraday.hasError:
             output += f'\n{self.intraday.summary()}'
         d = DayData(symbol=self.name, index = 0,df_all_data=self.df_data,count_days=10)
-        output += f'\n{d.summary}\n{self.chartUrl}'
+        output += f'\n{d.summary}\n{self.chartUrl.imageUrl}'
+        output += f'\n{d.summary}\n{self.chartUrl.dailyChartUrl}'
+        output += f'\n{d.summary}\n{self.chartUrl.weeklyChartUrl}'
         return output

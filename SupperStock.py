@@ -23,10 +23,17 @@ class SupperStock(Stock):
                     days.append(self.days[i])
         return sorted(list(set(days)),key = lambda x : x.index)
 
+    def isEnoughVolume(self):
+        if (self.liquidity <= 5):
+            return False
+        else:
+            return True
+
     @property
     def has_supper_volume(self):
-        if len(self.big_trends_up)>0:
-            return True
+        if self.isEnoughVolume():
+            if len(self.big_trends_up)>0:
+                return True
         else:
             return False
 

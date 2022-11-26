@@ -2,13 +2,12 @@ from FinanceStock import FinanceStock
 from RichNumber import RichNumber
 from Stock import Stock
 from BlogManager import *
-from vnstock import *
 from DateHelper import *
 from DayData import *
 from TextCommand import BotCommand
 from Buyers import *
 from Viewers import ViewOrders
-
+from vnstock import *
 class BotMessage(ObjectDb):
     def __init__(self, question, answer) -> None:
         super().__init__()
@@ -18,7 +17,6 @@ class BotMessage(ObjectDb):
     def __str__(self) -> str:
         return f'{self.question} : {self.time}\n{self.answer}'
     
-
 class BotAnswer:
     def __init__(self, query) -> None:
         self.query = query

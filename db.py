@@ -7,7 +7,6 @@ from urllib.request import urlopen
 import requests
 from pandas import json_normalize
 from datetime import datetime
-from vnstock import *
 import numpy as np
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
@@ -23,7 +22,6 @@ def get_all_stocks_db():
     except:
         print('Error')
         return None
-#print(get_all_stocks_db())
 
 def get_stock_data_from_api(symbol):
         url = "https://stock.kdtv4.vn/api/app/company/by-stock-code?stockCode=" + symbol.upper()        
@@ -165,8 +163,6 @@ def get_now_full_price(symbol):
         min_price = np.min(df_data['price'])
     
     return [last_price, max_price, min_price]
-
-#print(get_now_full_price(symbol='VIB'))
 
 def get_banks_symbols():
     bank_list = ['VPB', 'BID','CTG','VCB','TCB',
