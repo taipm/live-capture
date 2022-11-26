@@ -34,5 +34,5 @@ class AnalysisList:
             f'\nSum: {self.sum:,.2f} - Max: {self.max:,.2f} - Min: {self.min:,.2f} - Avg: {self.avg:,.2f}'+\
                 f'\nd({self.__len__()}): {self.distance(from_index=-1):,.2f} - ({self.distance(from_index= 10):,.2f})'
 
-a = AnalysisList([1,2,3,4,5])
-print(a)
+# a = AnalysisList([1,2,3,4,5])
+# print(a)

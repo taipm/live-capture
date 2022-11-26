@@ -118,6 +118,7 @@ class PriceAction:
     @property
     def suc_manh(self):
         return self.suc_bat+self.suc_bat_am
+        
     @property
     def count_inc(self):
         count = len(self.df_data[self.df_data['%']>0])

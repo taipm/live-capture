@@ -1,13 +1,14 @@
 from dataclasses import dataclass
-import json
+#import json
 from DateHelper import NOW
+from MongoDb import ObjectDb
 from OrderDb import OrderDb
 from RichNumber import RichNumber
 from db import get_now_price
 
 
 @dataclass
-class BuyOrder:
+class BuyOrder(ObjectDb):
     BSC_BUY_FEE = 0.1/100
     BSC_SELL_FEE = 0.1/100
     BSC_SELL_TAX = 0.1/100
@@ -55,22 +56,8 @@ class BuyOrder:
 
     def save_to_db(self):
         db = OrderDb()
-        order = self  
-        db.addOder(order=order.to_json())
+        db.addItem(self)
 
-    def to_string(self):
+    def __str__(self):
         return f'{self.symbol} | Mua: {self.volume:,.0f} Giá: {self.price:,.0f} Phí (mua): {self.fee:,.0f} Tổng chi phí: {self.total_cost:,.0f}' +\
                 f'\nGiá HT {self.market_price:,.2f} | LN: {RichNumber(self.current_profit).toText()} | Tỷ lệ: {self.current_rate_profit:,.2f} (%)'
-
-    def to_json(self):
-        return json.dumps(self,default=lambda o: o.__dict__)
-
-    def process(self):
-        print('Đang xử lý lệnh mua')
-
-# b = BuyOrder(symbol='HAX',volume=700,price=16510)
-# #print(b.avg_price)
-# print(b.market_price)
-# # print(f'{b.current_profit:,.2f}')
-# # print(f'{b.current_rate_profit:,.2f} (%)')
-# print(b.to_string())

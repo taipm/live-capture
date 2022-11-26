@@ -225,7 +225,8 @@ class Stock:
         if not self.intraday.hasError:
             output += f'\n{self.intraday.summary()}'
         d = DayData(symbol=self.name, index = 0,df_all_data=self.df_data,count_days=10)
-        output += f'\n{d.summary}\n{self.chartUrl.imageUrl}'
-        output += f'\n{d.summary}\n{self.chartUrl.dailyChartUrl}'
-        output += f'\n{d.summary}\n{self.chartUrl.weeklyChartUrl}'
+        output += f'\n{d.summary}'
+        output += f'\n{self.chartUrl.imageUrl}'
+        output += f'\n{self.chartUrl.dailyChartUrl}'
+        output += f'\n{self.chartUrl.weeklyChartUrl}'
         return output

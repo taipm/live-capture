@@ -11,7 +11,7 @@ from DateHelper import *
 from BotAnswer import BotAnswer
 from Messages import *
 from Notes import NoteDb
-from Reports import get_stocks_by_suc_manh
+#from Reports import get_stocks_by_suc_manh
 from TextBuilder import TextBuilder
 from TextCommand import *
 from BotTranslator import BotTranslator
@@ -81,13 +81,13 @@ def unknown_text(update: Update, context: CallbackContext):
 		update.message.reply_text(text=view.to_tele_view())
 		
 	elif input_text.upper() == '#TODAY':
-		print('Đang tìm cổ phiếu theo sức mạnh')
-		df = get_stocks_by_suc_manh(input_text[1:].strip())
-		update.message.reply_text(df.to_markdown(),parse_mode='Markdown')
+		print(f'Đang xử lý lệnh: {input_text.upper()}')
+		view = ViewOrders()
+		update.message.reply_text(view.getTodayOrders().to_markdown())
 	elif input_text.upper() == '#NOTES':
-		print('Đang tìm cổ phiếu theo sức mạnh')
 		db = NoteDb()
 		update.message.reply_text(db.getAll().to_markdown())
+
 	elif input_text.startswith('!'):
 		if('(' in input_text and ')' in input_text):
 			command = StockCommand(input_text[1:])

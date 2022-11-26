@@ -42,6 +42,22 @@ class ViewOrders:
         df = pd.DataFrame(list(orders), columns=['symbol','volume','price', 'total_cost', 'm_price','profit','%'])
         return df
 
+    def getTodayOrders(self):
+        db = OrderDb()
+        df = db.getItemsOfToday()
+        print(df)
+        orders = []
+        for i in range(0, len(df)):
+            item = df.iloc[i]
+            if (item['type']=='BUY'):
+                order = BuyOrder(symbol=item['symbol'],volume=item['volume'],price=item['price'])
+                order.update()
+                if(order.market_price > 0):
+                    data_item = [order.symbol,order.volume, order.price, order.total_cost, order.market_price, order.current_profit, order.current_rate_profit]
+                    orders.append(data_item)
+        df = pd.DataFrame(list(orders), columns=['symbol','volume','price', 'total_cost', 'm_price','profit','%'])
+        return df
+
     @property
     def total_buy_money(self):
         print(f'money: {np.sum(self.df_buy_oders["total_cost"])}')

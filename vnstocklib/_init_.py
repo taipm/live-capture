@@ -1,3 +1,4 @@
 import StockChart
-import StockInfo
 import StockNews
+from TextHelper import *
+from UrlCrawler import UrlCrawler

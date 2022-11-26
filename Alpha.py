@@ -29,6 +29,6 @@ class Alpha:
         return answer
 
     def addToNotes(self):
-        note = Note(text = f'{input} : {self.answerText}')
+        note = Note(text = f'{self.text} : {self.answerText}')
         db = NoteDb()
-        db.addItem(note.to_json())
+        db.addItem(note)

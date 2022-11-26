@@ -5,6 +5,7 @@ from AnalysisList import AnalysisList
 from AnalysisPrices import AnalysisPrice
 from BotAnswer import BotAnswer
 from BotTranslator import BotTranslator
+from BuyOrder import BuyOrder
 from DailyReport import DailyReport
 from DateRange import DateRange
 from FinanceStock import FinanceStock
@@ -13,11 +14,12 @@ from MongoDb import MongoDb
 from Notes import Note, NoteDb
 from OrderDb import OrderDb
 from RichNumber import RichNumber
+from SellOrder import SellOrder
 from Stock import Stock
-from vnstocklib.StockInfo import StockInfo
 from TextBuilder import TextBuilder
 from Viewers import ViewOrders
 from VnDate import VnDate
+from StockNews import StockNews, StockNewsFromBSC, StockNewsFromCafeF
 
 def Test_DateRange():
     r = DateRange(start_date=date(2022,10,1), end_date= date(2022,10,20))
@@ -44,6 +46,12 @@ def Test_Translator():
     t = BotTranslator(inputText="Xin chào")
     print(t.transText)
 
+    t = BotTranslator(inputText="Hello world")
+    print(t.transText)
+
+    t = BotTranslator(inputText="Cuộc sống thật khó khăn")
+    print(t.transText)
+
 def Test_Alpha():
 
     a = Alpha(query='Có bao nhiêu quốc gia trên thế giới')
@@ -60,6 +68,14 @@ def Test_OrderDb():
     o = OrderDb()
     print(o.getStockOrdersByToday())
     print(o.getStockOrders(symbol='VND'))
+
+    b = BuyOrder(symbol='VPG',volume=100,price=7000)
+    o.addItem(b)
+
+    s = SellOrder(symbol='VPG',volume=100,price=1000)
+    o.addItem(s)
+
+    print(o.getStockOrdersByToday().to_markdown())
 
 def Test_VnDate():
     v = VnDate(_date=date(2002,10,1))
@@ -93,12 +109,28 @@ def Test_TextBuilder():
     print(b.text_markdown)
     b.to_string()
 
-def Test_StockInfo():
-    s = StockInfo("DIG")
-    print(s.text)
-    print(s.get_stock_info().to_markdown())
-    print(s.get_stocks_in_sector().to_markdown())
-    print(s.get_news())
+
+def Test_StockNews():
+    symbol = 'HAX'
+    s_cafeF = StockNewsFromCafeF(symbol=symbol).getNews()
+    for item in s_cafeF:
+        print(item)
+    
+    print(f'{"*"*30}')
+    s_cafeF = StockNewsFromCafeF(symbol=symbol).getNewsInMonth()
+    for item in s_cafeF:
+        print(item)
+
+    print(f'{"--"*10}')
+    s_bsc = StockNewsFromBSC(symbol=symbol).get_news()
+    print(s_bsc)
+    
+    
+    s = StockNews("DIG").getNews()
+    for item in s:
+        print(item)
+    
+    #print(s.getNews())
 
 def Test_BotAnswer():
     bot = BotAnswer('HPG, VND, FRT')
@@ -121,7 +153,7 @@ def Test_Viewers():
 def Test_Notes():
     db = NoteDb()
     note = Note(text='Đây là note thứ 2')
-    db.addItem(note.to_json())
+    db.addItem(note)
     print(db.getAll())
     print(db.getItemsOfToday())
     
@@ -130,21 +162,21 @@ def runTest():
     # Test_FinanceStock()
     # Test_Stock()
     # Test_AnalysisPrice()
-    # Test_Translator()
-    Test_Alpha()
+    #Test_Translator()
+    #Test_Alpha()
     
     # Test_VnDate()
     # Test_AnalysisIntradayData()
     #Test_DailyReport()
     
     # Test_MongoDb()
-    # Test_OrderDb()
-    # Test_StockInfo()
+    #Test_OrderDb()
+    Test_StockNews()
     # Test_TextBuilder()
     # Test_BotAnswerObj(symbol='DHC')
     # Test_BotAnswer()
     # Test_RichNumber()
     # Test_Viewers()
-    Test_Notes()
+    #Test_Notes()
 
 runTest()

@@ -9,7 +9,7 @@ class Order:
         self.symbol = symbol.upper()
 
 
-class SellOrder:
+class SellOrder(ObjectDb):
     BSC_SELL_FEE = 0.1/100
     BSC_SELL_TAX = 0.01/100
 
@@ -41,5 +41,5 @@ class SellOrder:
         return f'{self.symbol} | Bán: {self.volume:,.0f} Giá: {self.price:,.0f} Thành tiền {self.income:,.0f}' +\
             f' Phí (bán): {self.fee:,.0f} Thuế (bán): {self.fee:,.0f} Tổng thu: {self.total_income:,.0f}'
 
-    def to_json(self):
-        return json.dumps(self,default=lambda o: o.__dict__)
+    # def to_json(self):
+    #     return json.dumps(self,default=lambda o: o.__dict__)

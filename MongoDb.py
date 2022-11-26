@@ -15,6 +15,9 @@ class ObjectDb:
 
     def __str__(self) -> str:
         return self.time
+    
+    def to_json(self):
+        return json.dumps(self,default=lambda o: o.__dict__)
 
 class MongoDb:
     def __init__(self, name) -> None:
@@ -23,8 +26,9 @@ class MongoDb:
         self.name = name
         self.collection = self.db.get_collection(name=name)
 
-    def addItem(self, item):
-        self.collection.insert_one(json.loads(item))
+    def addItem(self, item:ObjectDb):
+        print(f'addItem: {item}')
+        self.collection.insert_one(json.loads(item.to_json()))
 
     def getAll(self):
         items = self.collection.find()        
