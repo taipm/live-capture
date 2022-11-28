@@ -59,6 +59,7 @@ class Stock:
         self.Price_At_Max_Vol = 0
         self.intraday_price = 0
             
+        self.TODAY = DateData(symbol=self.name,index=0, df_all_data=self.df_data)
 
         self.intraday = AnalysisIntradayData(self.name)
         self.load_TCB_data()

@@ -8,6 +8,7 @@ import requests
 from pandas import json_normalize
 from datetime import datetime
 import numpy as np
+from vnstock import *
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
