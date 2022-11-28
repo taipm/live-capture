@@ -1,5 +1,4 @@
 from datetime import date
-#from DateHelper import StrTODAY
 import db
 from SupperStock import SupperStock
 from BlogManager import Blog
@@ -13,12 +12,13 @@ class DailyReport:
 
     def get_daily_report(self):
         output = ''
-        stocks = db.get_all_stocks_db()
-        print(stocks)
+        symbols = db.get_all_stocks_db()
+        print(symbols)
         errors = []
         short_desc = ''
         select_stocks = []
-        for symbol in stocks:
+        #symbols = ['ASM', 'SSI','PVT','HAG', 'DGC']
+        for symbol in symbols:
             try:
                 s = SupperStock(name=symbol)
                 if (s.has_supper_volume):
@@ -30,6 +30,7 @@ class DailyReport:
         print(errors)
         html_report = f'Danh sách cổ phiếu mạnh : {len(select_stocks)} \n{select_stocks}'
         output = f'{html_report}\n{output}'
+        output += f'\nCổ phiếu lỗi: {errors}'
         return output
 
     def updateBlog(self):
@@ -38,16 +39,9 @@ class DailyReport:
         blog = Blog()
         url = blog.post(title=title,content=content,tags='daily report')
         return url
-    
-    # def exportTo_docx(self):
-    #     document = Document()
-    #     new_parser = HtmlToDocx()
-    #         # do stuff to document
-    #     html = self.content
-    #     new_parser.add_html_to_document(html, document)
 
-    #         # do more stuff to document
-    #     document.save('dailyreport.docx')
+    def run(self):
+        self.updateBlog()
 
     def __str__(self) -> str:
         return f'{self.title}\n{self.content}'

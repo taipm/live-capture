@@ -16,6 +16,7 @@ from OrderDb import OrderDb
 from RichNumber import RichNumber
 from SellOrder import SellOrder
 from Stock import Stock
+from StockOwners import StockOwners
 from TextBuilder import TextBuilder
 from Viewers import ViewOrders
 from VnDate import VnDate
@@ -109,6 +110,10 @@ def Test_TextBuilder():
     print(b.text_markdown)
     b.to_string()
 
+def Test_StockOwners():
+    so = StockOwners(symbol='HAX')
+    print(so)
+
 
 def Test_StockNews():
     symbol = 'HAX'
@@ -172,6 +177,7 @@ def runTest():
     # Test_MongoDb()
     #Test_OrderDb()
     Test_StockNews()
+    Test_StockOwners()
     # Test_TextBuilder()
     # Test_BotAnswerObj(symbol='DHC')
     # Test_BotAnswer()

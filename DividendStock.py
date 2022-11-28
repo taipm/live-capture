@@ -1,7 +1,6 @@
-
-from unicodedata import name
 from vnstock import *
-class FinanceStock:
+
+class DividendStock:
     def __init__(self, symbol) -> None:
         self.symbol = symbol.upper()        
 
@@ -10,7 +9,6 @@ class FinanceStock:
     
     def get_avg_dividend(self):
         df = self.__get_dividend_history()
-
         df_cash = df[df['issueMethod']=='cash']
         df_share = df[df['issueMethod']=='share']
 
@@ -24,14 +22,14 @@ class FinanceStock:
         sum_cash = 0
 
         count_year = 0
-
+        output = ''
         for i in range(start_year,end_year):
             year = start_year + count_year
             rate_of_cash = df_cash[df_cash['cashYear'] == year]['cashDividendPercentage'].sum()
             rate_of_share = df_share[df_share['cashYear'] == year]['cashDividendPercentage'].sum()
             sum_cash += sum_shares*rate_of_cash
             sum_shares += sum_shares*rate_of_share
-            
+            output += f'\n{year} - Cổ tức TM: {sum_cash*10000:,.0f} Tổng số CP : {sum_shares:,.0f}'
             print(f'{year} - Cổ tức TM: {sum_cash*10000:,.2f} Tổng số CP : {sum_shares:,.0f}')
             count_year+=1
 
@@ -39,5 +37,9 @@ class FinanceStock:
         cash_avg = sum_cash/sum_of_year
         self.avg_cash = cash_avg
         self.avg_share = share_avg
+        output += f'\nYears: {sum_of_year} -  shares-avg: {share_avg:.2f} - cash-avg: {cash_avg:.2f}'
+        return output
 
-        return f'Years: {sum_of_year} -  shares-avg: {share_avg:.2f} - cash-avg: {cash_avg:.2f}'
+
+# d = DividendStock(symbol='DHC')
+# print(d.get_avg_dividend())

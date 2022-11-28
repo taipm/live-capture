@@ -4,56 +4,56 @@ from DateHelper import *
 from Constant import *
 import pandas as pd
 
-class StockDateData:
-    def __init__(self, symbol, index, df_all_data) -> None:
-        self.symbol = symbol.upper()
-        self.index = index
-        self.df_all_data = df_all_data
-        self.data_item = self.df_all_data.iloc[index]
+# class StockDateData:
+#     def __init__(self, symbol, index, df_all_data) -> None:
+#         self.symbol = symbol.upper()
+#         self.index = index
+#         self.df_all_data = df_all_data
+#         self.data_item = self.df_all_data.iloc[index]
         
-        self.date  = self.data_item['Date']
-        self.close = self.data_item['Close']
-        self.open = self.data_item['Open']
-        self.high = self.data_item['High']
-        self.low = self.data_item['Low']
-        self.volume = self.data_item['Volume']
-        self.margin = self.data_item['%']
+#         self.date  = self.data_item['Date']
+#         self.close = self.data_item['Close']
+#         self.open = self.data_item['Open']
+#         self.high = self.data_item['High']
+#         self.low = self.data_item['Low']
+#         self.volume = self.data_item['Volume']
+#         self.margin = self.data_item['%']
 
-        self.foriegn_buy = self.data_item['NN Mua']
-        self.foriegn_sell = self.data_item['NN Ban']
+#         self.foriegn_buy = self.data_item['NN Mua']
+#         self.foriegn_sell = self.data_item['NN Ban']
 
-    @property
-    def price(self):
-        if self.close > 0:
-            return self.close
-        else:
-            return self.open
+#     @property
+#     def price(self):
+#         if self.close > 0:
+#             return self.close
+#         else:
+#             return self.open
 
-    @property
-    def isFL(self):
-        if self.margin <= -6.67:
-            return True
-        else:
-            return False
-    @property
-    def isGreen(self):
-        if self.close >= self.open and self.margin >= 1:
-            return True
-        else:
-            return False
-    @property
-    def isCE(self):
-        if self.margin >= 6.67:
-            return True
-        else:
-            return False
+#     @property
+#     def isFL(self):
+#         if self.margin <= -6.67:
+#             return True
+#         else:
+#             return False
+#     @property
+#     def isGreen(self):
+#         if self.close >= self.open and self.margin >= 1:
+#             return True
+#         else:
+#             return False
+#     @property
+#     def isCE(self):
+#         if self.margin >= 6.67:
+#             return True
+#         else:
+#             return False
 
-    def analysis(self):
-        pass
+#     def analysis(self):
+#         pass
 
-    def __str__(self) -> str:
-        return f'{self.symbol} | {self.price:,.2f}'+\
-            f'{self.volume:,.0f}'
+#     def __str__(self) -> str:
+#         return f'{self.symbol} | {self.price:,.2f}'+\
+#             f'{self.volume:,.0f}'
 
 class DayData:
     def __init__(self, symbol, index, df_all_data, count_days) -> None:
@@ -190,6 +190,8 @@ class DayData:
     def is_supper_volume(self,level):
         if self.volume >= level*self.last_max_vol and self.margin_price >=1:
             return True
+        elif self.is_max_vol and self.isGreen:
+            return True
         else:
             return False
 
@@ -258,6 +260,14 @@ class DayData:
             output += f'{self.min_price} - min {self.T_days} ngày'
         output += f'- Giá CN/TN: {self.max_price} | {self.min_price} [{self.get_index_of_min_price()}] [d = {self.get_distance_price():,.2f} (%)]'
         return output
+    
+    # def isMaxPrice(self):
+    #     trail_prices = self.df_data[1:]
+    #     if(self.price >= np.max(trail_prices)):
+    #        return True
+    #     else:
+    #         return False
+
     @property
     def is_max_price(self):
         if(self.price >= self.last_max_price):

@@ -1,5 +1,6 @@
 from Caculator import *
 from DayData import *
+from DividendStock import DividendStock
 from IntradayData import *
 from PriceAction import PriceAction
 from vnstocklib.StockChart import StockChart
@@ -111,6 +112,7 @@ class Stock:
     @property
     def liquidity_avg(self):
         return np.average(self.daily_money)/billion #Tỷ
+
     @property
     def review_price(self):
         output = f'Giá'
@@ -174,6 +176,9 @@ class Stock:
         else:
             output += ' => Cao, xem lại'
         return output
+    
+    def getDividend(self):
+        return DividendStock(self.name).get_avg_dividend()
     @property
     def review_TA(self):
         output = f'Tín hiệu (TA):'
@@ -213,9 +218,25 @@ class Stock:
         n_price = self.df_data.iloc[index-pre_count_of_days]['Close']
         return percent(price,n_price)
 
-    
     def summary(self):        
-        output = f'{self.name} - {self.price} | {self.last_pct_price:,.2f}(%)| {self.last_trans_date}'       
+        output = f'{self.name} - {self.price} | {self.last_pct_price:,.2f}(%)| {self.last_trans_date}'
+        output += f'\n{self.review_price}'
+        output += f'\n{self.review_volume}'               
+        output += f'\nThanh khoản: {self.liquidity:,.2f} (tỷ) | CN/TN: {self.liquidity_max:,.2f} | {self.liquidity_min:,.2f}'
+        output += f'\n{self.review}'
+        output += f'\n{self.review_TA}'        
+        output += f'\n{"-"*30}'
+        if not self.intraday.hasError:
+            output += f'\n{self.intraday.summary()}'
+        d = DayData(symbol=self.name, index = 0,df_all_data=self.df_data,count_days=10)
+        output += f'\n{d.summary}'
+        output += f'\n{self.chartUrl.imageUrl}'
+        output += f'\n{self.chartUrl.dailyChartUrl}'
+        output += f'\n{self.chartUrl.weeklyChartUrl}'
+        return output
+    
+    def summaryToBlog(self):        
+        output = f'{self.name} - {self.price} | {self.last_pct_price:,.2f}(%) | {self.last_trans_date}'       
         output += f'\n{self.review_price}'
         output += f'\n{self.review_volume}'               
         output += f'\nThanh khoản: {self.liquidity:,.2f} (tỷ) | CN/TN: {self.liquidity_max:,.2f} | {self.liquidity_min:,.2f}'

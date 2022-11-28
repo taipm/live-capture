@@ -21,10 +21,10 @@ class TelegramBot:
     def sendImageFromUrl(self, userId, img_url:str):
         self.bot.sendMessage(chat_id=userId, text= img_url)    
 
-t = TelegramBot()
+#t = TelegramBot()
 #t.notify(userId=CHAT_ID, message= 'Hello')
 #t.sendImageFromUrl(userId=CHAT_ID, symbol='VND')
 
-chart = StockChart(symbol='VND')
-url = chart.imageUrl
-t.sendImageFromUrl(userId=CHAT_ID,img_url=url)
+# chart = StockChart(symbol='VND')
+# url = chart.imageUrl
+# t.sendImageFromUrl(userId=CHAT_ID,img_url=url)

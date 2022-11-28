@@ -1,5 +1,7 @@
 from DayData import DayData
 from Stock import Stock
+from StockNews import StockNews
+from StockOwners import StockOwners
 
 class SupperStock(Stock):
     def __init__(self, name) -> None:
@@ -29,13 +31,16 @@ class SupperStock(Stock):
         else:
             return True
 
+    def isMaxPrice(self)->bool:
+        return self.priceAction.isMaxPrice()
+
     @property
     def has_supper_volume(self):
+        result = False
         if self.isEnoughVolume():
             if len(self.big_trends_up)>0:
-                return True
-        else:
-            return False
+                result = True
+        return result
 
     def _str_(self):
         ouput = f'{self.name} - {self.len} - {self.price} - {self.vol}'
@@ -46,8 +51,32 @@ class SupperStock(Stock):
         output = ''
         if self.has_supper_volume:
             output += f'\n{self.name}'
+            owners = StockOwners(self.name)
+            output += f'\n{owners.analysis()}'
             for d in self.big_trends_up:
                 output += f'\n{d.index} - {d.price} - {d.date}'
                 output += f'\n{super().summary()}'
                 output += f'\n{"-"*30}'
+        return output
+    
+    def summaryToBlog(self):
+        output = ''
+        if self.has_supper_volume:
+            output += f'\n{self.name}'
+            owners = StockOwners(self.name)
+            news = StockNews(self.name)
+            output += f'\n{owners.summaryToBlog()}'
+            for d in self.big_trends_up:
+                output += f'\n{d.index} - {d.price} - {d.date}'
+                output += f'\n{super().summaryToBlog()}'
+                output += f'\n{"-"*30}'
+            output += f'\nTin tức: {news}'
+        # elif self.isMaxPrice():
+        #     output += f'\n{self.name}'
+        #     owners = StockOwners(self.name)
+        #     news = StockNews(self.name)
+        #     output += f'\n{owners.summaryToBlog()}'
+        #     output += f'\n{super().summaryToBlog()}'
+        #     output += f'\n{"-"*30}'
+        #     output += f'\nTin tức: {news}'
         return output

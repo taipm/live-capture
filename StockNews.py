@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from TextHelper import *
 import pandas as pd
 from UrlCrawler import UrlCrawler as crawler
-from urllib.request import Request, urlopen
+#from urllib.request import Request, urlopen
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -91,7 +91,6 @@ class StockNewsFromBSC:
                 index = self.lines.index(l)
                 text_item = l + ':' + f'{self.lines[index+1]}'
                 rs.append(text_item)
-                print(text_item)
         return rs
 
 class StockNews:
@@ -102,16 +101,16 @@ class StockNews:
     
     def getNews(self)->list[News]:
         news = []
-        news += self.bsc_news.get_news()
+        #news += self.bsc_news.get_news()
         news += self.cafef_news.getNews()
         return news
 
     def __str__(self) -> str:
         output = ''
         news = self.getNews()
-        for item in news:
+        n = 5
+        if len(news) < 5:
+            n = len(news)
+        for item in news[0:n]:
             output += f'\n{News(title = item.title, time = item.time)}'
         return output
-
-# s = StockNews(symbol='HAX')
-# print(s)

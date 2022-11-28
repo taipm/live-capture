@@ -26,11 +26,11 @@ class RichNumber:
             number = self.x
 
         if(number > billion):
-            text = f'{number/billion:,.2f}B'
+            text = f'{number/billion:,.2f} B'
         elif(number < billion and number >= million):
-            text = f'{number/million:,.2f}M'
+            text = f'{number/million:,.2f} M'
         elif(number < million and number >= thousand):
-            text = f'{number/thousand:,.2f}K'
+            text = f'{number/thousand:,.2f} K'
         else:
             text = f'{number}'
         return signal + text

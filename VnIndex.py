@@ -1,41 +1,91 @@
-from UrlCrawler import getHtmlFromUrl, getTextFromUrl
+#from UrlCrawler import getHtmlFromUrl, getTextFromUrl
 from Constant import *
 import pandas as pd
 import numpy as np
-import html5lib
-import lxml
-from bs4 import BeautifulSoup
+#import html5lib
+#import lxml
+#from bs4 import BeautifulSoup
 from DateHelper import *
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
-from vnstocklib._init_ import *
+from vnstock import *
 class VnindexDay:
     def __init__(self, date, close, change,volume, liquidity, volume_agree, liquidity_agree, open, high,low) -> None:
         pass
 
+class VnIndexOrders:
+    url = 'https://s.cafef.vn/Lich-su-giao-dich-VNINDEX-2.chn#data'
+    def __init__(self) -> None:
+        self.df_data = self.convertToCleanData()
+        
+
+    def getData(self)->pd.DataFrame:
+        df_data = pd.read_html(self.url)[2].iloc[1:]
+        print(df_data)
+        return df_data
+    
+    def convertToCleanData(self)->pd.DataFrame:
+        df_raw = self.getData()
+        df = df_raw
+        
+        df['date'] = df_raw[0]
+        del df[0]
+        
+        df['mark'] = df_raw[1].map(lambda x:x.split(' ')[0]).map(lambda y:float(y))
+        df['%'] = df_raw[1].map(lambda x:x.split(' ')[1][1:]).map(lambda y:float(y))
+        del df[1]
+
+        df['count_buy'] = df_raw[2]
+        del df[2]
+
+        df['volume_buy'] = df_raw[3]
+        del df[3]
+
+        df['count_sell'] = df_raw[4]
+        del df[4]
+
+        df['volume_sell'] = df_raw[5]
+        del df[5]
+
+        df['volume_buy_and_sell'] = df_raw[8]
+        del df[8]
+
+        print(df)
+        return df
+
+    def analysis(self):
+        todayMark = self.df_data['mark'][1]
+        todayMargin = self.df_data['%'][1]
+        output = f'VnIndex: {todayMark} [{todayMargin} %] - ({StrTODAY})'
+
+        if todayMargin >= 3:
+            output += f'\nTăng mạnh'
+        elif todayMargin <=-3:
+            output += f'\nGiảm mạnh'
+        
+        print(output)
+        return output
+        
+
 class VnIndex:
     def __init__(self) -> None:
         self.url_history = 'https://s.cafef.vn/Lich-su-giao-dich-VNINDEX-1.chn#data'
+        
         self.url_calendar_market = 'https://www.bsc.com.vn/bao-cao-phan-tich/lich-thi-truong'
         self.df_data = self.to_df_data()
     
     def get_current(self, command:str)->pd.DataFrame:
-        
         commands = ['Value', 'Losers', 'Gainers', 'Volume', 'ForeignTrading', 'NewLow', 'Breakout', 'NewHigh']
-        #commands = []
         if command in commands:
             df = market_top_mover(command)
             return df
         else:
             print('Lỗi câu lệnh')
             return pd.DataFrame.empty
-
-        ##Value, Losers, Gainers, Volume, ForeignTrading, NewLow, Breakout, NewHigh
         
 
     def getTopGainers(self):
         df = market_top_mover("Gainers")
-        ##Value, Losers, Gainers, Volume, ForeignTrading, NewLow, Breakout, NewHigh
         return df
     
     def get_history_data(self):        
@@ -79,8 +129,13 @@ class VnIndex:
     def sum_pct(self):
         return np.sum(self.df_data['%'])
 
-#vni = VnIndex()
-#print(vni.df_data.to_markdown())
-#print(vni.sum_pct)
-#print(vni.get_current('Breakout'))
-#print(vni.getTopGainers())
+# vni = VnIndex()
+# print(vni.df_data.to_markdown())
+# print(vni.sum_pct)
+# print(vni.get_current('Breakout'))
+# print(vni.getTopGainers())
+
+vni = VnIndexOrders()
+print(vni.df_data)
+vni.analysis()
+#vni.getData()

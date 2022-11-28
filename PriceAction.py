@@ -147,6 +147,12 @@ class PriceAction:
     def max_desc(self):
         return np.min(self.df_data['%'])
     
+    def isMaxPrice(self) -> bool:
+        if(self.price > self.last_max_price):
+           return True
+        else:
+            return False
+
     @property
     def price_is_max(self):
         trail_prices = self.prices[1:]
