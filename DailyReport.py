@@ -1,4 +1,5 @@
 from datetime import date
+from DailyMarketScore import DailyMarketScore
 import db
 from SupperStock import SupperStock
 from BlogManager import Blog
@@ -28,6 +29,7 @@ class DailyReport:
             except:
                 errors.append(symbol)
         print(errors)
+
         html_report = f'Danh sách cổ phiếu mạnh : {len(select_stocks)} \n{select_stocks}'
         output = f'{html_report}\n{output}'
         output += f'\nCổ phiếu lỗi: {errors}'

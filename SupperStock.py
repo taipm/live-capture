@@ -31,8 +31,8 @@ class SupperStock(Stock):
         else:
             return True
 
-    def isMaxPrice(self)->bool:
-        return self.priceAction.isMaxPrice()
+    # def isMaxPrice(self)->bool:
+    #     return self.priceAction.isMaxPrice()
 
     @property
     def has_supper_volume(self):

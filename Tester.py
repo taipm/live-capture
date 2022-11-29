@@ -7,6 +7,7 @@ from BotAnswer import BotAnswer
 from BotTranslator import BotTranslator
 from BuyOrder import BuyOrder
 from DailyReport import DailyReport
+from DateData import DateData
 from DateRange import DateRange
 from DividendStock import DividendStock
 from IntradayData import AnalysisIntradayData
@@ -162,7 +163,27 @@ def Test_Notes():
     db.addItem(note)
     print(db.getAll())
     print(db.getItemsOfToday())
-    
+
+def Test_DateData():
+    s = Stock(name='HAX')
+    d = DateData(symbol=s.name, index=0, df_all_data=s.df_data)
+    print(f'MA10: {d.getMA(window=10)}')
+    print(f'MA20: {d.getMA(window=20)}')
+    print(f'MA50: {d.getMA(window=50)}')
+    print(f'MA100: {d.getMA(window=100)}')
+
+    windows = [10,20,50,100, 200, 5*4*12]
+    for w in windows:
+        print(f'Max price {w}: {d.getMaxPrice(window=w)}')
+
+    windows = [10,20,50,100, 200, 5*4*12]
+    for w in windows:
+        print(f'Min price {w}: {d.getMinPrice(window=w)}')
+
+    windows = [0,1,2,3,5,10]
+    for w in windows:
+        print(f'Biến động giá {w}: {d.get_distance_price(window=w)}')
+
 def runTest():
     # Test_DateRange()
     # Test_DividendStock()
@@ -179,11 +200,12 @@ def runTest():
     # Test_OrderDb()
     # Test_StockNews()
     # Test_StockOwners()
-    Test_TextBuilder()
+    #Test_TextBuilder()
     # Test_BotAnswerObj(symbol='DHC')
     # Test_BotAnswer()
     # Test_RichNumber()
     # Test_Viewers()
     # Test_Notes()
+    Test_DateData()
 
 runTest()

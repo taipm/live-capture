@@ -135,7 +135,7 @@ def GetIntradayData(symbol):
         else:
             df = df.append(df_next)
     return df
-#print(GetIntradayData(symbol='VND'))
+
 def get_now_price(symbol):
     df_data = GetIntradayData(symbol = symbol)
     price = None
@@ -145,7 +145,7 @@ def get_now_price(symbol):
         price = df_data.sort_values(by=['time'],ascending=False).iloc[:1]['price'].values[0]
     
     return price
-#print(get_now_price(symbol='VND'))
+
 def get_now_full_price(symbol):
     df_data = GetIntradayData(symbol = symbol)
     last_price = None

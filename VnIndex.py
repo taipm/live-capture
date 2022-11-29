@@ -1,14 +1,11 @@
-#from UrlCrawler import getHtmlFromUrl, getTextFromUrl
 from Constant import *
 import pandas as pd
 import numpy as np
-#import html5lib
-#import lxml
-#from bs4 import BeautifulSoup
 from DateHelper import *
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 from vnstock import *
+
 class VnindexDay:
     def __init__(self, date, close, change,volume, liquidity, volume_agree, liquidity_agree, open, high,low) -> None:
         pass

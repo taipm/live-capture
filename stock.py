@@ -16,60 +16,63 @@ class Stock:
         print(f'Stock: {self.name}')
         self.chartUrl = StockChart(symbol=self.name)
         self.df_data = self.Load_Daily_Data()
-        self.priceAction = PriceAction(symbol=self.name,df_data=self.df_data,days=10)
-        
-        self.len = len(self.df_data.index)
-        
-        self.last_price = self.df_data['Close'][0]
-        self.last_volume = self.df_data['Volume'][0]
-        self.last_pct_price = self.df_data['%'][0]
-        
-        self.prices = self.df_data['Close']
-        self.volumes = self.df_data['Volume']        
-        self.daily_foreign = self.df_data['NN']
-        self.daily_money = self.df_data['Money']
-        self.daily_low_prices = self.df_data['Low']
-        self.daily_high_prices = self.df_data['High']
-        self.daily_open_prices = self.df_data['Open']
-        self.daily_close_prices = self.df_data['Close']
-
-        self.max_price = np.max(self.prices)
-        self.min_price = np.min(self.prices)
-        self.vol = self.volumes[0]
-        self.max_vol = np.max(self.volumes)
-        self.min_vol = np.min(self.volumes)
-        self.avg_vol = np.average(self.volumes)
-        
-        self.TCB_valuation = 0
-        self.max_price_year = 0
-        self.min_price_year = 0
-        self.MA20 = 0
-        self.MA50 = 0
-        self.MA100 = 0
-        self.RSI = 0
-        self.PB = 0
-        self.PE = 0
-        self.ROE = 0
-
-        self.signal_KT = 0
-        self.signal_TBD = 0
-        self.MACD_Signal = 0
-        self.MACD_Volume = 0
-        self.Du_Mua = 0
-        self.Du_Ban = 0
-        self.Price_At_Max_Vol = 0
-        self.intraday_price = 0
+        self.IsOK = True
+        if not self.df_data.empty:
+            self.len = len(self.df_data.index)
             
-        self.TODAY = DateData(symbol=self.name,index=0, df_all_data=self.df_data)
+            #self.last_price = self.df_data['Close'][0]
+            #self.last_volume = self.df_data['Volume'][0]
+            #self.last_pct_price = self.df_data['%'][0]
+            
+            self.prices = self.df_data['Close']
+            self.volumes = self.df_data['Volume']        
+            self.daily_foreign = self.df_data['NN']
+            self.daily_money = self.df_data['Money']
+            self.daily_low_prices = self.df_data['Low']
+            self.daily_high_prices = self.df_data['High']
+            self.daily_open_prices = self.df_data['Open']
+            self.daily_close_prices = self.df_data['Close']
 
-        self.intraday = AnalysisIntradayData(self.name)
-        self.load_TCB_data()
+            self.max_price = np.max(self.prices)
+            self.min_price = np.min(self.prices)
+            self.vol = self.volumes[0]
+            self.max_vol = np.max(self.volumes)
+            self.min_vol = np.min(self.volumes)
+            self.avg_vol = np.average(self.volumes)
+            
+            self.TCB_valuation = 0
+            self.max_price_year = 0
+            self.min_price_year = 0
+            self.MA20 = 0
+            self.MA50 = 0
+            self.MA100 = 0
+            self.RSI = 0
+            self.PB = 0
+            self.PE = 0
+            self.ROE = 0
+
+            self.signal_KT = 0
+            self.signal_TBD = 0
+            self.MACD_Signal = 0
+            self.MACD_Volume = 0
+            self.Du_Mua = 0
+            self.Du_Ban = 0
+            self.Price_At_Max_Vol = 0
+            self.intraday_price = 0
+                
+            self.TODAY = DateData(symbol=self.name,index=0, df_all_data=self.df_data)
+        else:
+            self.IsOK = False
+        #self.intraday = AnalysisIntradayData(self.name)
+
+        #self.load_TCB_data()
     
     def Load_Daily_Data(self) -> pd.DataFrame:
         return db.GetStockData(self.name)
     
     def load_TCB_data(self):
         data = price_board(self.name)
+        print(data)
         if not data.empty:
             self.intraday_price = data['Giá Khớp Lệnh'].values[0]/1000
             self.TCB_valuation = data['TCBS định giá'].values[0]/1000
@@ -226,27 +229,44 @@ class Stock:
         output += f'\n{self.review}'
         output += f'\n{self.review_TA}'        
         output += f'\n{"-"*30}'
+        
         if not self.intraday.hasError:
             output += f'\n{self.intraday.summary()}'
+
         d = DayData(symbol=self.name, index = 0,df_all_data=self.df_data,count_days=10)
         output += f'\n{d.summary}'
+
+        f = DividendStock(symbol=self.name)
+        output += '\nCổ tức: ' + f.get_avg_dividend()
+        
+        #output += Buyer(self.name).summary()
+
         output += f'\n{self.chartUrl.imageUrl}'
         output += f'\n{self.chartUrl.dailyChartUrl}'
         output += f'\n{self.chartUrl.weeklyChartUrl}'
         return output
     
-    def summaryToBlog(self):        
-        output = f'{self.name} - {self.price} | {self.last_pct_price:,.2f}(%) | {self.last_trans_date}'       
-        output += f'\n{self.review_price}'
-        output += f'\n{self.review_volume}'               
+    def summaryToBlog(self):
+        #self.priceAction = PriceAction(symbol=self.name,df_data=self.df_data,days=10)
+        self.intraday = AnalysisIntradayData(self.name)
+        self.load_TCB_data()
+
+        output = f'{self.name} - {self.price} | {self.last_pct_price:,.2f}(%)| {self.last_trans_date}'                
         output += f'\nThanh khoản: {self.liquidity:,.2f} (tỷ) | CN/TN: {self.liquidity_max:,.2f} | {self.liquidity_min:,.2f}'
         output += f'\n{self.review}'
         output += f'\n{self.review_TA}'        
         output += f'\n{"-"*30}'
         if not self.intraday.hasError:
             output += f'\n{self.intraday.summary()}'
+
         d = DayData(symbol=self.name, index = 0,df_all_data=self.df_data,count_days=10)
         output += f'\n{d.summary}'
+
+        f = DividendStock(symbol=self.name)
+        output += '\nCổ tức: ' + f.get_avg_dividend()
+        
+        #output += Buyer(self.name).summary()
+
         output += f'\n{self.chartUrl.imageUrl}'
         output += f'\n{self.chartUrl.dailyChartUrl}'
         output += f'\n{self.chartUrl.weeklyChartUrl}'
