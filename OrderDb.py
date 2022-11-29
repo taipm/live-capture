@@ -10,9 +10,6 @@ class OrderDb(MongoDb):
         self.df_data = self.getOrders()
         self.count_orders = len(self.df_data)
             
-    # def addOder(self, order):
-    #     self.Orders.insert_one(json.loads(order))
-
     def getOrders(self):
         orders = self.Orders.find()        
         df =  pd.DataFrame(list(orders))

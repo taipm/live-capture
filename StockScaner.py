@@ -11,6 +11,7 @@ class StockScaner:
     def scan(self)->DailyMarketScore:
         for symbol in self.symbols:
             stock = Stock(name=symbol)
+
             if stock.TODAY.isCE:
                 self.dailyMarket.addCE(symbol=symbol)
             
@@ -19,6 +20,10 @@ class StockScaner:
 
             if stock.TODAY.isGreen:
                 self.dailyMarket.addGREEN(symbol=symbol)
+            
+            if stock.TODAY.isRED:
+                self.dailyMarket.addGREEN(symbol=symbol)
+
         return self.dailyMarket
     
     def __str__(self) -> str:

@@ -13,9 +13,6 @@ def CompoundingInterest(amount, rate, rountines):
         amount += amount*rate
     return amount
 
-# x = CompoundingInterest(amount=100000000, rate=3/100, rountines=10)
-# print(f'{x:,.2f}')
-
 def inc_percent(x, p):
     '''
     p: Phần trăm (nếu 3% thì p = 3)

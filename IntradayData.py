@@ -57,9 +57,11 @@ class AnalysisIntradayData:
             self.rateOf_Sell_Orders = 0
     
     def loadData(self):
-        df = GetIntradayData(symbol=self.symbol)
-        if(df.empty or df is None):
+        df = GetIntradayData(symbol=self.symbol)        
+        if(df.empty):
             print(f'{self.symbol} - KHÔNG LẤY ĐƯỢC DỮ LIỆU TRONG NGÀY')
+            self.hasError = True
+        else:
             self.hasError = False
         return df
 
@@ -201,4 +203,3 @@ class AnalysisIntradayData:
             return 'SELL'
         else:
             return 'NA'
-

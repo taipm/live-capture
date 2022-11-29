@@ -11,8 +11,9 @@ from DateHelper import *
 from BotAnswer import BotAnswer
 from Messages import *
 from Notes import NoteDb
-#from Reports import get_stocks_by_suc_manh
-from TextBuilder import TextBuilder
+from TelegramBot import TelegramBot
+from db import *
+#from TextBuilder import TextBuilder
 from TextCommand import *
 from BotTranslator import BotTranslator
 from Viewers import ViewOrders
@@ -50,7 +51,9 @@ def unknown(update: Update, context: CallbackContext):
     update.message.reply_text(
 		"Sorry '%s' is not a valid command" % update.message.text)
 
-def unknown_text(update: Update, context: CallbackContext):
+def unknown_text(update: Update, context: CallbackContext):	
+	bot = TelegramBot(update=update,context=context)
+
 	input_text = toStandard(update.message.text)
 	botAnswer = BotAnswer(input_text)
 	
@@ -71,8 +74,7 @@ def unknown_text(update: Update, context: CallbackContext):
 	validCommands = ['BANKS','CK','VN30','BDS','ALL']
 	if (input_text.upper() in validCommands):
 		command = input_text.upper()
-		stocks = db.getStocksByCommand(command=command)
-		
+		stocks = getStocksByCommand(command=command)		
 		file_path =botAnswer.answer_stocks(stocks=stocks)
 		update.message.reply_text(file_path)
 		
@@ -84,14 +86,14 @@ def unknown_text(update: Update, context: CallbackContext):
 		print(f'Đang xử lý lệnh: {input_text.upper()}')
 		view = ViewOrders()
 		update.message.reply_text(view.getTodayOrders().to_markdown())
+
 	elif input_text.upper() == '#NOTES':
 		db = NoteDb()
 		update.message.reply_text(db.getAll().to_markdown())
 
 	elif input_text.startswith('!'):
 		if('(' in input_text and ')' in input_text):
-			command = StockCommand(input_text[1:])
-			print(command.to_string())
+			command = StockCommand(input_text[1:])			
 			command.order.save_to_db()
 			update.message.reply_text(command.order.to_string(),parse_mode='Markdown')
 		else:
@@ -105,8 +107,9 @@ def unknown_text(update: Update, context: CallbackContext):
 		try:
 			print('Đang xử lý')
 			textOf_answer = botAnswer.answer()
-			print(textOf_answer)			
-			update.message.reply_text(TextBuilder(textOf_answer).text_markdown, parse_mode="Markdown")
+			print(textOf_answer)
+			
+			bot.reply(message = textOf_answer)			
 		except:
 			rs = parseTextCommand(input_text)			
 			if rs == "":

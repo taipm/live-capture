@@ -8,7 +8,7 @@ from BotTranslator import BotTranslator
 from BuyOrder import BuyOrder
 from DailyReport import DailyReport
 from DateRange import DateRange
-from FinanceStock import FinanceStock
+from DividendStock import DividendStock
 from IntradayData import AnalysisIntradayData
 from MongoDb import MongoDb
 from Notes import Note, NoteDb
@@ -30,8 +30,8 @@ def Test_DateRange():
     print(r.isInRange(date=date(2022,10,25)))    
     print(r.__next__(step=2))
 
-def Test_FinanceStock():
-    f = FinanceStock(symbol='FRT')    
+def Test_DividendStock():
+    f = DividendStock(symbol='FRT')    
     print(f.get_avg_dividend())
 
 def Test_Stock():
@@ -107,8 +107,9 @@ def Test_MongoDb():
 
 def Test_TextBuilder():
     b = TextBuilder('Hello, how are you ?. Thanks. I"m 20 years old')
+    print(b.words)
     print(b.text_markdown)
-    b.to_string()
+    print(b)
 
 def Test_StockOwners():
     so = StockOwners(symbol='HAX')
@@ -164,25 +165,25 @@ def Test_Notes():
     
 def runTest():
     # Test_DateRange()
-    # Test_FinanceStock()
+    # Test_DividendStock()
     # Test_Stock()
     # Test_AnalysisPrice()
-    #Test_Translator()
-    #Test_Alpha()
+    # Test_Translator()
+    # Test_Alpha()
     
     # Test_VnDate()
     # Test_AnalysisIntradayData()
-    #Test_DailyReport()
+    # #Test_DailyReport()
     
     # Test_MongoDb()
-    #Test_OrderDb()
-    Test_StockNews()
-    Test_StockOwners()
-    # Test_TextBuilder()
+    # Test_OrderDb()
+    # Test_StockNews()
+    # Test_StockOwners()
+    Test_TextBuilder()
     # Test_BotAnswerObj(symbol='DHC')
     # Test_BotAnswer()
     # Test_RichNumber()
     # Test_Viewers()
-    #Test_Notes()
+    # Test_Notes()
 
 runTest()

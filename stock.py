@@ -1,4 +1,5 @@
 from Caculator import *
+from DateData import DateData
 from DayData import *
 from DividendStock import DividendStock
 from IntradayData import *
@@ -219,10 +220,8 @@ class Stock:
         n_price = self.df_data.iloc[index-pre_count_of_days]['Close']
         return percent(price,n_price)
 
-    def summary(self):        
-        output = f'{self.name} - {self.price} | {self.last_pct_price:,.2f}(%)| {self.last_trans_date}'
-        output += f'\n{self.review_price}'
-        output += f'\n{self.review_volume}'               
+    def summary(self):
+        output = f'{self.name} - {self.price} | {self.last_pct_price:,.2f}(%)| {self.last_trans_date}'                
         output += f'\nThanh khoản: {self.liquidity:,.2f} (tỷ) | CN/TN: {self.liquidity_max:,.2f} | {self.liquidity_min:,.2f}'
         output += f'\n{self.review}'
         output += f'\n{self.review_TA}'        

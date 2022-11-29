@@ -4,7 +4,6 @@ from Stock import Stock
 from BlogManager import *
 from DateHelper import *
 from DayData import *
-#from TextCommand import BotCommand
 from Buyers import *
 from Viewers import ViewOrders
 from vnstock import *
@@ -43,14 +42,14 @@ class BotAnswer:
             output += s.summary() + "\n"
             output += DayData(s.name,index=0,df_all_data= s.df_data,count_days=10).summary
             f = DividendStock(symbol=s.name)
-            output += '\nCổ tức: ' + f.get_avg_dividend()           
-            output += Buyer(s.name).summary()
+            output += '\nCổ tức: ' + f.get_avg_dividend()
+            #output += Buyer(s.name).summary()
             output += f'\nhttps://fireant.vn/top-symbols/content/symbols/{s.name}'
             post = BlogPost(title=self.query,content=output,tags=s.name)
             link = post.update_to_blog()
             output += f'\nBlog: {link}'
             return f'{output}'
-        elif(len(self.query)==4):            
+        elif(len(self.query)==4):
             v = ViewOrders()
             return v.to_views(symbol=self.query[1:].upper())
 
