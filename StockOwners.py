@@ -57,7 +57,7 @@ class StockOwners:
 
     def summaryToBlog(self):
         output = f'\nCỔ ĐÔNG NỘI BỘ'
-        output += f'\n{self.df_data.to_html()}'
+        output += f'\n{self.df_data[0:5].to_html()}'
         output += f'\n\nĐăng ký mua: {RichNumber(self.total_reg_buy()).toText()} | Bán: {RichNumber(self.total_reg_sell()).toText()} | Tổng: {RichNumber(self.total_reg_buy()-self.total_reg_sell()).toText()}'
         return output
 

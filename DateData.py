@@ -4,6 +4,8 @@ from DateHelper import *
 from Constant import *
 import pandas as pd
 
+from RangeMA import RangeMA
+
 class DateData:
     '''
     DỮ LIỆU HÀNG NGÀY
@@ -32,11 +34,54 @@ class DateData:
         else:
             return self.open
     
+    def isBreakFlat(self):
+        length = 10
+        max = np.max(self.df_all_data[1:length]['Close'])
+        min = np.min(self.df_all_data[1:length]['Close'])
+        high = ((max-min)/min)*100
+
+        if high <= 7:
+            if self.close > max:
+                return True
+        else:
+            return False
+
+    def isBreak52Week(self):
+        length = 5*4*12
+        max = np.max(self.df_all_data[1:length]['Close'])
+        min = np.min(self.df_all_data[1:length]['Close'])
+        print(f'{self.symbol} - max: {max} : min {min} : HT {self.close}')
+        if self.close > max:
+            return True
+        else:
+            return False
+
+    def isInRangeMA(self, window:int)->bool:
+        range = self.getRangeMA(window=window)
+        price = self.price
+        return range.isIn(price)
+
+    def isInRangeMAs(self, windows:list[int])->bool:        
+        results = []
+        for w in windows:
+            if self.isInRangeMA(window=w):
+                if self.getMA(window=10) >= self.getMA(window=20):
+                    results.append(w)
+        if len(results) >= 2: #Tối thiểu nằm trong 02 MA khác nhau
+            return True
+        else:
+            return False        
+
+    def getRangeMA(self, window:int):
+        ma_price = self.getMA(window=window)
+        r = RangeMA(ma_price)
+        return r
+
     def getMA(self, window:int):
         df = self.df_all_data.sort_values(by=['Date'])
-        short_rolling = df['Close'].rolling(window=window).mean()
-        short_rolling.tail()
-        return short_rolling[0]
+        short_rolling = df['Close'].rolling(window=window).mean()        
+        value = short_rolling[0]
+        return value
 
     def getMaxPrice(self, window:int)->float:
         return np.max(self.df_all_data['Close'][0:window])
@@ -53,6 +98,19 @@ class DateData:
         distance = ((max-min)/min)*100
         print(f'{window} : {min} -> {max} = {distance:,.2f}')
         return distance
+    
+    def isElephant(self, window:int)->bool:
+        volume = self.volume
+        max_volume = np.max(self.df_all_data['Volume'][0:window])
+        pre_volumes = self.df_all_data['Volume'][1:window]
+        rate = 5
+        if np.min(pre_volumes)>=5:
+            if self.close > self.open:
+                if (volume >= rate*np.min(pre_volumes)) or (max_volume >= rate*np.min(pre_volumes)):
+                    if self.close > self.open:
+                        return True
+        else:
+            return False
 
     @property
     def isSwing(self):
@@ -73,7 +131,8 @@ class DateData:
     @property
     def isHighest(self):
         if self.high == self.close:
-            return True
+            if self.close > self.open:
+                return True
         else:
             return False
 

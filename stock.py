@@ -3,7 +3,7 @@ from DateData import DateData
 from DayData import *
 from DividendStock import DividendStock
 from IntradayData import *
-from PriceAction import PriceAction
+from StockOwners import StockOwners
 from vnstocklib.StockChart import StockChart
 import db
 import pandas as pd
@@ -224,7 +224,7 @@ class Stock:
         return percent(price,n_price)
 
     def summary(self):
-        output = f'{self.name} - {self.price} | {self.last_pct_price:,.2f}(%)| {self.last_trans_date}'                
+        output = f'{self.name} - {self.price} | {self.df_data["%"][0]:,.2f}(%)| {self.last_trans_date}'                
         output += f'\nThanh khoản: {self.liquidity:,.2f} (tỷ) | CN/TN: {self.liquidity_max:,.2f} | {self.liquidity_min:,.2f}'
         output += f'\n{self.review}'
         output += f'\n{self.review_TA}'        
@@ -263,7 +263,9 @@ class Stock:
         output += f'\n{d.summary}'
 
         f = DividendStock(symbol=self.name)
-        output += '\nCổ tức: ' + f.get_avg_dividend()
+        output += f'\nCổ tức: ' + f.get_avg_dividend()
+        o = StockOwners(symbol=self.name)
+        output += f'\nCổ đông lớn: {o.summaryToBlog()} '
         
         #output += Buyer(self.name).summary()
 
