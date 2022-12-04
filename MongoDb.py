@@ -34,6 +34,8 @@ class MongoDb:
         items = self.collection.find()        
         df =  pd.DataFrame(list(items))
         return df
+    def deleteAll(self):
+        self.collection.delete_many({})
 
     def getItemsOfToday(self):
         df = self.getAll()

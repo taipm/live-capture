@@ -3,7 +3,6 @@ import numpy as np
 from DateHelper import *
 from Constant import *
 import pandas as pd
-
 from RangeMA import RangeMA
 
 class DateData:
@@ -83,6 +82,22 @@ class DateData:
         value = short_rolling[0]
         return value
 
+    def isThroughMA(self, window:int)->bool:
+        low = self.low
+        ma_price = self.getMA(window=window)
+        if low < ma_price and self.close > ma_price:
+            return True
+        else:
+            return False
+    def isThroughMAs(self, windows:list[int])->bool:        
+        results = []
+        for w in windows:
+            if self.isThroughMA(window=w):                
+                    results.append(w)
+        if len(results) >= 2: #Tối thiểu nằm trong 02 MA khác nhau
+            return True
+        else:
+            return False
     def getMaxPrice(self, window:int)->float:
         return np.max(self.df_all_data['Close'][0:window])
 

@@ -29,12 +29,13 @@ class DailyMarketScore(ObjectDb):
         self.MaxPrice = []
         self.MinVols = []
         self.MinPrice = []
-        self.MA50s = [] #>=MA50
-        self.MA20s = []
-        self.MA10s = []
-        self.MA100s = []
-        self.MA200s = []
-        self.MultiMAs = []
+
+        self.ThroughMA50s = []
+        self.ThroughMA20s = []
+        self.ThroughMA10s = []
+        self.ThroughMA100s = []
+        self.ThroughMA200s = []
+        self.ThroughMultiMAs = []
 
         self.VolumeUps = [] #Volume tăng liên tục
         self.VolumeDowns = [] #Volume giảm liên tục
@@ -66,22 +67,22 @@ class DailyMarketScore(ObjectDb):
         self.BreakFlats.append(symbol)
 
     def addMA10(self, symbol:str):
-        self.MA10s.append(symbol)
+        self.ThroughMA10s.append(symbol)
     
     def addMA20(self, symbol:str):
-        self.MA20s.append(symbol)
+        self.ThroughMA20s.append(symbol)
 
     def addMA50(self, symbol:str):
-        self.MA50s.append(symbol)
+        self.ThroughMA50s.append(symbol)
     
     def addMA100(self, symbol:str):
-        self.MA100s.append(symbol)
+        self.ThroughMA100s.append(symbol)
 
     def addMA200(self, symbol:str):
-        self.MA200s.append(symbol)
+        self.ThroughMA200s.append(symbol)
 
     def addMultiMAs(self, symbol:str):
-        self.MultiMAs.append(symbol)
+        self.ThroughMultiMAs.append(symbol)
 
     def addSwing(self, symbol:str):
         self.Swings.append(symbol)
@@ -116,7 +117,7 @@ class DailyMarketScore(ObjectDb):
         symbols += ','.join(self.Elephants) + ','
         symbols += ','.join(self.BreakFlats) + ','
         symbols += ','.join(self.Break52Weeks) + ','
-        symbols += ','.join(self.MultiMAs)
+        symbols += ','.join(self.ThroughMultiMAs)
         print(symbols)
         symbols = symbols.split(',')[1:]
         print(symbols)
@@ -159,12 +160,12 @@ class DailyMarketScore(ObjectDb):
         output += f'\nVượt đỉnh 52 tuần : ({len(self.Break52Weeks)}):\n{self.Break52Weeks}\n'
         output += f'\nVượt nền phẳng (flat): ({len(self.BreakFlats)}):\n{self.BreakFlats}\n'
 
-        output += f'\nMA10 ({len(self.MA10s)}):\n{self.MA10s}\n'
-        output += f'\nMA20 ({len(self.MA20s)}):\n{self.MA20s}\n'
-        output += f'\nMA50 ({len(self.MA50s)}):\n{self.MA50s}\n'
-        output += f'\nMA100 ({len(self.MA100s)}):\n{self.MA100s}\n'
-        output += f'\nMA200 ({len(self.MA200s)}):\n{self.MA200s}\n'
-        output += f'\nMA-GIAO NHAU: ({len(self.MultiMAs)}):\n{self.MultiMAs}\n'
+        output += f'\nMA10 ({len(self.ThroughMA10s)}):\n{self.ThroughMA10s}\n'
+        output += f'\nMA20 ({len(self.ThroughMA20s)}):\n{self.ThroughMA20s}\n'
+        output += f'\nMA50 ({len(self.ThroughMA50s)}):\n{self.ThroughMA50s}\n'
+        output += f'\nMA100 ({len(self.ThroughMA100s)}):\n{self.ThroughMA100s}\n'
+        output += f'\nMA200 ({len(self.ThroughMA200s)}):\n{self.ThroughMA200s}\n'
+        output += f'\nMA-GIAO NHAU: ({len(self.ThroughMultiMAs)}):\n{self.ThroughMultiMAs}\n'
 
         output += f'\nCE ({len(self.CEs)}):\n{self.CEs}\n'
         output += f'\nFL ({len(self.FLs)}):\n{self.FLs}\n'

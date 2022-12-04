@@ -82,6 +82,12 @@ def get_stock_data_from_api(symbol):
         except: #Cổ phiếu chưa có trong danh mục
                 return pd.DataFrame()
 
+def get_price_by_date(symbol, date:str)->float:
+    data = get_stock_data_from_api(symbol=symbol)
+    data = data[data['Date'].map(lambda x: str(x).split(' ')[0] == date.split(' ')[0])]#.iloc[0]
+    price = data['Close'].values[0]*1000
+    return price
+
 def GetStockData(symbol) -> pd.DataFrame:
         data = get_stock_data_from_api(symbol=symbol)
         if not data.empty:

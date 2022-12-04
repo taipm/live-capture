@@ -19,11 +19,6 @@ class Stock:
         self.IsOK = True
         if not self.df_data.empty:
             self.len = len(self.df_data.index)
-            
-            #self.last_price = self.df_data['Close'][0]
-            #self.last_volume = self.df_data['Volume'][0]
-            #self.last_pct_price = self.df_data['%'][0]
-            
             self.prices = self.df_data['Close']
             self.volumes = self.df_data['Volume']        
             self.daily_foreign = self.df_data['NN']
@@ -251,7 +246,7 @@ class Stock:
         self.intraday = AnalysisIntradayData(self.name)
         self.load_TCB_data()
 
-        output = f'{self.name} - {self.price} | {self.last_pct_price:,.2f}(%)| {self.last_trans_date}'                
+        output = f'{self.name} - {self.price} | {self.df_data["%"][0]:,.2f}(%)| {self.last_trans_date}'              
         output += f'\nThanh khoản: {self.liquidity:,.2f} (tỷ) | CN/TN: {self.liquidity_max:,.2f} | {self.liquidity_min:,.2f}'
         output += f'\n{self.review}'
         output += f'\n{self.review_TA}'        
@@ -268,8 +263,6 @@ class Stock:
         output += f'\nCổ đông lớn: {o.summaryToBlog()} '
         
         #output += Buyer(self.name).summary()
-
-        output += f'\n{self.chartUrl.imageUrl}'
         output += f'\n{self.chartUrl.dailyChartUrl}'
         output += f'\n{self.chartUrl.weeklyChartUrl}'
         return output

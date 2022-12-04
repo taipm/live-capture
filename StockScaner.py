@@ -41,28 +41,31 @@ class StockScaner:
                     if stock.TODAY.isSleep:
                         self.dailyMarket.addSleep(symbol=symbol)
 
-                    if stock.TODAY.isInRangeMA(window=10):
+                    if stock.TODAY.isThroughMA(window=10):
                         self.dailyMarket.addMA10(symbol=symbol)
                     
-                    if stock.TODAY.isInRangeMA(window=20):
+                    if stock.TODAY.isThroughMA(window=20):
                         self.dailyMarket.addMA20(symbol=symbol)
 
-                    if stock.TODAY.isInRangeMA(window=50):
+                    if stock.TODAY.isThroughMA(window=50):
                         self.dailyMarket.addMA50(symbol=symbol)
 
-                    if stock.TODAY.isInRangeMA(window=100):
+                    if stock.TODAY.isThroughMA(window=100):
                         self.dailyMarket.addMA100(symbol=symbol)
 
-                    if stock.TODAY.isInRangeMA(window=200):
+                    if stock.TODAY.isThroughMA(window=200):
                         self.dailyMarket.addMA200(symbol=symbol)
                     
-                    if stock.TODAY.isInRangeMAs(windows=[10,20,50,100,200]):
+                    if stock.TODAY.isThroughMAs(windows=[10,20,50,100,200]):
                         self.dailyMarket.addMultiMAs(symbol=symbol)
 
-                    if stock.TODAY.isElephant(window=10):
+                    if stock.TODAY.isElephant(window=20):
                         self.dailyMarket.addElephant(symbol=symbol)
 
                     if stock.TODAY.isBreakFlat():
+                        self.dailyMarket.addBreakFlat(symbol=symbol)
+                    
+                    if stock.TODAY.isThroughMA(window=10):
                         self.dailyMarket.addBreakFlat(symbol=symbol)
 
         return self.dailyMarket
