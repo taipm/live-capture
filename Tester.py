@@ -22,6 +22,7 @@ from TextBuilder import TextBuilder
 from Viewers import ViewOrders
 from VnDate import VnDate
 from StockNews import StockNews, StockNewsFromBSC, StockNewsFromCafeF
+from vnstock import *
 
 def Test_DateRange():
     r = DateRange(start_date=date(2022,10,1), end_date= date(2022,10,20))
@@ -184,6 +185,14 @@ def Test_DateData():
     for w in windows:
         print(f'Biến động giá {w}: {d.get_distance_price(window=w)}')
 
+import pandas as pd
+
+def Test_GetAllStocks():
+    stocks = listing_companies()['ticker']
+    df = pd.DataFrame(stocks)
+    df.to_excel('./stocks.xlsx')
+    return stocks.to_list()
+
 def runTest():
     # Test_DateRange()
     # Test_DividendStock()
@@ -206,6 +215,9 @@ def runTest():
     # Test_RichNumber()
     # Test_Viewers()
     # Test_Notes()
-    Test_DateData()
+    #Test_DateData()
+    #Test_GetAllStocks()
+
+    pass
 
 runTest()

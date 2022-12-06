@@ -118,7 +118,7 @@ class DateData:
         volume = self.volume
         max_volume = np.max(self.df_all_data['Volume'][0:window])
         pre_volumes = self.df_all_data['Volume'][1:window]
-        rate = 5
+        rate = 3
         if np.min(pre_volumes)>=5:
             if self.close > self.open:
                 if (volume >= rate*np.min(pre_volumes)) or (max_volume >= rate*np.min(pre_volumes)):

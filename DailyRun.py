@@ -10,6 +10,7 @@ def runDailyReport():
 def dailyScaner():
     scaner = StockScaner()
     dailyMarket = scaner.scan()
+    dailyMarket.saveToDb()
     print(dailyMarket)
 
     title = f'{StrTODAY} - DẤU ẤN THỊ TRƯỜNG'

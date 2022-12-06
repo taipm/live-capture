@@ -9,10 +9,18 @@ class Recommend(ObjectDb):
         self.type_recommend = type_recommend
         self.date_recommend = date_recommend
 
-    def profit(self, window:int)->float:
+    def profit(self, next_days:int)->float:
+        recommend_index = get_index_by_date(symbol = self.symbol, date=self.date_recommend)
+        print(f'Recommend index: {recommend_index} : {self.date_recommend}')
         price = get_price_by_date(symbol = self.symbol, date=str(self.date_recommend))
-        next_price = get_price_by_date(symbol = self.symbol, date='2022-12-02 21:10:46.529476')
-        return ((next_price-price)/price)*100
+        
+        index = recommend_index - next_days
+        next_price = get_price_by_index(symbol = self.symbol, index=index)
+        
+        profit = ((next_price-price)/price)*100
+        print(f'{price} - {self.date_recommend} | {next_price} : {index} -> {profit}')
+        
+        return profit
 
 r = Recommend(symbol='BSR',type_recommend='MA-GIAO NHAU', date_recommend='2022-11-02 21:10:46.529476')
-print(f'{r.profit(window=10):,.2f} (%)')
+print(f'{r.profit(next_days=10):,.2f} (%)')

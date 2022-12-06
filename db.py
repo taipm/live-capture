@@ -77,7 +77,9 @@ def get_stock_data_from_api(symbol):
                 df['M(NN)'] = df['NN']*df['Volume']*1000*100 #Giá trị giao dịch của khối ngoại (tỷ)
                 df['Oscillation'] = np.abs(((df['Low']-df['High'])/df['Low'])*100)
                 df['Oscillation-Down'] = ((df['Low']-df['Open'])/df['Open'])*100
-                df['Oscillation-Up'] = ((df['High']-df['Open'])/df['Open'])*100       
+                df['Oscillation-Up'] = ((df['High']-df['Open'])/df['Open'])*100
+
+                df.reset_index(inplace = True)
                 return df
         except: #Cổ phiếu chưa có trong danh mục
                 return pd.DataFrame()
@@ -87,6 +89,20 @@ def get_price_by_date(symbol, date:str)->float:
     data = data[data['Date'].map(lambda x: str(x).split(' ')[0] == date.split(' ')[0])]#.iloc[0]
     price = data['Close'].values[0]*1000
     return price
+
+def get_price_by_index(symbol, index:int)->float:
+    data = get_stock_data_from_api(symbol=symbol)
+    price = data['Close'].values[index]*1000
+    return price
+
+
+def get_index_by_date(symbol:str, date:str)->int:
+    data = get_stock_data_from_api(symbol=symbol)
+    df = data[data['Date'].map(lambda x: str(x).split(' ')[0] == date.split(' ')[0])]['Date']
+    # print(df)
+    # print(df.index)
+    return df.index.values[0]
+
 
 def GetStockData(symbol) -> pd.DataFrame:
         data = get_stock_data_from_api(symbol=symbol)
@@ -103,6 +119,29 @@ def GetStockData(symbol) -> pd.DataFrame:
                 print(f'{symbol} - chưa có trong danh mục')
                 return pd.DataFrame()
 
+def GetStockDataForTrendline(symbol) -> pd.DataFrame:
+        data = get_stock_data_from_api(symbol=symbol)
+        if not data.empty:
+                df = pd.DataFrame(data=data)
+                
+                df = df[df['Open'] > 0]
+                df = df[df['Volume']>0]
+
+                df['date'] = df['Date']
+                df['date'] = pd.to_datetime(df['date'])
+                del df['Date']
+                df = df.drop_duplicates(subset=['date'])
+                #df.set_index(["date"], inplace = True, append = True, drop = True)
+                df.set_index(['date'],inplace=True, drop=True)
+                del df['index']
+   
+                # resetting index
+                #df.reset_index(inplace = True)
+                print(df)
+                return df
+        else:
+                print(f'{symbol} - chưa có trong danh mục')
+                return pd.DataFrame()
 
 def get_intraday_data(symbol, page_num, page_size):
     """

@@ -1,5 +1,7 @@
+import datetime
 from DateHelper import StrTODAY
 from MongoDb import ObjectDb
+from RecommendDb import RecommendDb
 from vnstocklib.StockChart import StockChart
 
 class DailyMarketScore(ObjectDb):
@@ -124,7 +126,34 @@ class DailyMarketScore(ObjectDb):
         return list(set(symbols))
 
     def saveToDb(self):
-        pass
+        _now = str(datetime.datetime.now())
+        print(_now)
+        is_deleted_today = False
+        if len(self.Elephants) > 0:
+            db = RecommendDb(recommendLst=self.Elephants, type_recommend='Elephants', date_recommend=_now)
+            if not is_deleted_today:
+                db.deleteItemsOfToday()
+                is_deleted_today = True
+            db.saveAll()
+        if len(self.BreakFlats) > 0:
+            db = RecommendDb(recommendLst=self.BreakFlats, type_recommend='BreakFlats', date_recommend=_now)
+            if not is_deleted_today:
+                db.deleteItemsOfToday()
+                is_deleted_today = True
+            db.saveAll()
+        if len(self.ThroughMultiMAs) > 0:
+            db = RecommendDb(recommendLst=self.ThroughMultiMAs, type_recommend='ThroughMultiMAs', date_recommend=_now)
+            if not is_deleted_today:
+                db.deleteItemsOfToday()
+                is_deleted_today = True
+            db.saveAll()
+        if len(self.Break52Weeks) > 0:
+            db = RecommendDb(recommendLst=self.Break52Weeks, type_recommend='Break52Weeks', date_recommend=_now)
+            if not is_deleted_today:
+                db.deleteItemsOfToday()
+                is_deleted_today = True
+            db.saveAll()
+
 
     def StateMarket(self):
         count_CEs = len(self.CEs)

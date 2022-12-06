@@ -8,7 +8,7 @@ class StockScaner:
         self.dailyMarket = DailyMarketScore()
 
     def scan(self)->DailyMarketScore:
-        Errors = ['C99']
+        Errors = ['C99','FLC']
         for symbol in self.symbols:
             if symbol not in Errors:
                 stock = Stock(name=symbol)
@@ -59,13 +59,10 @@ class StockScaner:
                     if stock.TODAY.isThroughMAs(windows=[10,20,50,100,200]):
                         self.dailyMarket.addMultiMAs(symbol=symbol)
 
-                    if stock.TODAY.isElephant(window=20):
+                    if stock.TODAY.isElephant(window=10):
                         self.dailyMarket.addElephant(symbol=symbol)
 
                     if stock.TODAY.isBreakFlat():
-                        self.dailyMarket.addBreakFlat(symbol=symbol)
-                    
-                    if stock.TODAY.isThroughMA(window=10):
                         self.dailyMarket.addBreakFlat(symbol=symbol)
 
         return self.dailyMarket
