@@ -18,6 +18,7 @@ class DailyMarketScore(ObjectDb):
         self.Lowest = []
 
         self.Swings = []
+        self.Covers = []
         self.Sleeps = []
         
         self.Elephants = []
@@ -58,7 +59,9 @@ class DailyMarketScore(ObjectDb):
         self.MarketLiquidity:float
         self.MarketColor:str
 
-    
+    def addCover(self, symbol:str):
+        self.Covers.append(symbol)
+
     def addBreak52Weeks(self, symbol:str):
         self.Break52Weeks.append(symbol)
     
@@ -119,11 +122,12 @@ class DailyMarketScore(ObjectDb):
         symbols += ','.join(self.Elephants) + ','
         symbols += ','.join(self.BreakFlats) + ','
         symbols += ','.join(self.Break52Weeks) + ','
+        symbols += ','.join(self.Covers) + ','
         symbols += ','.join(self.ThroughMultiMAs)
         print(symbols)
-        symbols = symbols.split(',')[1:]
+        symbols = set(symbols.split(','))
         print(symbols)
-        return list(set(symbols))
+        return list(symbols)
 
     def saveToDb(self):
         _now = str(datetime.datetime.now())
@@ -149,6 +153,12 @@ class DailyMarketScore(ObjectDb):
             db.saveAll()
         if len(self.Break52Weeks) > 0:
             db = RecommendDb(recommendLst=self.Break52Weeks, type_recommend='Break52Weeks', date_recommend=_now)
+            if not is_deleted_today:
+                db.deleteItemsOfToday()
+                is_deleted_today = True
+            db.saveAll()
+        if len(self.Covers) > 0:
+            db = RecommendDb(recommendLst=self.Covers, type_recommend='Covers', date_recommend=_now)
             if not is_deleted_today:
                 db.deleteItemsOfToday()
                 is_deleted_today = True
@@ -186,6 +196,7 @@ class DailyMarketScore(ObjectDb):
         output = f'\nĐánh giá trạng thái: {self.StateMarket()}\n'
         
         output += f'\nElephants ({len(self.Elephants)}):\n{self.Elephants}\n'
+        output += f'\nCovers ({len(self.Covers)}):\n{self.Covers}\n'
         output += f'\nVượt đỉnh 52 tuần : ({len(self.Break52Weeks)}):\n{self.Break52Weeks}\n'
         output += f'\nVượt nền phẳng (flat): ({len(self.BreakFlats)}):\n{self.BreakFlats}\n'
 

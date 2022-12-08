@@ -166,7 +166,7 @@ def Test_Notes():
     print(db.getItemsOfToday())
 
 def Test_DateData():
-    s = Stock(name='HAX')
+    s = Stock(name='KDH')
     d = DateData(symbol=s.name, index=0, df_all_data=s.df_data)
     print(f'MA10: {d.getMA(window=10)}')
     print(f'MA20: {d.getMA(window=20)}')
@@ -215,7 +215,7 @@ def runTest():
     # Test_RichNumber()
     # Test_Viewers()
     # Test_Notes()
-    #Test_DateData()
+    Test_DateData()
     #Test_GetAllStocks()
 
     pass

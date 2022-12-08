@@ -44,12 +44,13 @@ class MongoDb:
             df = df[df['time'].map(lambda x: isToday(x)==True)]
             df = df.sort_values(by=['time'])
         return df
+        
     def deleteItemsOfToday(self):
         items = self.getItemsOfToday()
         for i in range(0, len(items)):
             item = items.iloc[i]
             del_query = {'time':item['time']}
             self.collection.delete_one(del_query)
-            
+
     def __str__(self):
         return f'TradingBook\n - {self.name}'

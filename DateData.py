@@ -127,6 +127,15 @@ class DateData:
         else:
             return False
 
+    def isCover(self):
+        before_data_item = self.df_all_data.iloc[1]
+        if self.high > before_data_item['High']:
+            if self.low < before_data_item['Low']:
+                if self.close > before_data_item['High']:
+                    return True
+        else:
+            return False
+
     @property
     def isSwing(self):
         d = self.get_distance_price(window=0)

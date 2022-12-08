@@ -4,16 +4,19 @@ from DailyMarketScore import DailyMarketScore
 
 class StockScaner:
     def __init__(self) -> None:
-        self.symbols = db.get_all_stocks_db()#[0:10]
+        #self.symbols = db.get_all_stocks_db()#[0:10]
+        self.symbols = db.get_all_stocks()#[0:10]
         self.dailyMarket = DailyMarketScore()
 
     def scan(self)->DailyMarketScore:
         Errors = ['C99','FLC']
+        print(len(self.symbols))
+        print(self.symbols)
         for symbol in self.symbols:
             if symbol not in Errors:
                 stock = Stock(name=symbol)
-                if stock.liquidity_min >= 5:
-
+                #if stock.IsOK:
+                if (not stock.df_data.empty) and stock.liquidity_min >= 5:
                     if stock.TODAY.isBreak52Week():
                         self.dailyMarket.addBreak52Weeks(symbol=symbol)
 
@@ -64,6 +67,9 @@ class StockScaner:
 
                     if stock.TODAY.isBreakFlat():
                         self.dailyMarket.addBreakFlat(symbol=symbol)
+                        
+                    if stock.TODAY.isCover():
+                        self.dailyMarket.addCover(symbol=symbol)
 
         return self.dailyMarket
     

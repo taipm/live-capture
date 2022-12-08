@@ -1,12 +1,9 @@
 import pandas as pd
-#import quandl as qdl
 from scipy.stats import linregress
 import matplotlib.pyplot as plt
 from db import *
-# get AAPL 10 years data
-
-#data = qdl.get("WIKI/AAPL", start_date="2007-01-01", end_date="2017-05-01")
-data = GetStockDataForTrendline(symbol='DPM')[0:5*52]
+symbol = 'HAH'
+data = GetStockDataForTrendline(symbol=symbol)[0:5*52]
 df = data.copy()
 data = df
 
@@ -57,7 +54,7 @@ data0['low_trend'] = reg[0] * data0['date_id'] + reg[1]
 #THỜI GIAN NGẮN HƠN
 
 #data = qdl.get("WIKI/AAPL", start_date="2007-01-01", end_date="2017-05-01")
-data = GetStockDataForTrendline(symbol='DPM')[0:5*4*3]
+data = GetStockDataForTrendline(symbol=symbol)[0:5*4*3]
 df = data.copy()
 data = df
 

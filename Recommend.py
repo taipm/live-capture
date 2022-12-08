@@ -22,5 +22,5 @@ class Recommend(ObjectDb):
         
         return profit
 
-r = Recommend(symbol='BSR',type_recommend='MA-GIAO NHAU', date_recommend='2022-11-02 21:10:46.529476')
-print(f'{r.profit(next_days=10):,.2f} (%)')
+# r = Recommend(symbol='BSR',type_recommend='MA-GIAO NHAU', date_recommend='2022-11-02 21:10:46.529476')
+# print(f'{r.profit(next_days=10):,.2f} (%)')

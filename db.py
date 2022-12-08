@@ -13,7 +13,9 @@ import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
 
 def get_all_stocks_db():
-    url = "https://stock.kdtv4.vn/api/app/company/?MaxResultCount=500"
+    COUNT = 1000#1620
+    #url = f"https://stock.kdtv4.vn/api/app/company/?MaxResultCount={COUNT}"
+    url = f"https://stock.kdtv4.vn/api/app/company"
     try:
         response = urlopen(url)                
         data_json = json.loads(response.read())                  
