@@ -219,6 +219,13 @@ class Stock:
         n_price = self.df_data.iloc[index-pre_count_of_days]['Close']
         return percent(price,n_price)
 
+    def getIndex(self, str_date:str):
+        data_item = self.df_data[self.df_data['Date'].map(lambda d:str(d)==str_date)]
+        #print(data_item)
+        return data_item
+    # def getProfit(self, fromDate:datetime, toDate:datetime):
+    #     from_index = self.(fromDate)
+
     def summary(self):
         output = f'{self.name} - {self.price} | {self.df_data["%"][0]:,.2f}(%)| {self.last_trans_date}'                
         output += f'\nThanh khoản: {self.liquidity:,.2f} (tỷ) | CN/TN: {self.liquidity_max:,.2f} | {self.liquidity_min:,.2f}'

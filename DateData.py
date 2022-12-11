@@ -76,7 +76,7 @@ class DateData:
         r = RangeMA(ma_price)
         return r
 
-    def getMA(self, window:int):
+    def getMA(self, window:int)->float:
         df = self.df_all_data.sort_values(by=['Date'])
         short_rolling = df['Close'].rolling(window=window).mean()        
         value = short_rolling[0]
@@ -127,8 +127,8 @@ class DateData:
         else:
             return False
 
-    def isCover(self):
-        before_data_item = self.df_all_data.iloc[1]
+    def isCover(self)->bool:
+        before_data_item = self.df_all_data.iloc[self.index+1]
         if self.high > before_data_item['High']:
             if self.low < before_data_item['Low']:
                 if self.close > before_data_item['High']:

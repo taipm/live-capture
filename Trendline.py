@@ -2,8 +2,9 @@ import pandas as pd
 from scipy.stats import linregress
 import matplotlib.pyplot as plt
 from db import *
-symbol = 'HAH'
-data = GetStockDataForTrendline(symbol=symbol)[0:5*52]
+
+symbol = 'VND'
+data = GetStockDataForTrendline(symbol=symbol)[0:5*26]
 df = data.copy()
 data = df
 

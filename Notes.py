@@ -12,10 +12,10 @@ class Note(ObjectDb):
         super().__init__()
         self.text = toStandard(text)
     
-    def __str__(self) -> str:
-        return super().__str__()
+    # def __str__(self) -> str:
+    #     return super().__str__()
 
-    def to_json(self):
-        return json.dumps(self,default=lambda o: o.__dict__)
+    # def to_json(self):
+    #     return json.dumps(self,default=lambda o: o.__dict__)
 
 #Test()

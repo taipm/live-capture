@@ -9,6 +9,7 @@ class RecommendDb(MongoDb):
         self.type_recommend = type_recommend
         self.date_recommend = date_recommend
 
+
     def saveAll(self):
         for symbol in self.recommends:
             self.addItem(Recommend(symbol=symbol,type_recommend=self.type_recommend, date_recommend=self.date_recommend))
