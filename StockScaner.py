@@ -12,11 +12,15 @@ class StockScaner:
         Errors = ['C99','FLC']
         print(len(self.symbols))
         print(self.symbols)
+        #self.symbols = ['CEO']
         for symbol in self.symbols:
             if symbol not in Errors:
                 stock = Stock(name=symbol)
                 #if stock.IsOK:
                 if (not stock.df_data.empty) and stock.liquidity_min >= 5:
+                    if stock.TODAY.isMinVolume(window=10):
+                        self.dailyMarket.addMinVolume(symbol=symbol)
+
                     if stock.TODAY.isBreak52Week():
                         self.dailyMarket.addBreak52Weeks(symbol=symbol)
 
@@ -70,6 +74,9 @@ class StockScaner:
                         
                     if stock.TODAY.isCover():
                         self.dailyMarket.addCover(symbol=symbol)
+                    
+                    if stock.TODAY.isUpVolume(rate=2, margin_price=2):
+                        self.dailyMarket.addUpVolume(symbol=symbol)
 
         return self.dailyMarket
     

@@ -1,3 +1,4 @@
+from time import sleep
 from Caculator import *
 import numpy as np
 from DateHelper import *
@@ -9,31 +10,32 @@ class DateData:
     '''
     DỮ LIỆU HÀNG NGÀY
     '''
-    def __init__(self, symbol, index, df_all_data:pd.DataFrame) -> None:
+    def __init__(self, symbol, index:int, df_all_data:pd.DataFrame) -> None:
         self.symbol = symbol.upper()
         self.index = index
         self.df_all_data = df_all_data
-        self.data_item = self.df_all_data.iloc[index]
+        #self.data_item = self.df_all_data.iloc[index]
+        self.data_item = self.df_all_data[self.df_all_data.index==index]
         
         self.date  = self.data_item['Date']
-        self.close = self.data_item['Close']
-        self.open = self.data_item['Open']
-        self.high = self.data_item['High']
-        self.low = self.data_item['Low']
-        self.volume = self.data_item['Volume']
-        self.margin = self.data_item['%']
+        self.close = float(self.data_item['Close'])
+        self.open = float(self.data_item['Open'])
+        self.high = float(self.data_item['High'])
+        self.low = float(self.data_item['Low'])
+        self.volume = float(self.data_item['Volume'])
+        self.margin = float(self.data_item['%'])
 
-        self.foriegn_buy = self.data_item['NN Mua']
-        self.foriegn_sell = self.data_item['NN Ban']
+        self.foriegn_buy = float(self.data_item['NN Mua'])
+        self.foriegn_sell = float(self.data_item['NN Ban'])
 
     @property
-    def price(self):
+    def price(self)->float:
         if self.close > 0:
             return self.close
         else:
             return self.open
     
-    def isBreakFlat(self):
+    def isBreakFlat(self)->bool:
         length = 10
         max = np.max(self.df_all_data[1:length]['Close'])
         min = np.min(self.df_all_data[1:length]['Close'])
@@ -45,7 +47,7 @@ class DateData:
         else:
             return False
 
-    def isBreak52Week(self):
+    def isBreak52Week(self)->bool:
         length = 5*4*12
         max = np.max(self.df_all_data[1:length]['Close'])
         min = np.min(self.df_all_data[1:length]['Close'])
@@ -114,10 +116,47 @@ class DateData:
         print(f'{window} : {min} -> {max} = {distance:,.2f}')
         return distance
     
+    def isUpVolume(self, rate:float, margin_price:float)->bool:
+        '''
+        current_vol >= rate*last_vol
+        '''
+        last_vol = self.df_all_data['Volume'].values[self.index+1]
+        current_vol = self.df_all_data['Volume'].values[self.index]
+        if self.symbol == "CEO":
+            print(f'{self.symbol} - {self.date}')
+            print(f'{current_vol} - {rate*last_vol}')
+            print(f'{self.close} - {self.open}')
+            sleep(5)
+        if current_vol >= rate*last_vol:
+            if self.close > self.open:
+                return True
+        else:
+            return False
+
+    def isMinVolume(self, window:int)->bool:
+        '''
+        current_vol >= rate*last_vol
+        '''
+        last_min_vol = np.min(self.df_all_data['Volume'].values[self.index+1:self.index+window])
+        current_vol = self.df_all_data['Volume'].values[self.index]
+        
+        last_min_price = np.min(self.df_all_data['Close'].values[self.index+1:self.index+window])
+        last_max_price = np.max(self.df_all_data['Close'].values[self.index+1:self.index+window])
+        current_price = self.df_all_data['Close'].values[self.index]
+        high_price = ((last_max_price-last_min_price)/last_min_price)*100
+
+        rate = 1
+        if current_vol <= rate*last_min_vol:
+            if current_price <= last_max_price and current_price >= last_min_price:
+                if high_price <= 5:
+                    return True
+        else:
+            return False
+
     def isElephant(self, window:int)->bool:
         volume = self.volume
-        max_volume = np.max(self.df_all_data['Volume'][0:window])
-        pre_volumes = self.df_all_data['Volume'][1:window]
+        max_volume = np.max(self.df_all_data['Volume'][self.index:self.index+window])
+        pre_volumes = self.df_all_data['Volume'][self.index+1:self.index+window]
         rate = 3
         if np.min(pre_volumes)>=5:
             if self.close > self.open:

@@ -22,6 +22,8 @@ class DailyMarketScore(ObjectDb):
         self.Sleeps = []
         
         self.Elephants = []
+        self.UpVolumes = []
+        self.MinVolumes = []
         self.BreakFlats = []
         self.Break52Weeks = []
 
@@ -58,6 +60,12 @@ class DailyMarketScore(ObjectDb):
         self.MarketIndex:float #Là điểm số thị trường
         self.MarketLiquidity:float
         self.MarketColor:str
+
+    def addUpVolume(self, symbol:str):
+        self.UpVolumes.append(symbol)
+
+    def addMinVolume(self, symbol:str):
+        self.MinVolumes.append(symbol)
 
     def addCover(self, symbol:str):
         self.Covers.append(symbol)
@@ -123,6 +131,8 @@ class DailyMarketScore(ObjectDb):
         symbols += ','.join(self.BreakFlats) + ','
         symbols += ','.join(self.Break52Weeks) + ','
         symbols += ','.join(self.Covers) + ','
+        symbols += ','.join(self.UpVolumes) + ','
+        symbols += ','.join(self.MinVolumes) + ','
         symbols += ','.join(self.ThroughMultiMAs)
         print(symbols)
         symbols = set(symbols.split(','))
@@ -133,6 +143,12 @@ class DailyMarketScore(ObjectDb):
         _now = str(datetime.datetime.now())
         print(_now)
         is_deleted_today = False
+        if len(self.MinVolumes) > 0:
+            db = RecommendDb(recommendLst=self.MinVolumes, type_recommend='MinVolumes', date_recommend=_now)
+            if not is_deleted_today:
+                db.deleteItemsOfToday()
+                is_deleted_today = True
+            db.saveAll()
         if len(self.Elephants) > 0:
             db = RecommendDb(recommendLst=self.Elephants, type_recommend='Elephants', date_recommend=_now)
             if not is_deleted_today:
@@ -159,6 +175,12 @@ class DailyMarketScore(ObjectDb):
             db.saveAll()
         if len(self.Covers) > 0:
             db = RecommendDb(recommendLst=self.Covers, type_recommend='Covers', date_recommend=_now)
+            if not is_deleted_today:
+                db.deleteItemsOfToday()
+                is_deleted_today = True
+            db.saveAll()
+        if len(self.UpVolumes) > 0:
+            db = RecommendDb(recommendLst=self.Covers, type_recommend='CoverVolumes', date_recommend=_now)
             if not is_deleted_today:
                 db.deleteItemsOfToday()
                 is_deleted_today = True
@@ -197,6 +219,8 @@ class DailyMarketScore(ObjectDb):
         
         output += f'\nElephants ({len(self.Elephants)}):\n{self.Elephants}\n'
         output += f'\nCovers ({len(self.Covers)}):\n{self.Covers}\n'
+        output += f'\nUpVolumes ({len(self.UpVolumes)}):\n{self.UpVolumes}\n'
+        output += f'\nMin-Volumes ({len(self.MinVolumes)}):\n{self.MinVolumes}\n'
         output += f'\nVượt đỉnh 52 tuần : ({len(self.Break52Weeks)}):\n{self.Break52Weeks}\n'
         output += f'\nVượt nền phẳng (flat): ({len(self.BreakFlats)}):\n{self.BreakFlats}\n'
 

@@ -136,7 +136,6 @@ def GetStockDataForTrendline(symbol) -> pd.DataFrame:
                 #df.set_index(["date"], inplace = True, append = True, drop = True)
                 df.set_index(['date'],inplace=True, drop=True)
                 del df['index']
-   
                 # resetting index
                 #df.reset_index(inplace = True)
                 print(df)
