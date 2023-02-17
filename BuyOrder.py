@@ -13,13 +13,19 @@ class BuyOrder(ObjectDb):
     BSC_SELL_FEE = 0.1/100
     BSC_SELL_TAX = 0.1/100
 
-    def __init__(self, symbol, volume, price) -> None:
+    def __init__(self, symbol, volume, price, date) -> None:
         self.symbol = symbol.upper()
         self.volume = volume
         self.price = price
         self.time = str(NOW)
         self.type = 'BUY'
-        self.market_price = get_now_price(self.symbol)
+        self.date = date
+        self.market_price = 0 #get_now_price(self.symbol)
+        #self.market_price = get_now_price(self.symbol)
+        self.note = ''
+
+    def addNote(self, note):
+        self.note += note
 
     def update(self):
         print(self.symbol)
@@ -59,5 +65,8 @@ class BuyOrder(ObjectDb):
         db.addItem(self)
 
     def __str__(self):
-        return f'{self.symbol} | Mua: {self.volume:,.0f} Giá: {self.price:,.0f} Phí (mua): {self.fee:,.0f} Tổng chi phí: {self.total_cost:,.0f}' +\
+        output = f'{self.symbol} : {self.date}'
+        output += f'\nMua: {self.volume:,.0f} Giá: {self.price:,.0f} Phí (mua): {self.fee:,.0f} Tổng chi phí: {self.total_cost:,.0f}' +\
                 f'\nGiá HT {self.market_price:,.2f} | LN: {RichNumber(self.current_profit).toText()} | Tỷ lệ: {self.current_rate_profit:,.2f} (%)'
+
+        return output

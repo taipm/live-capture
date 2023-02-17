@@ -12,21 +12,22 @@ class DateData:
     '''
     def __init__(self, symbol, index:int, df_all_data:pd.DataFrame) -> None:
         self.symbol = symbol.upper()
-        self.index = index
+        self.index = index# + 1
         self.df_all_data = df_all_data
-        #self.data_item = self.df_all_data.iloc[index]
-        self.data_item = self.df_all_data[self.df_all_data.index==index]
-        
-        self.date  = self.data_item['Date']
-        self.close = float(self.data_item['Close'])
-        self.open = float(self.data_item['Open'])
-        self.high = float(self.data_item['High'])
-        self.low = float(self.data_item['Low'])
-        self.volume = float(self.data_item['Volume'])
-        self.margin = float(self.data_item['%'])
+        self.length = len(self.df_all_data)
 
-        self.foriegn_buy = float(self.data_item['NN Mua'])
-        self.foriegn_sell = float(self.data_item['NN Ban'])
+        self.data_item = self.df_all_data[self.df_all_data.index==self.index]  
+        self.date  = self.data_item['Date'].values[0] #.values[self.index]        
+        self.close = float(self.data_item['Close'].values[0])#[self.index])
+        self.open = float(self.data_item['Open'].values[0])#[self.index])
+        self.high = float(self.data_item['High'].values[0])
+        self.low = float(self.data_item['Low'].values[0])
+        self.volume = float(self.data_item['Volume'].values[0])
+        self.margin = float(self.data_item['%'].values[0])
+
+        self.foriegn_buy = self.data_item['NN Mua'].values[0] #float(self.data_item['NN Mua'].values[0])
+        self.foriegn_sell = self.data_item['NN Ban'].values[0] #float(self.data_item['NN Ban'].values[0])
+        self.note = f''
 
     @property
     def price(self)->float:
@@ -34,11 +35,23 @@ class DateData:
             return self.close
         else:
             return self.open
-    
+
+    def getNextCandle(self, nextDays):
+        nextDay = nextDays
+        nextDays = 3
+        #print(self.df_all_data.loc[self.index])
+        return self.df_all_data.loc[self.index - nextDay:self.index]
+
+    def getProfit(self, nextDays):
+        df = self.getNextCandle(nextDays=nextDays).reset_index()
+        last_p= df['Close'][0]
+        p = df['Close'][3]
+        return ((last_p-p)/p)*100
+
     def isBreakFlat(self)->bool:
         length = 10
-        max = np.max(self.df_all_data[1:length]['Close'])
-        min = np.min(self.df_all_data[1:length]['Close'])
+        max = np.max(self.df_all_data[self.index+1:self.index+length]['Close'])
+        min = np.min(self.df_all_data[self.index+1:self.index+length]['Close'])
         high = ((max-min)/min)*100
 
         if high <= 7:
@@ -49,8 +62,8 @@ class DateData:
 
     def isBreak52Week(self)->bool:
         length = 5*4*12
-        max = np.max(self.df_all_data[1:length]['Close'])
-        min = np.min(self.df_all_data[1:length]['Close'])
+        max = np.max(self.df_all_data[self.index+1:self.index+length]['Close'])
+        min = np.min(self.df_all_data[self.index+1:self.index+length]['Close'])
         print(f'{self.symbol} - max: {max} : min {min} : HT {self.close}')
         if self.close > max:
             return True
@@ -101,10 +114,10 @@ class DateData:
         else:
             return False
     def getMaxPrice(self, window:int)->float:
-        return np.max(self.df_all_data['Close'][0:window])
+        return np.max(self.df_all_data['Close'][self.index:self.index+window])
 
     def getMinPrice(self, window:int)->float:
-        return np.min(self.df_all_data['Close'][0:window])
+        return np.min(self.df_all_data['Close'][self.index:self.index+window])
     
     def get_distance_price(self, window:int)->float:
         min = self.getMinPrice(window=window)
@@ -157,7 +170,7 @@ class DateData:
         volume = self.volume
         max_volume = np.max(self.df_all_data['Volume'][self.index:self.index+window])
         pre_volumes = self.df_all_data['Volume'][self.index+1:self.index+window]
-        rate = 3
+        rate = 2.5
         if np.min(pre_volumes)>=5:
             if self.close > self.open:
                 if (volume >= rate*np.min(pre_volumes)) or (max_volume >= rate*np.min(pre_volumes)):
@@ -199,9 +212,14 @@ class DateData:
         else:
             return False
 
+    def appendNote(self, note):
+        self.note += note
+
     @property
     def isLowest(self):
         if self.low == self.close:
+            self.appendNote(note='Giá thấp nhất ngày')
+
             return True
         else:
             return False
@@ -213,7 +231,7 @@ class DateData:
             return False
     @property
     def isGreen(self):
-        if self.close >= self.open:
+        if self.close > self.open:
             return True
         else:
             return False
@@ -242,5 +260,7 @@ class DateData:
         pass
 
     def __str__(self) -> str:
-        return f'{self.symbol} | {self.price:,.2f}'+\
-            f'{self.volume:,.0f}'
+        output = f'\n{self.symbol} - {self.date} | Giá: {self.price:,.2f} ({self.margin:,.2f} (%)) - KL: {self.volume:,.0f}'
+        output += f'\nOpen : {self.open} - Close: {self.close} - High: {self.high} - Low: {self.low} - d: {self.get_distance_price(window=0):,.2f} (%)\n'
+        #output += f'\nGhi chú: {self.note}'
+        return output

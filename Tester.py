@@ -38,6 +38,7 @@ def Test_DividendStock():
 
 def Test_Stock():
     stock = Stock(name='HAH')
+    print(stock.df_data)
     print(stock.summary())
 
 def Test_AnalysisPrice():
@@ -185,6 +186,13 @@ def Test_DateData():
     for w in windows:
         print(f'Biến động giá {w}: {d.get_distance_price(window=w)}')
 
+def Test_NextDay_DateData():
+    s = Stock(name='VND')
+    d = DateData(symbol=s.name, index=10, df_all_data=s.df_data)
+    print(f'Candles: {d.getNextCandle(nextDays=3)}')
+    print(f'Profit: {d.getProfit(nextDays=3):,.2f} (%)')
+    
+
 import pandas as pd
 
 def Test_GetAllStocks():
@@ -196,7 +204,8 @@ def Test_GetAllStocks():
 def runTest():
     # Test_DateRange()
     # Test_DividendStock()
-    # Test_Stock()
+    #Test_Stock()
+    Test_NextDay_DateData()
     # Test_AnalysisPrice()
     # Test_Translator()
     # Test_Alpha()
@@ -215,7 +224,7 @@ def runTest():
     # Test_RichNumber()
     # Test_Viewers()
     # Test_Notes()
-    Test_DateData()
+    #Test_DateData()
     #Test_GetAllStocks()
 
     pass

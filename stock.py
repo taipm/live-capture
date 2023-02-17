@@ -1,3 +1,4 @@
+from time import sleep
 from Caculator import *
 from DateData import DateData
 from DayData import *
@@ -9,7 +10,8 @@ import db
 import pandas as pd
 import numpy as np
 from vnstock import *
-    
+
+
 class Stock:
     def __init__(self, name) -> None:
         self.name = name.upper()
@@ -233,8 +235,8 @@ class Stock:
         output += f'\n{self.review_TA}'        
         output += f'\n{"-"*30}'
         
-        if not self.intraday.hasError:
-            output += f'\n{self.intraday.summary()}'
+        # if not self.intraday.hasError:
+        #     output += f'\n{self.intraday.summary()}'
 
         d = DayData(symbol=self.name, index = 0,df_all_data=self.df_data,count_days=10)
         output += f'\n{d.summary}'
@@ -249,6 +251,8 @@ class Stock:
         output += f'\n{self.chartUrl.weeklyChartUrl}'
         return output
     
+    
+
     def summaryToBlog(self):
         #self.priceAction = PriceAction(symbol=self.name,df_data=self.df_data,days=10)
         self.intraday = AnalysisIntradayData(self.name)
@@ -274,3 +278,9 @@ class Stock:
         output += f'\n{self.chartUrl.dailyChartUrl}'
         output += f'\n{self.chartUrl.weeklyChartUrl}'
         return output
+
+# symbols = ['HAX','MWG','BSR','NLG','VIB','VPB','DGC','FRT','NVL','IDC','SCR','DXG','HBC','ASM','IDI','BSI','VCI']
+# for symbol in symbols:
+#     s = Stock(name=symbol)
+#     s.scan()
+#     sleep(3)

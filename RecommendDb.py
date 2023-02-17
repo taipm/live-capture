@@ -9,6 +9,10 @@ class RecommendDb(MongoDb):
         self.type_recommend = type_recommend
         self.date_recommend = date_recommend
 
+    def getAllByType(self, type_recommend:str):
+        all_items = self.getAll()
+        items = all_items[all_items['type_recommend']==type_recommend]
+        return items
 
     def saveAll(self):
         for symbol in self.recommends:

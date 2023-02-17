@@ -22,8 +22,8 @@ class BlogPost:
         self.content = content
         self.tags = tags
 
-    # @setattr
-    # def title(self):
+    # def add_image(self, local_path):
+        
 
     def update_to_blog(self):
         blog = Blog()
@@ -117,3 +117,7 @@ class Blog:
 # x = blog.get_post(id='1696')
 # print("Bài mới: " + x.link)
 # print(blog.summary)
+
+# blog = Blog()
+# htmlContent = f'<img src="https://chart.vietstock.vn/trending/VICTrend.png" alt="VIC">'
+# blog.post(title='TEST',content=htmlContent,tags=['Test'])

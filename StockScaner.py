@@ -5,15 +5,17 @@ from DailyMarketScore import DailyMarketScore
 class StockScaner:
     def __init__(self) -> None:
         #self.symbols = db.get_all_stocks_db()#[0:10]
-        self.symbols = db.get_all_stocks()#[0:10]
+        #self.symbols = db.get_all_stocks()#[0:10]
+        self.symbols = db.get_all_stocks_db()
         self.dailyMarket = DailyMarketScore()
 
     def scan(self)->DailyMarketScore:
-        Errors = ['C99','FLC']
+        Errors = ['C99','FLC']#, 'VVS', 'XDC', 'HSV','CST', 'BVL', 'SGI',
+        #'TOS','VTZ','SSH','BCA', 'GMH','BIG', 'C4G', 'ODE', 'HMR']
         print(len(self.symbols))
         print(self.symbols)
         #self.symbols = ['CEO']
-        for symbol in self.symbols:
+        for symbol in self.symbols:#[0:10]:
             if symbol not in Errors:
                 stock = Stock(name=symbol)
                 #if stock.IsOK:

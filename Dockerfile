@@ -28,6 +28,7 @@ COPY . .
 
 RUN pip3 install --upgrade pip
 RUN pip3 install python-telegram-bot
+RUN pip3 install mplfinance
 #RUN pip3 install tesseract
 #RUN pip3 install pytesseract
 #RUN pip3 install selenium
@@ -48,6 +49,8 @@ RUN pip3 install html5lib
 RUN pip3 install translate
 RUN pip3 install langdetect
 RUN pip3 install pymongo
+RUN pip3 install beautifulsoup4
+
 #RUN pip3 install htmldocx
 #RUN pip3 install json-normalize
 

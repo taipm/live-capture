@@ -13,14 +13,19 @@ class SellOrder(ObjectDb):
     BSC_SELL_FEE = 0.1/100
     BSC_SELL_TAX = 0.01/100
 
-    def __init__(self, symbol,volume, price) -> None:
+    def __init__(self, symbol,volume, price, date) -> None:
         self.symbol = symbol.upper()
         self.volume = volume
         self.price = price
         self.time = str(NOW)
         self.type = 'SELL'
+        self.date = date
+        self.note = ''
         #self.market_price = 0
-                
+
+    def addNote(self, note):
+        self.note += note
+
     @property
     def income(self):
         return self.volume*self.price

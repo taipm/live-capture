@@ -30,6 +30,15 @@ class UrlCrawler:
         else:
             return None
 
+    @staticmethod
+    def getContent(url, css_class:str):
+        page = requests.get(url=url)
+        print(page.content)
+        soup = BeautifulSoup(page.content, "html.parser")
+        print(soup.text)
+        html = soup.find_all("div", class_ = "market-forexs")
+        return html
+
 
 # url ='https://www.channelnewsasia.com/business/vietnam-property-developer-no-va-land-cash-crunch-3049806'
 # txt = getTextFromUrl(url)

@@ -5,7 +5,3 @@ def toStandard(text):
     while '\n\n' in text:
         text = text.replace('\n\n', '\n')
     return text
-
-
-
-

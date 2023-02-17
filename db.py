@@ -14,8 +14,8 @@ ssl._create_default_https_context = ssl._create_unverified_context
 
 def get_all_stocks_db():
     COUNT = 1000#1620
-    #url = f"https://stock.kdtv4.vn/api/app/company/?MaxResultCount={COUNT}"
-    url = f"https://stock.kdtv4.vn/api/app/company"
+    url = f"https://stock.kdtv4.vn/api/app/company/?MaxResultCount={COUNT}"
+    #url = f"https://stock.kdtv4.vn/api/app/company"
     try:
         response = urlopen(url)                
         data_json = json.loads(response.read())                  
@@ -27,7 +27,7 @@ def get_all_stocks_db():
         return None
 
 def get_stock_data_from_api(symbol):
-        url = "https://stock.kdtv4.vn/api/app/company/by-stock-code?stockCode=" + symbol.upper()        
+        url = "https://stock.kdtv4.vn/api/app/company/by-stock-code?stockCode=" + symbol.upper()
         try:
                 response = urlopen(url)                
                 data_json = json.loads(response.read())
@@ -98,14 +98,6 @@ def get_price_by_index(symbol, index:int)->float:
     return price
 
 
-def get_index_by_date(symbol:str, date:str)->int:
-    data = get_stock_data_from_api(symbol=symbol)
-    df = data[data['Date'].map(lambda x: str(x).split(' ')[0] == date.split(' ')[0])]['Date']
-    # print(df)
-    # print(df.index)
-    return df.index.values[0]
-
-
 def GetStockData(symbol) -> pd.DataFrame:
         data = get_stock_data_from_api(symbol=symbol)
         if not data.empty:
@@ -115,11 +107,19 @@ def GetStockData(symbol) -> pd.DataFrame:
                 df = df[df['Volume']>0]
 
                 df = df.reset_index(drop=True)
+                df['Date'] = pd.to_datetime(df['Date'], format='%Y/%m/%d')
+                df['Stock'] = df['Stock'].astype(str)
                 df.set_index('Date')
+                df = df.sort_values(by=['Date'], ascending=True)
                 return df
         else:
                 print(f'{symbol} - chưa có trong danh mục')
                 return pd.DataFrame()
+
+def get_index_by_date(symbol:str, date)->int:
+    data = GetStockData(symbol=symbol)
+    df = data[data['Date'].map(lambda x: str(x).split(' ')[0] == str(date).split(' ')[0])]['Date']
+    return df.index.values[0]
 
 def GetStockDataForTrendline(symbol) -> pd.DataFrame:
         data = get_stock_data_from_api(symbol=symbol)

@@ -1,31 +1,27 @@
-from pathlib import Path
+#https://docs.python-telegram-bot.org/en/stable/examples.echobot.html
 from time import sleep
-from telegram.ext.updater import Updater
-from telegram.update import Update
-from telegram.ext.callbackcontext import CallbackContext
-from telegram.ext.commandhandler import CommandHandler
-from telegram.ext.messagehandler import MessageHandler
-from telegram.ext.filters import Filters
+from telegram.ext import Updater, CallbackContext, CommandHandler,MessageHandler,Application
+from telegram import Chat, ChatMember, ChatMemberUpdated, Update
 from Config import *
 from DateHelper import *
 from BotAnswer import BotAnswer
 from Messages import *
 from Notes import NoteDb
+from StockChart import plot_candlestick_chart
 from TelegramBot import TelegramBot
 from db import *
-#from TextBuilder import TextBuilder
 from TextCommand import *
 from BotTranslator import BotTranslator
 from Viewers import ViewOrders
+from telegram import ForceReply, Update
+from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 
-updater = Updater(TELE_TOKEN, use_context=True)
-
-def start(update: Update, context: CallbackContext):
+def start(update:Update, context: CallbackContext):
 	update.message.reply_text(
 		"Hello sir, Welcome to the Bot.Please write\
 		/help to see the commands available.")
 
-def help(update: Update, context: CallbackContext):
+def help(update, context: CallbackContext):
 	update.message.reply_text("""Available Commands :-
 	/VND - Trả về thông tin cổ phiếu VND (phục vụ giao dịch)
 	/#BDS (#CK, #BANKS, ...) - Trả về thông tin các nhóm ngành
@@ -33,25 +29,24 @@ def help(update: Update, context: CallbackContext):
 	/!VND(100,10)
 	/!VND(-100,10)
 	/? - Wolframe Alpha
-	/geeks - To get the GeeksforGeeks URL""")
+	""")
 
-def geeks_url(update: Update, context: CallbackContext):
-	update.message.reply_text(
-		"GeeksforGeeks URL => https://www.geeksforgeeks.org/")
+async def plot_graph(update:Update, context: ContextTypes.DEFAULT_TYPE):
+	today = datetime.datetime.now()
+	today_str = today.strftime("%Y-%m-%d")
+	input_text = toStandard(update.message.text)
+	if len(input_text) == 3:
+		buf = plot_candlestick_chart(symbol=input_text.upper(),start_date='2022-06-01',end_date=today_str)   
+		await update.effective_chat.send_photo(photo=buf)
+	else:
+		await update.message.reply_text(f"{input_text} is not stock symbol")
 
 
-def news_handler(update: Update, context: CallbackContext):
-	try:
-		text = ""#getNews_wallstreet()
-		update.message.reply_text(text=text)
-	except:
-		update.message.reply_text("Không được đọc chữ")
-
-def unknown(update: Update, context: CallbackContext):
+def unknown(update:Update, context: CallbackContext):
     update.message.reply_text(
 		"Sorry '%s' is not a valid command" % update.message.text)
 
-def unknown_text(update: Update, context: CallbackContext):	
+def unknown_text(update:Update, context: CallbackContext):	
 	bot = TelegramBot(update=update,context=context)
 
 	input_text = toStandard(update.message.text)
@@ -118,15 +113,18 @@ def unknown_text(update: Update, context: CallbackContext):
 			else:
 				update.message.reply_text(rs)
 
-def main():
-	updater.dispatcher.add_handler(CommandHandler('start', start))
-	updater.dispatcher.add_handler(CommandHandler('help', help))
-	updater.dispatcher.add_handler(CommandHandler('geeks', geeks_url))
-	updater.dispatcher.add_handler(CommandHandler('news', news_handler))		
-	updater.dispatcher.add_handler(MessageHandler(Filters.command, unknown)) # Filters out unknown commands
-	# Filters out unknown messages.
-	updater.dispatcher.add_handler(MessageHandler(Filters.text, unknown_text))	
-	updater.start_polling(timeout=60)
+def main():	
+	application = Application.builder().token(TELE_TOKEN).build()
+	application.add_handler(CommandHandler("start", start))
+	application.add_handler(CommandHandler("help", help))	
+	# on non command i.e message - echo the message on Telegram
+	application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, plot_graph))
 
-main()
+	application.run_polling(timeout=60)
+	
+	#application.run_polling(allowed_updates=Update.ALL_TYPES)
+	#updater.run_polling(timeout=60)
+
+if __name__ == "__main__":
+    main()
 

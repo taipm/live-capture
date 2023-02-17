@@ -21,8 +21,14 @@ def dailyScaner():
     print(url)
     return url
 
+
+from MongoDb import MongoDb
+def updateRecommends():
+    recommends = MongoDb(name='Recommends').getAll()
+    print(recommends)
+
 def run():
-    #runDailyReport()
     dailyScaner()
+    #updateRecommends()
 
 run()

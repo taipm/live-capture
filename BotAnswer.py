@@ -1,4 +1,3 @@
-from DividendStock import DividendStock
 from RichNumber import RichNumber
 from Stock import Stock
 from BlogManager import *
